@@ -22,7 +22,7 @@ You are creating a daily English lesson for a Chinese beginner.
 Return valid JSON only. Do not include markdown fences.
 
 Requirements:
-- About 180 to 220 words of English total.
+- About 150 to 180 words of English total.
 - Use easy, beginner-friendly English.
 - Topic can be a light current event or a safe general-interest modern topic.
 - If you are not sure about a breaking-news fact, avoid specific claims and choose a safer topic.
@@ -58,6 +58,10 @@ JSON schema:
   "sourceNote": "string"
 }
 `;
+
+console.log("=== DeepSeek Prompt Start ===");
+console.log(prompt);
+console.log("=== DeepSeek Prompt End ===");
 
 const content = await generateLessonContent();
 
@@ -107,7 +111,7 @@ async function generateLessonContent() {
       body: {
         model: "deepseek-v4-flash",
         temperature: 0.8,
-        max_tokens: 2200,
+        max_tokens: 4200,
         response_format: { type: "json_object" },
         messages: buildMessages(),
       },
@@ -117,7 +121,7 @@ async function generateLessonContent() {
       body: {
         model: "deepseek-v4-flash",
         temperature: 0.6,
-        max_tokens: 2600,
+        max_tokens: 4200,
         messages: buildMessages(),
       },
     },
@@ -134,7 +138,7 @@ async function generateLessonContent() {
       }
 
       failures.push(
-        `${attempt.label}: empty content (finish_reason=${payload?.choices?.[0]?.finish_reason || "unknown"})`
+        `${attempt.label}: empty content (finish_reason=${payload?.choices?.[0]?.finish_reason || "unknown"}) ${describePayload(payload)}`
       );
     } catch (error) {
       failures.push(`${attempt.label}: ${error.message}`);
@@ -159,6 +163,10 @@ function buildMessages() {
 }
 
 async function requestLesson(body) {
+  console.log("=== DeepSeek Request Body Start ===");
+  console.log(JSON.stringify(body, null, 2));
+  console.log("=== DeepSeek Request Body End ===");
+
   const response = await fetch("https://api.deepseek.com/chat/completions", {
     method: "POST",
     headers: {
@@ -170,10 +178,17 @@ async function requestLesson(body) {
 
   if (!response.ok) {
     const errorBody = await response.text();
+    console.log("=== DeepSeek Error Response Start ===");
+    console.log(errorBody);
+    console.log("=== DeepSeek Error Response End ===");
     throw new Error(`DeepSeek API failed: ${response.status} ${errorBody}`);
   }
 
-  return response.json();
+  const payload = await response.json();
+  console.log("=== DeepSeek Raw Response Start ===");
+  console.log(JSON.stringify(payload, null, 2));
+  console.log("=== DeepSeek Raw Response End ===");
+  return payload;
 }
 
 function readAssistantContent(payload) {
@@ -210,7 +225,46 @@ function readAssistantContent(payload) {
     return choice.text.trim();
   }
 
+  if (typeof message?.reasoning_content === "string" && message.reasoning_content.trim()) {
+    return message.reasoning_content.trim();
+  }
+
   return "";
+}
+
+function describePayload(payload) {
+  const choice = payload?.choices?.[0];
+  const message = choice?.message;
+  const content = message?.content;
+  const contentPreview = Array.isArray(content)
+    ? content
+        .map((item) => {
+          if (typeof item === "string") {
+            return item;
+          }
+          if (item?.type === "text" && typeof item.text === "string") {
+            return item.text;
+          }
+          return JSON.stringify(item);
+        })
+        .join("")
+    : typeof content === "string"
+      ? content
+      : "";
+
+  const debug = {
+    finish_reason: choice?.finish_reason || null,
+    content_type: Array.isArray(content) ? "array" : typeof content,
+    content_length: contentPreview.length,
+    content_preview: contentPreview.slice(0, 400),
+    reasoning_length: typeof message?.reasoning_content === "string" ? message.reasoning_content.length : 0,
+    reasoning_preview:
+      typeof message?.reasoning_content === "string"
+        ? message.reasoning_content.slice(0, 400)
+        : "",
+  };
+
+  return JSON.stringify(debug);
 }
 
 function extractJsonString(content) {
