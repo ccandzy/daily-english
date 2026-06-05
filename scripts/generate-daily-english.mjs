@@ -29,7 +29,9 @@ Requirements:
 - Output exactly 3 short paragraphs.
 - After each English paragraph, provide a natural Chinese translation.
 - Include 5 short phrases, 5 difficult words, and 5 common useful words.
-- For the word hover dictionary, include 25 to 45 simple English-to-Chinese entries.
+- For the word hover dictionary, include every English word used in the 3 paragraphs.
+- Do not miss any word, including articles, pronouns, prepositions, numbers, names, and singular/plural forms.
+- Dictionary keys must use the exact basic word form that appears after removing leading or trailing punctuation.
 - Use concise Chinese translations.
 
 JSON schema:
@@ -120,6 +122,8 @@ function validateLesson(data) {
   if (!data.title || !data.topic || !data.date || !data.dictionary) {
     throw new Error("Lesson is missing required top-level fields.");
   }
+
+  assertDictionaryCoverage(data.paragraphs, data.dictionary);
 }
 
 function escapeHtml(value) {
@@ -133,19 +137,50 @@ function escapeHtml(value) {
 
 function buildWordMap(dictionary) {
   return Object.fromEntries(
-    Object.entries(dictionary).map(([key, value]) => [key.toLowerCase(), String(value)])
+    Object.entries(dictionary).map(([key, value]) => [normalizeWord(key), String(value).trim()])
   );
 }
 
 function wrapWords(text, dictionary) {
   return escapeHtml(text).replace(/[A-Za-z0-9.'-]+/g, (token) => {
-    const meaning = dictionary[token.toLowerCase()];
+    const normalized = normalizeWord(token);
+    const meaning = dictionary[normalized];
     if (!meaning) {
-      return token;
+      throw new Error(`Missing dictionary meaning for token: ${token}`);
     }
 
-    return `<span class="word" data-meaning="${escapeHtml(meaning)}">${token}</span>`;
+    return `<span class="word" tabindex="0" data-meaning="${escapeHtml(meaning)}">${token}</span>`;
   });
+}
+
+function normalizeWord(word) {
+  return String(word)
+    .toLowerCase()
+    .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+}
+
+function extractWordTokens(paragraphs) {
+  const tokens = [];
+  for (const block of paragraphs) {
+    const matches = String(block.english).match(/[A-Za-z0-9.'-]+/g) || [];
+    for (const token of matches) {
+      const normalized = normalizeWord(token);
+      if (normalized) {
+        tokens.push(normalized);
+      }
+    }
+  }
+  return [...new Set(tokens)];
+}
+
+function assertDictionaryCoverage(paragraphs, dictionary) {
+  const wordMap = buildWordMap(dictionary);
+  const missing = extractWordTokens(paragraphs).filter((token) => !wordMap[token]);
+  if (missing.length > 0) {
+    throw new Error(
+      `Dictionary is missing ${missing.length} article words: ${missing.join(", ")}`
+    );
+  }
 }
 
 function buildHtml(lessonData, currentSiteUrl) {
@@ -332,7 +367,8 @@ function buildHtml(lessonData, currentSiteUrl) {
 
     .word:hover::after,
     .word:active::after,
-    .word:focus-visible::after {
+    .word:focus-visible::after,
+    .word.is-open::after {
       content: attr(data-meaning);
       position: absolute;
       left: 50%;
@@ -421,7 +457,8 @@ function buildHtml(lessonData, currentSiteUrl) {
 
       .word:hover::after,
       .word:active::after,
-      .word:focus-visible::after {
+      .word:focus-visible::after,
+      .word.is-open::after {
         left: 0;
         transform: none;
       }
@@ -465,6 +502,29 @@ function buildHtml(lessonData, currentSiteUrl) {
   </div>
 
   <script>
+    const words = Array.from(document.querySelectorAll(".word"));
+
+    for (const word of words) {
+      word.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = !word.classList.contains("is-open");
+        closeWordTooltips();
+        if (willOpen) {
+          word.classList.add("is-open");
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      closeWordTooltips();
+    });
+
+    function closeWordTooltips() {
+      for (const word of words) {
+        word.classList.remove("is-open");
+      }
+    }
+
     function toggleTranslation(index, button) {
       const el = document.getElementById("translation-" + index);
       const isOpen = el.classList.toggle("show");
