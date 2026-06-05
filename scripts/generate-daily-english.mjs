@@ -59,46 +59,11 @@ JSON schema:
 }
 `;
 
-const response = await fetch("https://api.deepseek.com/chat/completions", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${apiKey}`,
-  },
-  body: JSON.stringify({
-    model: "deepseek-v4-flash",
-    temperature: 0.8,
-    max_tokens: 2200,
-    response_format: { type: "json_object" },
-    messages: [
-      {
-        role: "system",
-        content:
-          "You generate safe, beginner-friendly English study materials in strict JSON.",
-      },
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-  }),
-});
-
-if (!response.ok) {
-  const body = await response.text();
-  throw new Error(`DeepSeek API failed: ${response.status} ${body}`);
-}
-
-const payload = await response.json();
-const content = payload?.choices?.[0]?.message?.content;
-
-if (!content) {
-  throw new Error("DeepSeek API returned no content.");
-}
+const content = await generateLessonContent();
 
 let lesson;
 try {
-  lesson = JSON.parse(content);
+  lesson = JSON.parse(extractJsonString(content));
 } catch (error) {
   throw new Error(`Failed to parse lesson JSON: ${error.message}\n${content}`);
 }
@@ -133,6 +98,139 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+async function generateLessonContent() {
+  const attempts = [
+    {
+      label: "json-response-format",
+      body: {
+        model: "deepseek-v4-flash",
+        temperature: 0.8,
+        max_tokens: 2200,
+        response_format: { type: "json_object" },
+        messages: buildMessages(),
+      },
+    },
+    {
+      label: "plain-text-json-fallback",
+      body: {
+        model: "deepseek-v4-flash",
+        temperature: 0.6,
+        max_tokens: 2600,
+        messages: buildMessages(),
+      },
+    },
+  ];
+
+  const failures = [];
+
+  for (const attempt of attempts) {
+    try {
+      const payload = await requestLesson(attempt.body);
+      const content = readAssistantContent(payload);
+      if (content) {
+        return content;
+      }
+
+      failures.push(
+        `${attempt.label}: empty content (finish_reason=${payload?.choices?.[0]?.finish_reason || "unknown"})`
+      );
+    } catch (error) {
+      failures.push(`${attempt.label}: ${error.message}`);
+    }
+  }
+
+  throw new Error(`DeepSeek API returned no usable content. ${failures.join(" | ")}`);
+}
+
+function buildMessages() {
+  return [
+    {
+      role: "system",
+      content:
+        "You generate safe, beginner-friendly English study materials in strict JSON.",
+    },
+    {
+      role: "user",
+      content: prompt,
+    },
+  ];
+}
+
+async function requestLesson(body) {
+  const response = await fetch("https://api.deepseek.com/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`DeepSeek API failed: ${response.status} ${errorBody}`);
+  }
+
+  return response.json();
+}
+
+function readAssistantContent(payload) {
+  const choice = payload?.choices?.[0];
+  const message = choice?.message;
+  const content = message?.content;
+
+  if (typeof content === "string" && content.trim()) {
+    return content.trim();
+  }
+
+  if (Array.isArray(content)) {
+    const text = content
+      .map((item) => {
+        if (typeof item === "string") {
+          return item;
+        }
+
+        if (item?.type === "text" && typeof item.text === "string") {
+          return item.text;
+        }
+
+        return "";
+      })
+      .join("")
+      .trim();
+
+    if (text) {
+      return text;
+    }
+  }
+
+  if (typeof choice?.text === "string" && choice.text.trim()) {
+    return choice.text.trim();
+  }
+
+  return "";
+}
+
+function extractJsonString(content) {
+  const trimmed = String(content).trim();
+  if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+    return trimmed;
+  }
+
+  const fencedMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+  if (fencedMatch?.[1]) {
+    return fencedMatch[1].trim();
+  }
+
+  const firstBrace = trimmed.indexOf("{");
+  const lastBrace = trimmed.lastIndexOf("}");
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    return trimmed.slice(firstBrace, lastBrace + 1);
+  }
+
+  return trimmed;
 }
 
 function buildWordMap(dictionary) {
