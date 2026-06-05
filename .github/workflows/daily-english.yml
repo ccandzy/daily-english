@@ -27,7 +27,7 @@ jobs:
 
       - name: Generate daily lesson
         env:
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          DEEPSEEK_API_KEY: ${{sk-99cb4600c0e94fbbb441c04a3c27f251 }}
           SITE_URL: https://ccandzy.github.io/daily-english/
         run: node scripts/generate-daily-english.mjs
 
