@@ -20,6 +20,9 @@ const prompt = `
 You are creating a daily English lesson for a Chinese beginner.
 
 Return valid JSON only. Do not include markdown fences.
+Do not show your thinking, plan, notes, analysis, or word-count process.
+Do not explain the schema.
+Do not output any text before or after the JSON object.
 
 Requirements:
 - About 150 to 180 words of English total.
@@ -29,9 +32,6 @@ Requirements:
 - Output exactly 3 short paragraphs.
 - After each English paragraph, provide a natural Chinese translation.
 - Include 5 short phrases, 5 difficult words, and 5 common useful words.
-- For the word hover dictionary, include every English word used in the 3 paragraphs.
-- Do not miss any word, including articles, pronouns, prepositions, numbers, names, and singular/plural forms.
-- Dictionary keys must use the exact basic word form that appears after removing leading or trailing punctuation.
 - Use concise Chinese translations.
 
 JSON schema:
@@ -52,9 +52,6 @@ JSON schema:
   "commonWords": [
     { "term": "string", "meaning": "string" }
   ],
-  "dictionary": {
-    "word": "中文"
-  },
   "sourceNote": "string"
 }
 `;
@@ -88,11 +85,9 @@ function validateLesson(data) {
     }
   }
 
-  if (!data.title || !data.topic || !data.date || !data.dictionary) {
+  if (!data.title || !data.topic || !data.date) {
     throw new Error("Lesson is missing required top-level fields.");
   }
-
-  assertDictionaryCoverage(data.paragraphs, data.dictionary);
 }
 
 function escapeHtml(value) {
@@ -110,7 +105,7 @@ async function generateLessonContent() {
       label: "json-response-format",
       body: {
         model: "deepseek-v4-flash",
-        temperature: 0.8,
+        temperature: 0.3,
         max_tokens: 4200,
         response_format: { type: "json_object" },
         messages: buildMessages(),
@@ -120,7 +115,7 @@ async function generateLessonContent() {
       label: "plain-text-json-fallback",
       body: {
         model: "deepseek-v4-flash",
-        temperature: 0.6,
+        temperature: 0.2,
         max_tokens: 4200,
         messages: buildMessages(),
       },
@@ -134,7 +129,20 @@ async function generateLessonContent() {
       const payload = await requestLesson(attempt.body);
       const content = readAssistantContent(payload);
       if (content) {
-        return content;
+        const extracted = extractJsonString(content);
+        if (looksLikeJsonObject(extracted)) {
+          return extracted;
+        }
+
+        const repaired = await repairLessonContent(content);
+        if (repaired) {
+          return repaired;
+        }
+
+        failures.push(
+          `${attempt.label}: non-JSON content ${describePayload(payload)}`
+        );
+        continue;
       }
 
       failures.push(
@@ -153,7 +161,7 @@ function buildMessages() {
     {
       role: "system",
       content:
-        "You generate safe, beginner-friendly English study materials in strict JSON.",
+        "You generate safe, beginner-friendly English study materials in strict JSON. Never reveal chain-of-thought, planning notes, or analysis. Return only the final JSON object.",
     },
     {
       role: "user",
@@ -287,21 +295,62 @@ function extractJsonString(content) {
   return trimmed;
 }
 
-function buildWordMap(dictionary) {
-  return Object.fromEntries(
-    Object.entries(dictionary).map(([key, value]) => [normalizeWord(key), String(value).trim()])
-  );
+function looksLikeJsonObject(text) {
+  const trimmed = String(text).trim();
+  return trimmed.startsWith("{") && trimmed.endsWith("}");
 }
 
-function wrapWords(text, dictionary) {
+async function repairLessonContent(rawContent) {
+  const repairPrompt = `
+Convert the following model output into one valid JSON object only.
+
+Rules:
+- Output valid JSON only.
+- Do not include markdown fences.
+- Do not include analysis, notes, planning, or word counts.
+- Use the lesson content already present in the draft.
+- If the draft contains planning text, ignore it and keep only the final lesson result.
+- Preserve the required schema exactly.
+
+Draft content:
+${rawContent}
+`;
+
+  console.log("=== DeepSeek Repair Prompt Start ===");
+  console.log(repairPrompt);
+  console.log("=== DeepSeek Repair Prompt End ===");
+
+  const payload = await requestLesson({
+    model: "deepseek-v4-flash",
+    temperature: 0.1,
+    max_tokens: 4200,
+    response_format: { type: "json_object" },
+    messages: [
+      {
+        role: "system",
+        content:
+          "You convert messy lesson drafts into one strict JSON object. Return only JSON and never include reasoning.",
+      },
+      {
+        role: "user",
+        content: repairPrompt,
+      },
+    ],
+  });
+
+  const content = readAssistantContent(payload);
+  const extracted = extractJsonString(content);
+  if (looksLikeJsonObject(extracted)) {
+    return extracted;
+  }
+
+  return "";
+}
+
+function wrapWords(text) {
   return escapeHtml(text).replace(/[A-Za-z0-9.'-]+/g, (token) => {
     const normalized = normalizeWord(token);
-    const meaning = dictionary[normalized];
-    if (!meaning) {
-      throw new Error(`Missing dictionary meaning for token: ${token}`);
-    }
-
-    return `<span class="word" tabindex="0" data-meaning="${escapeHtml(meaning)}">${token}</span>`;
+    return `<span class="word" tabindex="0" data-word="${escapeHtml(normalized)}" data-meaning="点击或悬浮可翻译">${token}</span>`;
   });
 }
 
@@ -311,37 +360,12 @@ function normalizeWord(word) {
     .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
 }
 
-function extractWordTokens(paragraphs) {
-  const tokens = [];
-  for (const block of paragraphs) {
-    const matches = String(block.english).match(/[A-Za-z0-9.'-]+/g) || [];
-    for (const token of matches) {
-      const normalized = normalizeWord(token);
-      if (normalized) {
-        tokens.push(normalized);
-      }
-    }
-  }
-  return [...new Set(tokens)];
-}
-
-function assertDictionaryCoverage(paragraphs, dictionary) {
-  const wordMap = buildWordMap(dictionary);
-  const missing = extractWordTokens(paragraphs).filter((token) => !wordMap[token]);
-  if (missing.length > 0) {
-    throw new Error(
-      `Dictionary is missing ${missing.length} article words: ${missing.join(", ")}`
-    );
-  }
-}
-
 function buildHtml(lessonData, currentSiteUrl) {
-  const dictionary = buildWordMap(lessonData.dictionary);
   const articleHtml = lessonData.paragraphs
     .map(
       (block, index) => `
         <div class="article-block">
-          <p>${wrapWords(block.english, dictionary)}</p>
+          <p>${wrapWords(block.english)}</p>
           <button class="toggle-btn" type="button" onclick="toggleTranslation(${index}, this)">显示中文翻译</button>
           <div class="translation" id="translation-${index}">${escapeHtml(block.chinese)}</div>
         </div>
@@ -356,7 +380,7 @@ function buildHtml(lessonData, currentSiteUrl) {
   const safeTopic = escapeHtml(lessonData.topic);
   const safeDate = escapeHtml(lessonData.date);
   const safeTip = escapeHtml(
-    lessonData.summaryTipZh || "把鼠标放在英文单词上，可以看到中文翻译。每段后面都可以点击按钮查看中文。"
+    lessonData.summaryTipZh || "把鼠标放在英文单词上，或在手机上点击英文单词，可以实时查看中文翻译。每段后面都可以点击按钮查看中文。"
   );
   const safeSource = escapeHtml(lessonData.sourceNote || "AI-generated lesson for daily English reading.");
   const safeUrl = currentSiteUrl ? `<a href="${escapeHtml(currentSiteUrl)}">${escapeHtml(currentSiteUrl)}</a>` : "";
@@ -627,6 +651,7 @@ function buildHtml(lessonData, currentSiteUrl) {
         <section id="article">${articleHtml}</section>
         <p class="footer">
           ${safeSource}
+          <br>Word translation on hover or tap uses the MyMemory public translation API.
           ${safeUrl ? `<br>Site: ${safeUrl}` : ""}
         </p>
       </main>
@@ -654,15 +679,25 @@ function buildHtml(lessonData, currentSiteUrl) {
   </div>
 
   <script>
+    const translationCache = new Map();
     const words = Array.from(document.querySelectorAll(".word"));
 
     for (const word of words) {
+      word.addEventListener("mouseenter", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("focus", () => {
+        loadTranslation(word);
+      });
+
       word.addEventListener("click", (event) => {
         event.stopPropagation();
         const willOpen = !word.classList.contains("is-open");
         closeWordTooltips();
         if (willOpen) {
           word.classList.add("is-open");
+          loadTranslation(word);
         }
       });
     }
@@ -675,6 +710,83 @@ function buildHtml(lessonData, currentSiteUrl) {
       for (const word of words) {
         word.classList.remove("is-open");
       }
+    }
+
+    async function loadTranslation(word) {
+      const key = word.dataset.word || normalizeWord(word.textContent || "");
+      if (!key) {
+        word.dataset.meaning = "暂无翻译";
+        return;
+      }
+
+      if (translationCache.has(key)) {
+        word.dataset.meaning = translationCache.get(key);
+        return;
+      }
+
+      word.dataset.meaning = "翻译中...";
+
+      try {
+        const params = new URLSearchParams({
+          q: key,
+          langpair: "en|zh-CN",
+          mt: "1"
+        });
+        const response = await fetch("https://api.mymemory.translated.net/get?" + params.toString());
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        const translated =
+          data?.responseData?.translatedText ||
+          data?.matches?.find((item) => item?.translation)?.translation ||
+          "";
+
+        const clean = normalizeTranslation(translated, key);
+        const finalMeaning = clean || "暂无翻译";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      } catch (error) {
+        const fallback = localFallback(key);
+        const finalMeaning = fallback || "翻译失败，请稍后再试";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      }
+    }
+
+    function normalizeWord(value) {
+      return String(value).toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+    }
+
+    function normalizeTranslation(value, sourceWord) {
+      const text = String(value || "").trim();
+      if (!text) {
+        return "";
+      }
+
+      const lowered = text.toLowerCase();
+      if (lowered === String(sourceWord).toLowerCase()) {
+        return "";
+      }
+
+      return text.replace(/^zh-cn\\|/i, "").trim();
+    }
+
+    function localFallback(word) {
+      const fallback = {
+        a: "一个",
+        an: "一个",
+        and: "和",
+        are: "是",
+        in: "在……里",
+        is: "是",
+        of: "……的",
+        on: "在……上",
+        the: "这；这个",
+        to: "到；去；用于不定式"
+      };
+      return fallback[word] || "";
     }
 
     function toggleTranslation(index, button) {
