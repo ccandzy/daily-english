@@ -1,0 +1,14 @@
+name: Sync to Gitee
+on: [push]
+jobs:
+  repo-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mirror the Github repo to Gitee
+        uses: Yikun/gitee-repo-sync@master
+        with:
+          src: github/ccandzy
+          dst: gitee/ccandzy
+          dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
+          dst_token: ${{ secrets.GITEE_TOKEN }}
+          static_list: "daily-english"
