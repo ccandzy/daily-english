@@ -10,5 +10,4 @@ jobs:
           src: github/ccandzy/daily-english
           dst: gitee/ccandzy/daily-english
           dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
-          dst_token: ${{ secrets.GITEE_TOKEN }}
           static_list: "daily-english"
