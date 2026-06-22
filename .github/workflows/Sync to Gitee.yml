@@ -14,9 +14,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Sync to Gitee
+      - name: Setup SSH
         env:
-          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+          SSH_KEY: ${{ secrets.GITEE_PRIVATE_KEY }}
         run: |
-          git remote add gitee https://oauth2:${GITEE_TOKEN}@gitee.com/ccandzy/daily-english.git
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H gitee.com >> ~/.ssh/known_hosts
+
+      - name: Sync to Gitee
+        run: |
+          git remote add gitee git@gitee.com:ccandzy/daily-english.git
           git push gitee main --force --tags
