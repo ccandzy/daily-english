@@ -1,6 +1,11 @@
 name: Sync to Gitee
 
-on: [push]
+on:
+  workflow_run:
+    workflows:
+      - "Daily English Generator"    # 把这儿改成触发的 workflow 名称（或多个）
+    types:
+      - completed
 
 permissions:
   contents: read
