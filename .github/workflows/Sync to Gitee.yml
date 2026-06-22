@@ -1,0 +1,22 @@
+name: Sync to Gitee
+
+on: [push]
+
+permissions:
+  contents: read
+
+jobs:
+  repo-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync to Gitee
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          git remote add gitee https://oauth2:${GITEE_TOKEN}@gitee.com/ccandzy/daily-english.git
+          git push gitee main --force --tags
