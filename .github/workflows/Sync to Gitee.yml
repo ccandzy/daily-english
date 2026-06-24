@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -28,7 +28,21 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H gitee.com >> ~/.ssh/known_hosts
 
-      - name: Sync to Gitee
+      - name: Sync to Gitee (with retry)
         run: |
           git remote add gitee git@gitee.com:ccandzy/daily-english.git
-          git push gitee main --force --tags
+          
+          # 重试逻辑：最多尝试 3 次
+          for i in {1..3}; do
+            echo "Attempt $i/3: Pushing to Gitee..."
+            if git push gitee main --force --tags; then
+              echo "✅ Successfully synced to Gitee"
+              exit 0
+            else
+              echo "❌ Push failed, retrying in 5 seconds..."
+              sleep 5
+            fi
+          done
+          
+          echo "❌ Failed to sync after 3 attempts"
+          exit 1
