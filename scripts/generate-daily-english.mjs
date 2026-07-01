@@ -17,7 +17,7 @@ const shanghaiDate = new Intl.DateTimeFormat("en-CA", {
 }).format(now);
 
 const prompt = `
-You are creating a daily English lesson for a Chinese beginner.
+You are creating a daily English lesson for a Chinese learner with basic foundation.
 
 Return valid JSON only. Do not include markdown fences.
 Do not show your thinking, plan, notes, analysis, or word-count process.
@@ -26,7 +26,7 @@ Do not output any text before or after the JSON object.
 
 Requirements:
 - About 150 to 180 words of English total.
-- Use easy, beginner-friendly English.
+- Use slightly more challenging but still clear English (around CEFR A2-B1).
 - Topic can be a light current event or a safe general-interest modern topic.
 - If you are not sure about a breaking-news fact, avoid specific claims and choose a safer topic.
 - Output exactly 3 short paragraphs.
@@ -161,7 +161,7 @@ function buildMessages() {
     {
       role: "system",
       content:
-        "You generate safe, beginner-friendly English study materials in strict JSON. Never reveal chain-of-thought, planning notes, or analysis. Return only the final JSON object.",
+        "You generate safe, learner-friendly English study materials in strict JSON. Keep the language slightly challenging but still clear for CEFR A2-B1 learners. Never reveal chain-of-thought, planning notes, or analysis. Return only the final JSON object.",
     },
     {
       role: "user",
