@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import fsSync from "node:fs";
 
 const apiKey = process.env.DEEPSEEK_API_KEY;
 const siteUrl = process.env.SITE_URL || "";
@@ -16,8 +17,91 @@ const shanghaiDate = new Intl.DateTimeFormat("en-CA", {
   day: "2-digit",
 }).format(now);
 
+// ---------- Topic rotation: topic pool + recent-topic check ----------
+// 扩展后的主题池（你可以继续补充）
+const topicPool = [
+  "health and exercise",
+  "food and cooking",
+  "travel and tourism",
+  "technology (gadgets)",
+  "climate and environment",
+  "education and study tips",
+  "work and jobs",
+  "sports",
+  "culture and festivals",
+  "daily routines",
+  "hobbies and crafts",
+  "pets and animals",
+  "books and reading",
+  "movies and entertainment",
+  "weather and seasons",
+  "city life and transport (non-electric)",
+  "nature and outdoors",
+  "science discoveries",
+  "simple history stories",
+  "holidays and celebrations",
+  "markets and shopping",
+  "money saving tips",
+  "online safety and privacy",
+  "language learning tips",
+  "career skills and interviews"
+];
+
+function getRecentTopics(archiveDir, lookback = 12) {
+  const recent = [];
+  try {
+    if (!fsSync.existsSync(archiveDir)) return recent;
+    const files = fsSync
+      .readdirSync(archiveDir)
+      .filter((f) => f.endsWith(".html"))
+      .sort()
+      .reverse()
+      .slice(0, lookback);
+    for (const f of files) {
+      const content = fsSync.readFileSync(path.join(archiveDir, f), "utf8");
+      const m = content.match(/Topic:\s*([^<\n\r]+)/i);
+      if (m && m[1]) {
+        recent.push(m[1].trim().toLowerCase());
+      }
+    }
+  } catch (e) {
+    // 忽略读取错误，返回空数组
+  }
+  return recent;
+}
+
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const archiveDirPath = path.join(process.cwd(), "archive");
+const recentTopics = getRecentTopics(archiveDirPath, 12);
+
+let chosenTopic = "";
+for (const t of shuffleArray(topicPool)) {
+  const norm = t.toLowerCase();
+  // 简单冲突检测：子串包含关系（可按需增强为更复杂的语义相似度）
+  const conflict = recentTopics.some((rt) => rt.includes(norm) || norm.includes(rt));
+  if (!conflict) {
+    chosenTopic = t;
+    break;
+  }
+}
+if (!chosenTopic) {
+  chosenTopic = topicPool[Math.floor(Math.random() * topicPool.length)];
+}
+// ---------- End topic rotation ----------
+
 const prompt = `
 You are creating a daily English lesson for a Chinese learner with basic foundation.
+
+Preferred topic: ${chosenTopic}.
+Topic can be a light current event or a safe general-interest modern topic. Avoid repeating recent topics found in the site's archive.
 
 Return valid JSON only. Do not include markdown fences.
 Do not show your thinking, plan, notes, analysis, or word-count process.
@@ -161,7 +245,7 @@ function buildMessages() {
     {
       role: "system",
       content:
-        "You generate safe, learner-friendly English study materials in strict JSON. Keep the language slightly challenging but still clear for CEFR A2-B1 learners. Never reveal chain-of-thought, planning notes, or analysis. Return only the final JSON object.",
+        "You generate safe, learner-friendly English study materials in strict JSON. Keep the language slightly challenging but still clear for CEFR A2-B1 learners. Never reveal chain-of-thought,[...]",
     },
     {
       role: "user",
