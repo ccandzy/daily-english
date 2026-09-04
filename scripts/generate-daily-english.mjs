@@ -5,9 +5,7 @@ import fsSync from "node:fs";
 const apiKey = process.env.DEEPSEEK_API_KEY;
 const siteUrl = process.env.SITE_URL || "";
 
-if (!apiKey) {
-  throw new Error("Missing DEEPSEEK_API_KEY environment variable.");
-}
+// API Key 缺失时不再直接退出。后面会自动使用本地备用课程，保证页面仍能更新。
 
 const now = new Date();
 const shanghaiDate = new Intl.DateTimeFormat("en-CA", {
@@ -162,137 +160,246 @@ console.log("=== DeepSeek Prompt Start ===");
 console.log(prompt);
 console.log("=== DeepSeek Prompt End ===");
 
-const content = await generateLessonContent();
+await main();
 
-let lesson;
-try {
-  lesson = parseMarkdownLesson(content);
-} catch (error) {
-  throw new Error(`Failed to parse lesson Markdown: ${error.message}\n${content}`);
+async function main() {
+  const warnings = [];
+  let content = "";
+
+  try {
+    content = await generateLessonContent();
+  } catch (error) {
+    warnings.push(`AI content unavailable: ${error.message}`);
+  }
+
+  let lesson;
+  try {
+    lesson = parseMarkdownLesson(content);
+  } catch (error) {
+    warnings.push(`Markdown parser failed: ${error.message}`);
+    lesson = createFallbackLesson();
+  }
+
+  lesson = repairLesson(lesson, content, warnings);
+
+  let html;
+  try {
+    html = buildHtml(lesson, siteUrl);
+  } catch (error) {
+    warnings.push(`HTML build failed; using a fully local lesson: ${error.message}`);
+    lesson = createFallbackLesson();
+    html = buildHtml(lesson, siteUrl);
+  }
+
+  const archiveDir = path.join(process.cwd(), "archive");
+  const results = await Promise.allSettled([
+    fs.mkdir(archiveDir, { recursive: true }).then(() =>
+      writeFileAtomically(path.join(archiveDir, `${shanghaiDate}.html`), html)
+    ),
+    writeFileAtomically(path.join(process.cwd(), "index.html"), html),
+  ]);
+
+  const labels = [`archive/${shanghaiDate}.html`, "index.html"];
+  results.forEach((result, index) => {
+    if (result.status === "fulfilled") {
+      console.log(`✅ ${labels[index]} updated successfully.`);
+    } else {
+      console.error(`❌ ${labels[index]} update failed: ${result.reason?.message || result.reason}`);
+    }
+  });
+
+  for (const warning of warnings) console.warn(`⚠️  ${warning}`);
+
+  if (results.every((result) => result.status === "rejected")) {
+    throw new Error("Both HTML writes failed; no output file could be updated.");
+  }
 }
-
-validateLesson(lesson);
-
-const html = buildHtml(lesson, siteUrl);
-const archiveDir = path.join(process.cwd(), "archive");
-await fs.mkdir(archiveDir, { recursive: true });
-await fs.writeFile(path.join(process.cwd(), "index.html"), html, "utf8");
-await fs.writeFile(path.join(archiveDir, `${shanghaiDate}.html`), html, "utf8");
 
 // ========== Markdown 解析函数 ==========
 
 function parseMarkdownLesson(markdown) {
-  const text = String(markdown || "").trim();
-  
-  // 提取标题
-  const titleMatch = text.match(/^#\s+(.+?)(?:\n|$)/);
-  const title = titleMatch?.[1]?.trim() || "Daily English Lesson";
+  const text = normalizeMarkdown(markdown);
+  const lines = text.split("\n");
+  const title = cleanMarkdownText(
+    lines.find((line) => /^\s*#(?!#)\s+\S/.test(line))?.replace(/^\s*#\s+/, "") || ""
+  );
+  const topic = readMetadata(lines, ["topic", "主题"]);
+  const summaryTipZh = readMetadata(lines, ["summary tip", "learning tip", "学习要点", "学习提示"]);
 
-  // 提取 Topic
-  const topicMatch = text.match(/\*\*Topic:\*\*\s*(.+?)(?:\n|$)/i);
-  const topic = topicMatch?.[1]?.trim() || chosenTopic;
-
-  // 提取摘要提示
-  const summaryMatch = text.match(/\*\*Summary Tip:\*\*\s*(.+?)(?:\n|$)/i);
-  const summaryTipZh = summaryMatch?.[1]?.trim() || "点击单词可以查看翻译";
-
-  // 解析段落（查找 ## Paragraph N 及其翻译）
   const paragraphs = [];
-  const paragraphRegex = /##\s*Paragraph\s*\d+\s*\n\s*(.+?)\s*\n\s*\*\*中文翻译:\*\*\s*(.+?)(?=##|$)/gs;
-  let match;
-  while ((match = paragraphRegex.exec(text)) !== null) {
-    const english = match[1]?.trim() || "";
-    const chinese = match[2]?.trim() || "";
-    if (english) {
-      paragraphs.push({ english, chinese });
+  let current = null;
+  let mode = "english";
+
+  const flushParagraph = () => {
+    if (!current) return;
+    const english = cleanParagraph(current.english.join(" "));
+    const chinese = cleanParagraph(current.chinese.join(" "));
+    if (english) paragraphs.push({ english, chinese });
+    current = null;
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (isParagraphHeading(line)) {
+      flushParagraph();
+      current = { english: [], chinese: [] };
+      mode = "english";
+      continue;
     }
+    if (isKnownSectionHeading(line)) {
+      flushParagraph();
+      continue;
+    }
+    if (!current) continue;
+
+    const translation = parseTranslationLine(line);
+    if (translation !== null) {
+      mode = "chinese";
+      if (translation) current.chinese.push(translation);
+      continue;
+    }
+    if (!line || /^#{1,6}\s+/.test(line)) continue;
+    current[mode].push(line);
   }
+  flushParagraph();
 
-  // 解析短语
-  const phrases = parseWordList(text, /##\s*Phrases/i, 5);
-
-  // 解析难词
-  const hardWords = parseWordList(text, /##\s*Hard Words/i, 5);
-
-  // 解析常用词
-  const commonWords = parseWordList(text, /##\s*Common Words/i, 5);
-
-  // 如果段落不足，尽力补充
+  // 标题结构完全失效时，只救援“看起来像英文正文”的自然段。
   if (paragraphs.length === 0) {
-    console.warn("⚠️  No paragraphs found. Attempting to extract from raw text...");
-    // 尽力从原文本中提取任何段落
-    const fallbackParagraphRegex = /\n\n(.+?)\n\n/gs;
-    const fallbackMatches = text.match(fallbackParagraphRegex);
-    if (fallbackMatches) {
-      for (const p of fallbackMatches.slice(0, 3)) {
-        paragraphs.push({ english: p.trim(), chinese: "" });
-      }
-    }
+    paragraphs.push(...salvageEnglishParagraphs(text));
   }
 
   return {
-    title,
-    topic,
+    title: title || "Daily English Lesson",
+    topic: topic || chosenTopic,
     date: shanghaiDate,
-    summaryTipZh,
-    paragraphs: paragraphs.length > 0 ? paragraphs : [{ english: "Content not available", chinese: "内容不可用" }],
-    phrases: phrases.length > 0 ? phrases : [],
-    hardWords: hardWords.length > 0 ? hardWords : [],
-    commonWords: commonWords.length > 0 ? commonWords : [],
+    summaryTipZh: summaryTipZh || "点击或悬浮英文单词查看翻译，每段后也可以展开中文。",
+    paragraphs,
+    phrases: parseWordList(text, ["phrases", "short phrases", "短语"]),
+    hardWords: parseWordList(text, ["hard words", "difficult words", "难词", "生词"]),
+    commonWords: parseWordList(text, ["common words", "useful words", "常用词"]),
     sourceNote: "AI-generated lesson for daily English reading.",
   };
 }
 
-function parseWordList(text, sectionRegex, expectedCount) {
-  const words = [];
-  const sectionMatch = text.match(new RegExp(`${sectionRegex.source}[\\s\\S]*?(?=##|$)`, sectionRegex.flags));
-  
-  if (!sectionMatch) return words;
+function normalizeMarkdown(markdown) {
+  return String(markdown || "")
+    .replace(/^\uFEFF/, "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/^\s*```(?:markdown|md)?\s*$/gim, "")
+    .replace(/^\s*```\s*$/gim, "")
+    .trim();
+}
 
-  const sectionText = sectionMatch[0];
-  // 匹配 "- **term**: meaning" 格式
-  const itemRegex = /^\\s*[-*]\\s*\*\*([^*]+)\*\*\\s*:\\s*(.+?)$/gm;
-  let itemMatch;
-  
-  while ((itemMatch = itemRegex.exec(sectionText)) !== null && words.length < expectedCount) {
-    const term = itemMatch[1]?.trim();
-    const meaning = itemMatch[2]?.trim();
-    if (term && meaning) {
-      words.push({ term, meaning });
-    }
+function cleanMarkdownText(value) {
+  return String(value || "")
+    .replace(/^\s*[-*>]+\s*/, "")
+    .replace(/\*\*|__|`/g, "")
+    .trim();
+}
+
+function cleanParagraph(value) {
+  return cleanMarkdownText(value).replace(/\s+/g, " ").trim();
+}
+
+function readMetadata(lines, names) {
+  const alternatives = names.map(escapeRegExp).join("|");
+  const regex = new RegExp(`^\\s*(?:\\*\\*|__)?(?:${alternatives})\\s*[:：](?:\\*\\*|__)?\\s*(.+)$`, "i");
+  for (const line of lines) {
+    const match = line.match(regex);
+    if (match?.[1]) return cleanMarkdownText(match[1]);
   }
+  return "";
+}
 
+function isParagraphHeading(line) {
+  return /^#{1,6}\s*(?:paragraph|para|section|part)\s*(?:\d+|one|two|three)?\s*[:：-]?\s*$/i.test(line);
+}
+
+function isKnownSectionHeading(line) {
+  return /^#{1,6}\s*(?:phrases?|short phrases?|hard words?|difficult words?|common words?|useful words?|短语|难词|生词|常用词).*$/i.test(line);
+}
+
+function parseTranslationLine(line) {
+  const match = line.match(/^\s*(?:\*\*|__)?(?:中文翻译|中文|translation|chinese translation)\s*[:：](?:\*\*|__)?\s*(.*)$/i);
+  return match ? cleanMarkdownText(match[1]) : null;
+}
+
+function parseWordList(text, sectionNames, expectedCount = 5) {
+  const words = [];
+  const names = sectionNames.map((name) => name.toLowerCase());
+  const lines = text.split("\n");
+  let inSection = false;
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    const heading = line.match(/^#{1,6}\s*(.+?)\s*$/);
+    if (heading) {
+      const normalizedHeading = cleanMarkdownText(heading[1]).replace(/\s*\([^)]*\)\s*$/, "").toLowerCase();
+      inSection = names.some((name) => normalizedHeading === name || normalizedHeading.startsWith(`${name} `));
+      continue;
+    }
+    if (!inSection || !line || words.length >= expectedCount) continue;
+
+    const item = line.match(/^\s*(?:[-*+]\s+|\d+[.)]\s+)(.+?)\s*(?:[:：]|\s[-–—]\s)\s*(.+?)\s*$/);
+    if (!item) continue;
+    const term = cleanMarkdownText(item[1]);
+    const meaning = cleanMarkdownText(item[2]);
+    if (term && meaning) words.push({ term, meaning });
+  }
   return words;
 }
 
+function salvageEnglishParagraphs(text) {
+  return text
+    .split(/\n\s*\n/)
+    .map(cleanParagraph)
+    .filter((block) => {
+      if (!block || /^#|^(?:topic|summary tip|中文|translation)\s*[:：]/i.test(block)) return false;
+      if (/^(?:[-*+]\s+|\d+[.)]\s+)/.test(block)) return false;
+      const englishLetters = (block.match(/[A-Za-z]/g) || []).length;
+      const chineseChars = (block.match(/[\u3400-\u9fff]/g) || []).length;
+      const wordCount = (block.match(/[A-Za-z]+(?:['’-][A-Za-z]+)*/g) || []).length;
+      return englishLetters > chineseChars * 2 && wordCount >= 8;
+    })
+    .slice(0, 3)
+    .map((english) => ({ english, chinese: "" }));
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 async function generateLessonContent() {
-  const attempts = [
-    {
-      label: "markdown-format",
-      body: {
-        model: "deepseek-v4-flash",
-        temperature: 0.3,
-        max_tokens: 4200,
-        messages: buildMessages(),
-      },
-    },
-  ];
+  if (!apiKey) throw new Error("DEEPSEEK_API_KEY is missing");
+
+  const body = {
+    model: "deepseek-v4-flash",
+    temperature: 0.3,
+    max_tokens: 4200,
+    messages: buildMessages(),
+  };
 
   const failures = [];
 
-  for (const attempt of attempts) {
+  for (let attempt = 1; attempt <= 3; attempt++) {
     try {
-      const payload = await requestLesson(attempt.body);
+      const payload = await requestLesson(body);
       const content = readAssistantContent(payload);
-      if (content && content.trim().length > 100) {
+      // 不再用固定的 100 字符卡死流程；只要有文本，就交给容错解析器尽量提取。
+      if (content.trim()) {
+        console.log(`✅ DeepSeek request succeeded on attempt ${attempt}.`);
         return content;
       }
 
       failures.push(
-        `${attempt.label}: empty or too short content (finish_reason=${payload?.choices?.[0]?.finish_reason || "unknown"}) ${describePayload(payload)}`
+        `attempt ${attempt}: empty content (finish_reason=${payload?.choices?.[0]?.finish_reason || "unknown"}) ${describePayload(payload)}`
       );
     } catch (error) {
-      failures.push(`${attempt.label}: ${error.message}`);
+      failures.push(`attempt ${attempt}: ${error.message}`);
+    }
+
+    if (attempt < 3) {
+      await delay(attempt * 1500);
     }
   }
 
@@ -318,14 +425,25 @@ async function requestLesson(body) {
   console.log(JSON.stringify(body, null, 2));
   console.log("=== DeepSeek Request Body End ===");
 
-  const response = await fetch("https://api.deepseek.com/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(body),
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 45000);
+  let response;
+  try {
+    response = await fetch("https://api.deepseek.com/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (error?.name === "AbortError") throw new Error("DeepSeek API timed out after 45 seconds");
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (!response.ok) {
     const errorBody = await response.text();
@@ -340,6 +458,10 @@ async function requestLesson(body) {
   console.log(JSON.stringify(payload, null, 2));
   console.log("=== DeepSeek Raw Response End ===");
   return payload;
+}
+
+function delay(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 function readAssistantContent(payload) {
@@ -440,21 +562,105 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
-function validateLesson(data) {
-  if (!data.title) {
-    data.title = "Daily English Lesson";
+function repairLesson(data, rawContent, warnings) {
+  if (!data || typeof data !== "object") {
+    warnings.push("No parsed lesson object; local fallback was used.");
+    return createFallbackLesson();
   }
-  if (!data.topic) {
-    data.topic = chosenTopic;
+
+  data.title = cleanParagraph(data.title) || "Daily English Lesson";
+  data.topic = cleanParagraph(data.topic) || chosenTopic;
+  data.date = shanghaiDate;
+  data.summaryTipZh = cleanParagraph(data.summaryTipZh) || "点击或悬浮英文单词查看翻译，每段后也可以展开中文。";
+
+  if (!Array.isArray(data.paragraphs)) data.paragraphs = [];
+  data.paragraphs = data.paragraphs
+    .map((item) => ({
+      english: cleanParagraph(item?.english),
+      chinese: cleanParagraph(item?.chinese),
+    }))
+    .filter((item) => item.english)
+    .slice(0, 3);
+
+  if (data.paragraphs.length === 0) {
+    warnings.push(rawContent ? "AI text contained no usable English paragraph; local fallback was used." : "AI produced no content; local fallback was used.");
+    return createFallbackLesson();
   }
-  if (!Array.isArray(data.paragraphs) || data.paragraphs.length === 0) {
-    console.warn("⚠️  No valid paragraphs. Using placeholder.");
-    data.paragraphs = [{ english: "Unable to generate content. Please try again.", chinese: "无法生成内容，请重试。" }];
+
+  data.paragraphs.forEach((paragraph, index) => {
+    if (!paragraph.chinese) {
+      paragraph.chinese = "本段暂未生成中文翻译。";
+      warnings.push(`Paragraph ${index + 1} has no Chinese translation.`);
+    }
+  });
+
+  for (const key of ["phrases", "hardWords", "commonWords"]) {
+    if (!Array.isArray(data[key])) data[key] = [];
+    data[key] = data[key]
+      .map((item) => ({ term: cleanParagraph(item?.term), meaning: cleanParagraph(item?.meaning) }))
+      .filter((item) => item.term && item.meaning)
+      .slice(0, 5);
+    if (data[key].length < 5) warnings.push(`${key} contains ${data[key].length}/5 usable items.`);
   }
-  // 允许词表为空，不会导致页面崩溃
-  if (!Array.isArray(data.phrases)) data.phrases = [];
-  if (!Array.isArray(data.hardWords)) data.hardWords = [];
-  if (!Array.isArray(data.commonWords)) data.commonWords = [];
+
+  data.sourceNote = cleanParagraph(data.sourceNote) || "AI-generated lesson for daily English reading.";
+  return data;
+}
+
+function createFallbackLesson() {
+  return {
+    title: "Small Steps Make Learning Easier",
+    topic: chosenTopic || "daily learning",
+    date: shanghaiDate,
+    summaryTipZh: "今天先完成一次短阅读。稳定的小进步，比偶尔学习很久更容易坚持。",
+    paragraphs: [
+      {
+        english: "Learning English does not always require a long study session. Ten focused minutes can be useful when you read slowly, notice new expressions, and think about the meaning of each sentence.",
+        chinese: "学习英语并不总是需要很长的学习时间。慢慢阅读、留意新表达并思考每句话的含义时，专注的十分钟也很有用。",
+      },
+      {
+        english: "A simple daily routine can make progress easier to see. You may read one short article, choose several useful words, and then explain the main idea in your own language.",
+        chinese: "简单的每日习惯可以让进步更容易被看见。你可以读一篇短文，选择几个有用的单词，然后用自己的语言解释主要内容。",
+      },
+      {
+        english: "Some days will be busy, and your work may be incomplete. That is normal. The important thing is to return the next day and keep your learning habit alive.",
+        chinese: "有些日子会很忙，学习也可能没有全部完成。这很正常。重要的是第二天继续回来，让学习习惯保持下去。",
+      },
+    ],
+    phrases: [
+      { term: "focused minutes", meaning: "专注的几分钟" },
+      { term: "daily routine", meaning: "每日习惯" },
+      { term: "main idea", meaning: "主要意思" },
+      { term: "in your own language", meaning: "用你自己的语言" },
+      { term: "keep a habit alive", meaning: "让习惯保持下去" },
+    ],
+    hardWords: [
+      { term: "require", meaning: "需要" },
+      { term: "focused", meaning: "专注的" },
+      { term: "expression", meaning: "表达；短语" },
+      { term: "progress", meaning: "进步" },
+      { term: "incomplete", meaning: "不完整的" },
+    ],
+    commonWords: [
+      { term: "learn", meaning: "学习" },
+      { term: "read", meaning: "阅读" },
+      { term: "choose", meaning: "选择" },
+      { term: "explain", meaning: "解释" },
+      { term: "return", meaning: "返回；再次开始" },
+    ],
+    sourceNote: "Local fallback lesson used because complete AI content was unavailable.",
+  };
+}
+
+async function writeFileAtomically(targetPath, content) {
+  const temporaryPath = `${targetPath}.${process.pid}.${Date.now()}.tmp`;
+  try {
+    await fs.writeFile(temporaryPath, content, "utf8");
+    await fs.rename(temporaryPath, targetPath);
+  } catch (error) {
+    await fs.unlink(temporaryPath).catch(() => {});
+    throw error;
+  }
 }
 
 function buildHtml(lessonData, currentSiteUrl) {
@@ -897,6 +1103,9 @@ function buildHtml(lessonData, currentSiteUrl) {
 }
 
 function buildList(items) {
+  if (!Array.isArray(items) || items.length === 0) {
+    return '<li class="empty-item">本组内容暂未完整生成</li>';
+  }
   return items
     .map(
       (item) =>
