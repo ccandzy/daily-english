@@ -103,10 +103,7 @@ You are creating a daily English lesson for a Chinese learner with basic foundat
 Preferred topic: ${chosenTopic}.
 Topic can be a light current event or a safe general-interest modern topic. Avoid repeating recent topics found in the site's archive.
 
-Return valid JSON only. Do not include markdown fences.
-Do not show your thinking, plan, notes, analysis, or word-count process.
-Do not explain the schema.
-Do not output any text before or after the JSON object.
+Return content in the following Markdown format. Do not include markdown code fences or any text before/after.
 
 Requirements:
 - About 150 to 180 words of English total.
@@ -118,26 +115,47 @@ Requirements:
 - Include 5 short phrases, 5 difficult words, and 5 common useful words.
 - Use concise Chinese translations.
 
-JSON schema:
-{
-  "title": "string",
-  "topic": "string",
-  "date": "${shanghaiDate}",
-  "summaryTipZh": "string",
-  "paragraphs": [
-    { "english": "string", "chinese": "string" }
-  ],
-  "phrases": [
-    { "term": "string", "meaning": "string" }
-  ],
-  "hardWords": [
-    { "term": "string", "meaning": "string" }
-  ],
-  "commonWords": [
-    { "term": "string", "meaning": "string" }
-  ],
-  "sourceNote": "string"
-}
+Markdown format:
+# [Title of the Lesson]
+
+**Topic:** [topic name]
+**Summary Tip:** [brief learning tip in Chinese]
+
+## Paragraph 1
+[English text]
+
+**中文翻译:** [Chinese translation]
+
+## Paragraph 2
+[English text]
+
+**中文翻译:** [Chinese translation]
+
+## Paragraph 3
+[English text]
+
+**中文翻译:** [Chinese translation]
+
+## Phrases (Short Phrases)
+- **[phrase 1]**: [meaning in Chinese]
+- **[phrase 2]**: [meaning in Chinese]
+- **[phrase 3]**: [meaning in Chinese]
+- **[phrase 4]**: [meaning in Chinese]
+- **[phrase 5]**: [meaning in Chinese]
+
+## Hard Words (Difficult Words)
+- **[word 1]**: [meaning in Chinese]
+- **[word 2]**: [meaning in Chinese]
+- **[word 3]**: [meaning in Chinese]
+- **[word 4]**: [meaning in Chinese]
+- **[word 5]**: [meaning in Chinese]
+
+## Common Words (Useful Words)
+- **[word 1]**: [meaning in Chinese]
+- **[word 2]**: [meaning in Chinese]
+- **[word 3]**: [meaning in Chinese]
+- **[word 4]**: [meaning in Chinese]
+- **[word 5]**: [meaning in Chinese]
 `;
 
 console.log("=== DeepSeek Prompt Start ===");
@@ -148,9 +166,9 @@ const content = await generateLessonContent();
 
 let lesson;
 try {
-  lesson = JSON.parse(extractJsonString(content));
+  lesson = parseMarkdownLesson(content);
 } catch (error) {
-  throw new Error(`Failed to parse lesson JSON: ${error.message}\n${content}`);
+  throw new Error(`Failed to parse lesson Markdown: ${error.message}\n${content}`);
 }
 
 validateLesson(lesson);
@@ -161,45 +179,99 @@ await fs.mkdir(archiveDir, { recursive: true });
 await fs.writeFile(path.join(process.cwd(), "index.html"), html, "utf8");
 await fs.writeFile(path.join(archiveDir, `${shanghaiDate}.html`), html, "utf8");
 
-function validateLesson(data) {
-  const requiredArrays = ["paragraphs", "phrases", "hardWords", "commonWords"];
-  for (const key of requiredArrays) {
-    if (!Array.isArray(data[key]) || data[key].length === 0) {
-      throw new Error(`Lesson field "${key}" is missing or empty.`);
+// ========== Markdown 解析函数 ==========
+
+function parseMarkdownLesson(markdown) {
+  const text = String(markdown || "").trim();
+  
+  // 提取标题
+  const titleMatch = text.match(/^#\s+(.+?)(?:\n|$)/);
+  const title = titleMatch?.[1]?.trim() || "Daily English Lesson";
+
+  // 提取 Topic
+  const topicMatch = text.match(/\*\*Topic:\*\*\s*(.+?)(?:\n|$)/i);
+  const topic = topicMatch?.[1]?.trim() || chosenTopic;
+
+  // 提取摘要提示
+  const summaryMatch = text.match(/\*\*Summary Tip:\*\*\s*(.+?)(?:\n|$)/i);
+  const summaryTipZh = summaryMatch?.[1]?.trim() || "点击单词可以查看翻译";
+
+  // 解析段落（查找 ## Paragraph N 及其翻译）
+  const paragraphs = [];
+  const paragraphRegex = /##\s*Paragraph\s*\d+\s*\n\s*(.+?)\s*\n\s*\*\*中文翻译:\*\*\s*(.+?)(?=##|$)/gs;
+  let match;
+  while ((match = paragraphRegex.exec(text)) !== null) {
+    const english = match[1]?.trim() || "";
+    const chinese = match[2]?.trim() || "";
+    if (english) {
+      paragraphs.push({ english, chinese });
     }
   }
 
-  if (!data.title || !data.topic || !data.date) {
-    throw new Error("Lesson is missing required top-level fields.");
+  // 解析短语
+  const phrases = parseWordList(text, /##\s*Phrases/i, 5);
+
+  // 解析难词
+  const hardWords = parseWordList(text, /##\s*Hard Words/i, 5);
+
+  // 解析常用词
+  const commonWords = parseWordList(text, /##\s*Common Words/i, 5);
+
+  // 如果段落不足，尽力补充
+  if (paragraphs.length === 0) {
+    console.warn("⚠️  No paragraphs found. Attempting to extract from raw text...");
+    // 尽力从原文本中提取任何段落
+    const fallbackParagraphRegex = /\n\n(.+?)\n\n/gs;
+    const fallbackMatches = text.match(fallbackParagraphRegex);
+    if (fallbackMatches) {
+      for (const p of fallbackMatches.slice(0, 3)) {
+        paragraphs.push({ english: p.trim(), chinese: "" });
+      }
+    }
   }
+
+  return {
+    title,
+    topic,
+    date: shanghaiDate,
+    summaryTipZh,
+    paragraphs: paragraphs.length > 0 ? paragraphs : [{ english: "Content not available", chinese: "内容不可用" }],
+    phrases: phrases.length > 0 ? phrases : [],
+    hardWords: hardWords.length > 0 ? hardWords : [],
+    commonWords: commonWords.length > 0 ? commonWords : [],
+    sourceNote: "AI-generated lesson for daily English reading.",
+  };
 }
 
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+function parseWordList(text, sectionRegex, expectedCount) {
+  const words = [];
+  const sectionMatch = text.match(new RegExp(`${sectionRegex.source}[\\s\\S]*?(?=##|$)`, sectionRegex.flags));
+  
+  if (!sectionMatch) return words;
+
+  const sectionText = sectionMatch[0];
+  // 匹配 "- **term**: meaning" 格式
+  const itemRegex = /^\\s*[-*]\\s*\*\*([^*]+)\*\*\\s*:\\s*(.+?)$/gm;
+  let itemMatch;
+  
+  while ((itemMatch = itemRegex.exec(sectionText)) !== null && words.length < expectedCount) {
+    const term = itemMatch[1]?.trim();
+    const meaning = itemMatch[2]?.trim();
+    if (term && meaning) {
+      words.push({ term, meaning });
+    }
+  }
+
+  return words;
 }
 
 async function generateLessonContent() {
   const attempts = [
     {
-      label: "json-response-format",
+      label: "markdown-format",
       body: {
         model: "deepseek-v4-flash",
         temperature: 0.3,
-        max_tokens: 4200,
-        response_format: { type: "json_object" },
-        messages: buildMessages(),
-      },
-    },
-    {
-      label: "plain-text-json-fallback",
-      body: {
-        model: "deepseek-v4-flash",
-        temperature: 0.2,
         max_tokens: 4200,
         messages: buildMessages(),
       },
@@ -212,25 +284,12 @@ async function generateLessonContent() {
     try {
       const payload = await requestLesson(attempt.body);
       const content = readAssistantContent(payload);
-      if (content) {
-        const extracted = extractJsonString(content);
-        if (looksLikeJsonObject(extracted)) {
-          return extracted;
-        }
-
-        const repaired = await repairLessonContent(content);
-        if (repaired) {
-          return repaired;
-        }
-
-        failures.push(
-          `${attempt.label}: non-JSON content ${describePayload(payload)}`
-        );
-        continue;
+      if (content && content.trim().length > 100) {
+        return content;
       }
 
       failures.push(
-        `${attempt.label}: empty content (finish_reason=${payload?.choices?.[0]?.finish_reason || "unknown"}) ${describePayload(payload)}`
+        `${attempt.label}: empty or too short content (finish_reason=${payload?.choices?.[0]?.finish_reason || "unknown"}) ${describePayload(payload)}`
       );
     } catch (error) {
       failures.push(`${attempt.label}: ${error.message}`);
@@ -245,7 +304,7 @@ function buildMessages() {
     {
       role: "system",
       content:
-        "You generate safe, learner-friendly English study materials in strict JSON. Keep the language slightly challenging but still clear for CEFR A2-B1 learners. Never reveal chain-of-thought,[...]",
+        "You generate safe, learner-friendly English study materials in Markdown format. Keep the language slightly challenging but still clear for CEFR A2-B1 learners. Return only the Markdown content, no explanations or code fences.",
     },
     {
       role: "user",
@@ -359,78 +418,6 @@ function describePayload(payload) {
   return JSON.stringify(debug);
 }
 
-function extractJsonString(content) {
-  const trimmed = String(content).trim();
-  if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
-    return trimmed;
-  }
-
-  const fencedMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
-  if (fencedMatch?.[1]) {
-    return fencedMatch[1].trim();
-  }
-
-  const firstBrace = trimmed.indexOf("{");
-  const lastBrace = trimmed.lastIndexOf("}");
-  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-    return trimmed.slice(firstBrace, lastBrace + 1);
-  }
-
-  return trimmed;
-}
-
-function looksLikeJsonObject(text) {
-  const trimmed = String(text).trim();
-  return trimmed.startsWith("{") && trimmed.endsWith("}");
-}
-
-async function repairLessonContent(rawContent) {
-  const repairPrompt = `
-Convert the following model output into one valid JSON object only.
-
-Rules:
-- Output valid JSON only.
-- Do not include markdown fences.
-- Do not include analysis, notes, planning, or word counts.
-- Use the lesson content already present in the draft.
-- If the draft contains planning text, ignore it and keep only the final lesson result.
-- Preserve the required schema exactly.
-
-Draft content:
-${rawContent}
-`;
-
-  console.log("=== DeepSeek Repair Prompt Start ===");
-  console.log(repairPrompt);
-  console.log("=== DeepSeek Repair Prompt End ===");
-
-  const payload = await requestLesson({
-    model: "deepseek-v4-flash",
-    temperature: 0.1,
-    max_tokens: 4200,
-    response_format: { type: "json_object" },
-    messages: [
-      {
-        role: "system",
-        content:
-          "You convert messy lesson drafts into one strict JSON object. Return only JSON and never include reasoning.",
-      },
-      {
-        role: "user",
-        content: repairPrompt,
-      },
-    ],
-  });
-
-  const content = readAssistantContent(payload);
-  const extracted = extractJsonString(content);
-  if (looksLikeJsonObject(extracted)) {
-    return extracted;
-  }
-
-  return "";
-}
-
 function wrapWords(text) {
   return escapeHtml(text).replace(/[A-Za-z0-9.'-]+/g, (token) => {
     const normalized = normalizeWord(token);
@@ -442,6 +429,32 @@ function normalizeWord(word) {
   return String(word)
     .toLowerCase()
     .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function validateLesson(data) {
+  if (!data.title) {
+    data.title = "Daily English Lesson";
+  }
+  if (!data.topic) {
+    data.topic = chosenTopic;
+  }
+  if (!Array.isArray(data.paragraphs) || data.paragraphs.length === 0) {
+    console.warn("⚠️  No valid paragraphs. Using placeholder.");
+    data.paragraphs = [{ english: "Unable to generate content. Please try again.", chinese: "无法生成内容，请重试。" }];
+  }
+  // 允许词表为空，不会导致页面崩溃
+  if (!Array.isArray(data.phrases)) data.phrases = [];
+  if (!Array.isArray(data.hardWords)) data.hardWords = [];
+  if (!Array.isArray(data.commonWords)) data.commonWords = [];
 }
 
 function buildHtml(lessonData, currentSiteUrl) {
