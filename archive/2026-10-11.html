@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cooking at Home: Simple and Smart</title>
+  <style>
+    :root {
+      --bg-a: #f4efe7;
+      --bg-b: #dcecf2;
+      --paper: #fffdf8;
+      --sidebar: #edf6fb;
+      --ink: #22363c;
+      --muted: #64777c;
+      --accent: #11765f;
+      --accent-deep: #0b5948;
+      --line: #cad9dd;
+      --hover: #d8f4ec;
+      --tooltip: #17353a;
+      --soft: #edf9f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 28%),
+        linear-gradient(145deg, var(--bg-a) 0%, var(--bg-b) 100%);
+    }
+
+    .page {
+      max-width: 1220px;
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card,
+    .sidebar {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 38px rgba(32, 67, 75, 0.08);
+    }
+
+    .card {
+      background: var(--paper);
+      padding: 30px;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      padding: 22px;
+      position: sticky;
+      top: 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 45px);
+      line-height: 1.12;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tip {
+      margin: 0 0 24px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      background: var(--soft);
+      color: #28544b;
+    }
+
+    .article-block {
+      margin-bottom: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .article-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .article-block p {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .toggle-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--accent);
+      color: #f7fffd;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-1px);
+      background: var(--accent-deep);
+    }
+
+    .translation {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f3fcf8;
+      color: #355556;
+      font-size: 16px;
+    }
+
+    .translation.show {
+      display: block;
+    }
+
+    .word {
+      position: relative;
+      display: inline-block;
+      padding: 0 2px;
+      border-radius: 5px;
+      cursor: help;
+      transition: background-color 0.15s ease;
+    }
+
+    .word:hover {
+      background: var(--hover);
+    }
+
+    .word:hover::after,
+    .word:active::after,
+    .word:focus-visible::after,
+    .word.is-open::after {
+      content: attr(data-meaning);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      min-width: 64px;
+      max-width: 180px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: var(--tooltip);
+      color: #f4fdfd;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      z-index: 2;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(17, 118, 95, 0.12);
+      color: var(--accent-deep);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .side-section {
+      margin-bottom: 22px;
+    }
+
+    .side-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .side-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .side-section li {
+      margin-bottom: 10px;
+      color: #304248;
+      font-size: 15px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--accent-deep);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 14px auto;
+        padding: 10px;
+      }
+
+      .card,
+      .sidebar {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .article-block p {
+        font-size: 18px;
+      }
+
+      .word:hover::after,
+      .word:active::after,
+      .word:focus-visible::after,
+      .word.is-open::after {
+        left: 0;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="layout">
+      <main class="card">
+        <h1>Cooking at Home: Simple and Smart</h1>
+        <p class="meta">Date: 2026-10-11 | Level: Beginner | Topic: Food and Cooking — Home Cooking Habits</p>
+        <p class="tip">先读一遍英文，抓住大意，再看中文翻译检查理解。注意文中表示“好处”和“建议”的句子，它们最常用。</p>
+        <section id="article">
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="many" data-meaning="点击或悬浮可翻译">Many</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="cooking" data-meaning="点击或悬浮可翻译">cooking</span> <span class="word" tabindex="0" data-word="at" data-meaning="点击或悬浮可翻译">at</span> <span class="word" tabindex="0" data-word="home" data-meaning="点击或悬浮可翻译">home</span> <span class="word" tabindex="0" data-word="more" data-meaning="点击或悬浮可翻译">more</span> <span class="word" tabindex="0" data-word="often" data-meaning="点击或悬浮可翻译">often</span> <span class="word" tabindex="0" data-word="these" data-meaning="点击或悬浮可翻译">these</span> <span class="word" tabindex="0" data-word="days" data-meaning="点击或悬浮可翻译">days.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="only" data-meaning="点击或悬浮可翻译">only</span> <span class="word" tabindex="0" data-word="cheaper" data-meaning="点击或悬浮可翻译">cheaper</span> <span class="word" tabindex="0" data-word="than" data-meaning="点击或悬浮可翻译">than</span> <span class="word" tabindex="0" data-word="eating" data-meaning="点击或悬浮可翻译">eating</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="restaurants" data-meaning="点击或悬浮可翻译">restaurants</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="healthier" data-meaning="点击或悬浮可翻译">healthier.</span> <span class="word" tabindex="0" data-word="when" data-meaning="点击或悬浮可翻译">When</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="prepare" data-meaning="点击或悬浮可翻译">prepare</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="own" data-meaning="点击或悬浮可翻译">own</span> <span class="word" tabindex="0" data-word="meals" data-meaning="点击或悬浮可翻译">meals</span>, <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="control" data-meaning="点击或悬浮可翻译">control</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="salt" data-meaning="点击或悬浮可翻译">salt</span>, <span class="word" tabindex="0" data-word="oil" data-meaning="点击或悬浮可翻译">oil</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="sugar" data-meaning="点击或悬浮可翻译">sugar.</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">You</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="know" data-meaning="点击或悬浮可翻译">know</span> <span class="word" tabindex="0" data-word="exactly" data-meaning="点击或悬浮可翻译">exactly</span> <span class="word" tabindex="0" data-word="what" data-meaning="点击或悬浮可翻译">what</span> <span class="word" tabindex="0" data-word="goes" data-meaning="点击或悬浮可翻译">goes</span> <span class="word" tabindex="0" data-word="into" data-meaning="点击或悬浮可翻译">into</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="food" data-meaning="点击或悬浮可翻译">food.</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">For</span> <span class="word" tabindex="0" data-word="many" data-meaning="点击或悬浮可翻译">many</span> <span class="word" tabindex="0" data-word="families" data-meaning="点击或悬浮可翻译">families</span>, <span class="word" tabindex="0" data-word="cooking" data-meaning="点击或悬浮可翻译">cooking</span> <span class="word" tabindex="0" data-word="has" data-meaning="点击或悬浮可翻译">has</span> <span class="word" tabindex="0" data-word="become" data-meaning="点击或悬浮可翻译">become</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="relaxing" data-meaning="点击或悬浮可翻译">relaxing</span> <span class="word" tabindex="0" data-word="hobby" data-meaning="点击或悬浮可翻译">hobby</span>, <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="boring" data-meaning="点击或悬浮可翻译">boring</span> <span class="word" tabindex="0" data-word="duty" data-meaning="点击或悬浮可翻译">duty.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(0, this)">显示中文翻译</button>
+          <div class="translation" id="translation-0">如今许多人更常在家做饭。这不仅比在餐馆吃饭便宜，也更健康。自己做饭时，你能控制盐、油和糖的用量。你也很清楚食物里放了什么。对很多家庭来说，做饭已成为一种放松的爱好，而不是无聊的任务。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="however" data-meaning="点击或悬浮可翻译">However</span>, <span class="word" tabindex="0" data-word="cooking" data-meaning="点击或悬浮可翻译">cooking</span> <span class="word" tabindex="0" data-word="every" data-meaning="点击或悬浮可翻译">every</span> <span class="word" tabindex="0" data-word="day" data-meaning="点击或悬浮可翻译">day</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="feel" data-meaning="点击或悬浮可翻译">feel</span> <span class="word" tabindex="0" data-word="tiring" data-meaning="点击或悬浮可翻译">tiring</span> <span class="word" tabindex="0" data-word="after" data-meaning="点击或悬浮可翻译">after</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="long" data-meaning="点击或悬浮可翻译">long</span> <span class="word" tabindex="0" data-word="day" data-meaning="点击或悬浮可翻译">day</span> <span class="word" tabindex="0" data-word="at" data-meaning="点击或悬浮可翻译">at</span> <span class="word" tabindex="0" data-word="work" data-meaning="点击或悬浮可翻译">work.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="smart" data-meaning="点击或悬浮可翻译">smart</span> <span class="word" tabindex="0" data-word="solution" data-meaning="点击或悬浮可翻译">solution</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="planning" data-meaning="点击或悬浮可翻译">planning</span> <span class="word" tabindex="0" data-word="ahead" data-meaning="点击或悬浮可翻译">ahead.</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">On</span> <span class="word" tabindex="0" data-word="weekends" data-meaning="点击或悬浮可翻译">weekends</span>, <span class="word" tabindex="0" data-word="wash" data-meaning="点击或悬浮可翻译">wash</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="cut" data-meaning="点击或悬浮可翻译">cut</span> <span class="word" tabindex="0" data-word="vegetables" data-meaning="点击或悬浮可翻译">vegetables</span>, <span class="word" tabindex="0" data-word="cook" data-meaning="点击或悬浮可翻译">cook</span> <span class="word" tabindex="0" data-word="some" data-meaning="点击或悬浮可翻译">some</span> <span class="word" tabindex="0" data-word="rice" data-meaning="点击或悬浮可翻译">rice</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="store" data-meaning="点击或悬浮可翻译">store</span> <span class="word" tabindex="0" data-word="everything" data-meaning="点击或悬浮可翻译">everything</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="boxes" data-meaning="点击或悬浮可翻译">boxes.</span> <span class="word" tabindex="0" data-word="then" data-meaning="点击或悬浮可翻译">Then</span>, <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="busy" data-meaning="点击或悬浮可翻译">busy</span> <span class="word" tabindex="0" data-word="evenings" data-meaning="点击或悬浮可翻译">evenings</span>, <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="put" data-meaning="点击或悬浮可翻译">put</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="simple" data-meaning="点击或悬浮可翻译">simple</span> <span class="word" tabindex="0" data-word="meal" data-meaning="点击或悬浮可翻译">meal</span> <span class="word" tabindex="0" data-word="together" data-meaning="点击或悬浮可翻译">together</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="fifteen" data-meaning="点击或悬浮可翻译">fifteen</span> <span class="word" tabindex="0" data-word="minutes" data-meaning="点击或悬浮可翻译">minutes.</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="habit" data-meaning="点击或悬浮可翻译">habit</span> <span class="word" tabindex="0" data-word="saves" data-meaning="点击或悬浮可翻译">saves</span> <span class="word" tabindex="0" data-word="both" data-meaning="点击或悬浮可翻译">both</span> <span class="word" tabindex="0" data-word="time" data-meaning="点击或悬浮可翻译">time</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="money" data-meaning="点击或悬浮可翻译">money</span> <span class="word" tabindex="0" data-word="during" data-meaning="点击或悬浮可翻译">during</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="week" data-meaning="点击或悬浮可翻译">week.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(1, this)">显示中文翻译</button>
+          <div class="translation" id="translation-1">不过，工作一整天后，每天做饭可能会让人感到疲惫。一个聪明的办法就是提前计划。周末时洗好切好蔬菜，煮些米饭，把东西都装进盒子里。那么忙碌的晚上，你十五分钟就能凑出一顿简单的饭。这个习惯在工作日既省时间又省钱。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="simple" data-meaning="点击或悬浮可翻译">Simple</span> <span class="word" tabindex="0" data-word="dishes" data-meaning="点击或悬浮可翻译">dishes</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="often" data-meaning="点击或悬浮可翻译">often</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="best" data-meaning="点击或悬浮可翻译">best.</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">For</span> <span class="word" tabindex="0" data-word="example" data-meaning="点击或悬浮可翻译">example</span>, <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="bowl" data-meaning="点击或悬浮可翻译">bowl</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="tomato" data-meaning="点击或悬浮可翻译">tomato</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="egg" data-meaning="点击或悬浮可翻译">egg</span> <span class="word" tabindex="0" data-word="noodles" data-meaning="点击或悬浮可翻译">noodles</span> <span class="word" tabindex="0" data-word="takes" data-meaning="点击或悬浮可翻译">takes</span> <span class="word" tabindex="0" data-word="very" data-meaning="点击或悬浮可翻译">very</span> <span class="word" tabindex="0" data-word="little" data-meaning="点击或悬浮可翻译">little</span> <span class="word" tabindex="0" data-word="effort" data-meaning="点击或悬浮可翻译">effort</span>, <span class="word" tabindex="0" data-word="yet" data-meaning="点击或悬浮可翻译">yet</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="tastes" data-meaning="点击或悬浮可翻译">tastes</span> <span class="word" tabindex="0" data-word="warm" data-meaning="点击或悬浮可翻译">warm</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="satisfying" data-meaning="点击或悬浮可翻译">satisfying.</span> <span class="word" tabindex="0" data-word="beginners" data-meaning="点击或悬浮可翻译">Beginners</span> <span class="word" tabindex="0" data-word="should" data-meaning="点击或悬浮可翻译">should</span> <span class="word" tabindex="0" data-word="start" data-meaning="点击或悬浮可翻译">start</span> <span class="word" tabindex="0" data-word="with" data-meaning="点击或悬浮可翻译">with</span> <span class="word" tabindex="0" data-word="easy" data-meaning="点击或悬浮可翻译">easy</span> <span class="word" tabindex="0" data-word="recipes" data-meaning="点击或悬浮可翻译">recipes</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="worry" data-meaning="点击或悬浮可翻译">worry</span> <span class="word" tabindex="0" data-word="about" data-meaning="点击或悬浮可翻译">about</span> <span class="word" tabindex="0" data-word="mistakes" data-meaning="点击或悬浮可翻译">mistakes.</span> <span class="word" tabindex="0" data-word="every" data-meaning="点击或悬浮可翻译">Every</span> <span class="word" tabindex="0" data-word="time" data-meaning="点击或悬浮可翻译">time</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="cook" data-meaning="点击或悬浮可翻译">cook</span>, <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="learn" data-meaning="点击或悬浮可翻译">learn</span> <span class="word" tabindex="0" data-word="something" data-meaning="点击或悬浮可翻译">something</span> <span class="word" tabindex="0" data-word="new" data-meaning="点击或悬浮可翻译">new</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="food" data-meaning="点击或悬浮可翻译">food</span> <span class="word" tabindex="0" data-word="slowly" data-meaning="点击或悬浮可翻译">slowly</span> <span class="word" tabindex="0" data-word="gets" data-meaning="点击或悬浮可翻译">gets</span> <span class="word" tabindex="0" data-word="better" data-meaning="点击或悬浮可翻译">better.</span> <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">So</span> <span class="word" tabindex="0" data-word="do" data-meaning="点击或悬浮可翻译">do</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="be" data-meaning="点击或悬浮可翻译">be</span> <span class="word" tabindex="0" data-word="afraid" data-meaning="点击或悬浮可翻译">afraid</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="try" data-meaning="点击或悬浮可翻译">try.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(2, this)">显示中文翻译</button>
+          <div class="translation" id="translation-2">简单的菜往往最好。比如，一碗西红柿鸡蛋面几乎不费力气，却温暖又让人满足。初学者应从简单的食谱开始，不必担心出错。每次做饭你都会学到新东西，你的厨艺也会慢慢变好。所以不要害怕尝试。</div>
+        </div>
+      </section>
+        <p class="footer">
+          AI-generated lesson for daily English reading.
+          <br>Word translation on hover or tap uses the MyMemory public translation API.
+          <br>Site: <a href="https://ccandzy.github.io/daily-english/">https://ccandzy.github.io/daily-english/</a>
+        </p>
+      </main>
+
+      <aside class="sidebar">
+        <div class="side-section">
+          <span class="label">Phrases</span>
+          <h2>Short Phrases</h2>
+          <ul><li><strong>cook at home</strong>: 在家做饭</li><li><strong>plan ahead</strong>: 提前计划</li><li><strong>put together</strong>: 拼凑成；组合</li><li><strong>not only ... but also</strong>: 不仅……而且</li><li><strong>take little effort</strong>: 不费力气</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Hard Words</span>
+          <h2>Difficult Words</h2>
+          <ul><li><strong>prepare</strong>: 准备；制作</li><li><strong>control</strong>: 控制</li><li><strong>tiring</strong>: 令人疲倦的</li><li><strong>satisfying</strong>: 令人满足的</li><li><strong>recipe</strong>: 食谱</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Common Words</span>
+          <h2>Useful Words</h2>
+          <ul><li><strong>cheap</strong>: 便宜的</li><li><strong>healthy</strong>: 健康的</li><li><strong>busy</strong>: 忙碌的</li><li><strong>simple</strong>: 简单的</li><li><strong>taste</strong>: 尝起来；味道</li></ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const translationCache = new Map();
+    const words = Array.from(document.querySelectorAll(".word"));
+
+    for (const word of words) {
+      word.addEventListener("mouseenter", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("focus", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = !word.classList.contains("is-open");
+        closeWordTooltips();
+        if (willOpen) {
+          word.classList.add("is-open");
+          loadTranslation(word);
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      closeWordTooltips();
+    });
+
+    function closeWordTooltips() {
+      for (const word of words) {
+        word.classList.remove("is-open");
+      }
+    }
+
+    async function loadTranslation(word) {
+      const key = word.dataset.word || normalizeWord(word.textContent || "");
+      if (!key) {
+        word.dataset.meaning = "暂无翻译";
+        return;
+      }
+
+      if (translationCache.has(key)) {
+        word.dataset.meaning = translationCache.get(key);
+        return;
+      }
+
+      word.dataset.meaning = "翻译中...";
+
+      try {
+        const params = new URLSearchParams({
+          q: key,
+          langpair: "en|zh-CN",
+          mt: "1"
+        });
+        const response = await fetch("https://api.mymemory.translated.net/get?" + params.toString());
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        const translated =
+          data?.responseData?.translatedText ||
+          data?.matches?.find((item) => item?.translation)?.translation ||
+          "";
+
+        const clean = normalizeTranslation(translated, key);
+        const finalMeaning = clean || "暂无翻译";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      } catch (error) {
+        const fallback = localFallback(key);
+        const finalMeaning = fallback || "翻译失败，请稍后再试";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      }
+    }
+
+    function normalizeWord(value) {
+      return String(value).toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+    }
+
+    function normalizeTranslation(value, sourceWord) {
+      const text = String(value || "").trim();
+      if (!text) {
+        return "";
+      }
+
+      const lowered = text.toLowerCase();
+      if (lowered === String(sourceWord).toLowerCase()) {
+        return "";
+      }
+
+      return text.replace(/^zh-cn\|/i, "").trim();
+    }
+
+    function localFallback(word) {
+      const fallback = {
+        a: "一个",
+        an: "一个",
+        and: "和",
+        are: "是",
+        in: "在……里",
+        is: "是",
+        of: "……的",
+        on: "在……上",
+        the: "这；这个",
+        to: "到；去；用于不定式"
+      };
+      return fallback[word] || "";
+    }
+
+    function toggleTranslation(index, button) {
+      const el = document.getElementById("translation-" + index);
+      const isOpen = el.classList.toggle("show");
+      button.textContent = isOpen ? "隐藏中文翻译" : "显示中文翻译";
+    }
+  </script>
+</body>
+</html>
