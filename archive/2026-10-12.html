@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The First Bicycle: A Simple Machine That Changed Travel</title>
+  <style>
+    :root {
+      --bg-a: #f4efe7;
+      --bg-b: #dcecf2;
+      --paper: #fffdf8;
+      --sidebar: #edf6fb;
+      --ink: #22363c;
+      --muted: #64777c;
+      --accent: #11765f;
+      --accent-deep: #0b5948;
+      --line: #cad9dd;
+      --hover: #d8f4ec;
+      --tooltip: #17353a;
+      --soft: #edf9f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 28%),
+        linear-gradient(145deg, var(--bg-a) 0%, var(--bg-b) 100%);
+    }
+
+    .page {
+      max-width: 1220px;
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card,
+    .sidebar {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 38px rgba(32, 67, 75, 0.08);
+    }
+
+    .card {
+      background: var(--paper);
+      padding: 30px;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      padding: 22px;
+      position: sticky;
+      top: 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 45px);
+      line-height: 1.12;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tip {
+      margin: 0 0 24px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      background: var(--soft);
+      color: #28544b;
+    }
+
+    .article-block {
+      margin-bottom: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .article-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .article-block p {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .toggle-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--accent);
+      color: #f7fffd;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-1px);
+      background: var(--accent-deep);
+    }
+
+    .translation {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f3fcf8;
+      color: #355556;
+      font-size: 16px;
+    }
+
+    .translation.show {
+      display: block;
+    }
+
+    .word {
+      position: relative;
+      display: inline-block;
+      padding: 0 2px;
+      border-radius: 5px;
+      cursor: help;
+      transition: background-color 0.15s ease;
+    }
+
+    .word:hover {
+      background: var(--hover);
+    }
+
+    .word:hover::after,
+    .word:active::after,
+    .word:focus-visible::after,
+    .word.is-open::after {
+      content: attr(data-meaning);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      min-width: 64px;
+      max-width: 180px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: var(--tooltip);
+      color: #f4fdfd;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      z-index: 2;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(17, 118, 95, 0.12);
+      color: var(--accent-deep);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .side-section {
+      margin-bottom: 22px;
+    }
+
+    .side-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .side-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .side-section li {
+      margin-bottom: 10px;
+      color: #304248;
+      font-size: 15px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--accent-deep);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 14px auto;
+        padding: 10px;
+      }
+
+      .card,
+      .sidebar {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .article-block p {
+        font-size: 18px;
+      }
+
+      .word:hover::after,
+      .word:active::after,
+      .word:focus-visible::after,
+      .word.is-open::after {
+        left: 0;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="layout">
+      <main class="card">
+        <h1>The First Bicycle: A Simple Machine That Changed Travel</h1>
+        <p class="meta">Date: 2026-10-12 | Level: Beginner | Topic: A short history of the bicycle</p>
+        <p class="tip">读历史小故事时，先抓住时间词（In 1817, Later, Then, Today），它们能帮你理清事情发生的顺序。</p>
+        <section id="article">
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">In</span> <span class="word" tabindex="0" data-word="1817" data-meaning="点击或悬浮可翻译">1817</span>, <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="german" data-meaning="点击或悬浮可翻译">German</span> <span class="word" tabindex="0" data-word="inventor" data-meaning="点击或悬浮可翻译">inventor</span> <span class="word" tabindex="0" data-word="named" data-meaning="点击或悬浮可翻译">named</span> <span class="word" tabindex="0" data-word="karl" data-meaning="点击或悬浮可翻译">Karl</span> <span class="word" tabindex="0" data-word="von" data-meaning="点击或悬浮可翻译">von</span> <span class="word" tabindex="0" data-word="drais" data-meaning="点击或悬浮可翻译">Drais</span> <span class="word" tabindex="0" data-word="built" data-meaning="点击或悬浮可翻译">built</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="strange" data-meaning="点击或悬浮可翻译">strange</span> <span class="word" tabindex="0" data-word="machine" data-meaning="点击或悬浮可翻译">machine.</span> <span class="word" tabindex="0" data-word="he" data-meaning="点击或悬浮可翻译">He</span> <span class="word" tabindex="0" data-word="called" data-meaning="点击或悬浮可翻译">called</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> &<span class="word" tabindex="0" data-word="quot" data-meaning="点击或悬浮可翻译">quot</span>;<span class="word" tabindex="0" data-word="running" data-meaning="点击或悬浮可翻译">running</span> <span class="word" tabindex="0" data-word="machine" data-meaning="点击或悬浮可翻译">machine.</span>&<span class="word" tabindex="0" data-word="quot" data-meaning="点击或悬浮可翻译">quot</span>; <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="had" data-meaning="点击或悬浮可翻译">had</span> <span class="word" tabindex="0" data-word="two" data-meaning="点击或悬浮可翻译">two</span> <span class="word" tabindex="0" data-word="wheels" data-meaning="点击或悬浮可翻译">wheels</span>, <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="wooden" data-meaning="点击或悬浮可翻译">wooden</span> <span class="word" tabindex="0" data-word="frame" data-meaning="点击或悬浮可翻译">frame</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="no" data-meaning="点击或悬浮可翻译">no</span> <span class="word" tabindex="0" data-word="pedals" data-meaning="点击或悬浮可翻译">pedals.</span> <span class="word" tabindex="0" data-word="riders" data-meaning="点击或悬浮可翻译">Riders</span> <span class="word" tabindex="0" data-word="pushed" data-meaning="点击或悬浮可翻译">pushed</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="ground" data-meaning="点击或悬浮可翻译">ground</span> <span class="word" tabindex="0" data-word="with" data-meaning="点击或悬浮可翻译">with</span> <span class="word" tabindex="0" data-word="their" data-meaning="点击或悬浮可翻译">their</span> <span class="word" tabindex="0" data-word="feet" data-meaning="点击或悬浮可翻译">feet</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="move" data-meaning="点击或悬浮可翻译">move</span> <span class="word" tabindex="0" data-word="forward" data-meaning="点击或悬浮可翻译">forward.</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">People</span> <span class="word" tabindex="0" data-word="laughed" data-meaning="点击或悬浮可翻译">laughed</span> <span class="word" tabindex="0" data-word="at" data-meaning="点击或悬浮可翻译">at</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="was" data-meaning="点击或悬浮可翻译">was</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="first" data-meaning="点击或悬浮可翻译">first</span> <span class="word" tabindex="0" data-word="step" data-meaning="点击或悬浮可翻译">step</span> <span class="word" tabindex="0" data-word="toward" data-meaning="点击或悬浮可翻译">toward</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="modern" data-meaning="点击或悬浮可翻译">modern</span> <span class="word" tabindex="0" data-word="bicycle" data-meaning="点击或悬浮可翻译">bicycle.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(0, this)">显示中文翻译</button>
+          <div class="translation" id="translation-0">1817年，一位名叫卡尔·冯·德莱斯的德国发明家造出了一台奇怪的机器。他把它叫作&quot;跑步机&quot;。它有两个轮子、一个木制车架，却没有踏板。骑车的人用脚蹬地来让车子向前移动。人们嘲笑它，但它是迈向现代自行车的第一步。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="later" data-meaning="点击或悬浮可翻译">Later</span>, <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="1860s" data-meaning="点击或悬浮可翻译">1860s</span>, <span class="word" tabindex="0" data-word="french" data-meaning="点击或悬浮可翻译">French</span> <span class="word" tabindex="0" data-word="builders" data-meaning="点击或悬浮可翻译">builders</span> <span class="word" tabindex="0" data-word="added" data-meaning="点击或悬浮可翻译">added</span> <span class="word" tabindex="0" data-word="pedals" data-meaning="点击或悬浮可翻译">pedals</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="front" data-meaning="点击或悬浮可翻译">front</span> <span class="word" tabindex="0" data-word="wheel" data-meaning="点击或悬浮可翻译">wheel.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="ride" data-meaning="点击或悬浮可翻译">ride</span> <span class="word" tabindex="0" data-word="was" data-meaning="点击或悬浮可翻译">was</span> <span class="word" tabindex="0" data-word="rough" data-meaning="点击或悬浮可翻译">rough</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="dangerous" data-meaning="点击或悬浮可翻译">dangerous</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="was" data-meaning="点击或悬浮可翻译">was</span> <span class="word" tabindex="0" data-word="faster" data-meaning="点击或悬浮可翻译">faster.</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">People</span> <span class="word" tabindex="0" data-word="called" data-meaning="点击或悬浮可翻译">called</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> &<span class="word" tabindex="0" data-word="quot" data-meaning="点击或悬浮可翻译">quot</span>;<span class="word" tabindex="0" data-word="boneshaker" data-meaning="点击或悬浮可翻译">boneshaker.</span>&<span class="word" tabindex="0" data-word="quot" data-meaning="点击或悬浮可翻译">quot</span>; <span class="word" tabindex="0" data-word="then" data-meaning="点击或悬浮可翻译">Then</span>, <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="1885" data-meaning="点击或悬浮可翻译">1885</span>, <span class="word" tabindex="0" data-word="an" data-meaning="点击或悬浮可翻译">an</span> <span class="word" tabindex="0" data-word="englishman" data-meaning="点击或悬浮可翻译">Englishman</span> <span class="word" tabindex="0" data-word="named" data-meaning="点击或悬浮可翻译">named</span> <span class="word" tabindex="0" data-word="john" data-meaning="点击或悬浮可翻译">John</span> <span class="word" tabindex="0" data-word="kemp" data-meaning="点击或悬浮可翻译">Kemp</span> <span class="word" tabindex="0" data-word="starley" data-meaning="点击或悬浮可翻译">Starley</span> <span class="word" tabindex="0" data-word="designed" data-meaning="点击或悬浮可翻译">designed</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="safer" data-meaning="点击或悬浮可翻译">safer</span> <span class="word" tabindex="0" data-word="model" data-meaning="点击或悬浮可翻译">model</span> <span class="word" tabindex="0" data-word="with" data-meaning="点击或悬浮可翻译">with</span> <span class="word" tabindex="0" data-word="equal" data-meaning="点击或悬浮可翻译">equal</span> <span class="word" tabindex="0" data-word="wheels" data-meaning="点击或悬浮可翻译">wheels</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="chain" data-meaning="点击或悬浮可翻译">chain.</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> &<span class="word" tabindex="0" data-word="quot" data-meaning="点击或悬浮可翻译">quot</span>;<span class="word" tabindex="0" data-word="safety" data-meaning="点击或悬浮可翻译">safety</span> <span class="word" tabindex="0" data-word="bicycle" data-meaning="点击或悬浮可翻译">bicycle</span>&<span class="word" tabindex="0" data-word="quot" data-meaning="点击或悬浮可翻译">quot</span>; <span class="word" tabindex="0" data-word="soon" data-meaning="点击或悬浮可翻译">soon</span> <span class="word" tabindex="0" data-word="became" data-meaning="点击或悬浮可翻译">became</span> <span class="word" tabindex="0" data-word="popular" data-meaning="点击或悬浮可翻译">popular</span> <span class="word" tabindex="0" data-word="around" data-meaning="点击或悬浮可翻译">around</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="world" data-meaning="点击或悬浮可翻译">world.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(1, this)">显示中文翻译</button>
+          <div class="translation" id="translation-1">后来，在19世纪60年代，法国工匠把踏板装到了前轮上。骑起来又颠又危险，但速度更快了。人们叫它&quot;震骨车&quot;。然后，在1885年，一位名叫约翰·坎普·斯塔利的英国人设计出了一种更安全的车型，两个轮子一样大，还带有链条。这种&quot;安全自行车&quot;很快就在世界各地流行起来。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">For</span> <span class="word" tabindex="0" data-word="many" data-meaning="点击或悬浮可翻译">many</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span>, <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="bicycle" data-meaning="点击或悬浮可翻译">bicycle</span> <span class="word" tabindex="0" data-word="meant" data-meaning="点击或悬浮可翻译">meant</span> <span class="word" tabindex="0" data-word="freedom" data-meaning="点击或悬浮可翻译">freedom.</span> <span class="word" tabindex="0" data-word="workers" data-meaning="点击或悬浮可翻译">Workers</span> <span class="word" tabindex="0" data-word="rode" data-meaning="点击或悬浮可翻译">rode</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="factories" data-meaning="点击或悬浮可翻译">factories</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="women" data-meaning="点击或悬浮可翻译">women</span> <span class="word" tabindex="0" data-word="could" data-meaning="点击或悬浮可翻译">could</span> <span class="word" tabindex="0" data-word="travel" data-meaning="点击或悬浮可翻译">travel</span> <span class="word" tabindex="0" data-word="alone" data-meaning="点击或悬浮可翻译">alone</span> <span class="word" tabindex="0" data-word="more" data-meaning="点击或悬浮可翻译">more</span> <span class="word" tabindex="0" data-word="easily" data-meaning="点击或悬浮可翻译">easily.</span> <span class="word" tabindex="0" data-word="today" data-meaning="点击或悬浮可翻译">Today</span>, <span class="word" tabindex="0" data-word="millions" data-meaning="点击或悬浮可翻译">millions</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="still" data-meaning="点击或悬浮可翻译">still</span> <span class="word" tabindex="0" data-word="ride" data-meaning="点击或悬浮可翻译">ride</span> <span class="word" tabindex="0" data-word="bikes" data-meaning="点击或悬浮可翻译">bikes</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="fun" data-meaning="点击或悬浮可翻译">fun</span>, <span class="word" tabindex="0" data-word="exercise" data-meaning="点击或悬浮可翻译">exercise</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="clean" data-meaning="点击或悬浮可翻译">clean</span> <span class="word" tabindex="0" data-word="transport" data-meaning="点击或悬浮可翻译">transport.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="simple" data-meaning="点击或悬浮可翻译">simple</span> <span class="word" tabindex="0" data-word="idea" data-meaning="点击或悬浮可翻译">idea</span> <span class="word" tabindex="0" data-word="from" data-meaning="点击或悬浮可翻译">from</span> <span class="word" tabindex="0" data-word="long" data-meaning="点击或悬浮可翻译">long</span> <span class="word" tabindex="0" data-word="ago" data-meaning="点击或悬浮可翻译">ago</span> <span class="word" tabindex="0" data-word="still" data-meaning="点击或悬浮可翻译">still</span> <span class="word" tabindex="0" data-word="helps" data-meaning="点击或悬浮可翻译">helps</span> <span class="word" tabindex="0" data-word="us" data-meaning="点击或悬浮可翻译">us</span> <span class="word" tabindex="0" data-word="every" data-meaning="点击或悬浮可翻译">every</span> <span class="word" tabindex="0" data-word="day" data-meaning="点击或悬浮可翻译">day.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="one" data-meaning="点击或悬浮可翻译">one</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="most" data-meaning="点击或悬浮可翻译">most</span> <span class="word" tabindex="0" data-word="useful" data-meaning="点击或悬浮可翻译">useful</span> <span class="word" tabindex="0" data-word="inventions" data-meaning="点击或悬浮可翻译">inventions</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="history" data-meaning="点击或悬浮可翻译">history.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(2, this)">显示中文翻译</button>
+          <div class="translation" id="translation-2">对很多人来说，自行车意味着自由。工人们骑车去工厂，女性也更容易独自出行了。今天，数百万人仍然为了娱乐、锻炼和清洁出行而骑自行车。很久以前的一个简单想法，至今仍在每天帮助我们。它是历史上最有用的发明之一。</div>
+        </div>
+      </section>
+        <p class="footer">
+          AI-generated lesson for daily English reading.
+          <br>Word translation on hover or tap uses the MyMemory public translation API.
+          <br>Site: <a href="https://ccandzy.github.io/daily-english/">https://ccandzy.github.io/daily-english/</a>
+        </p>
+      </main>
+
+      <aside class="sidebar">
+        <div class="side-section">
+          <span class="label">Phrases</span>
+          <h2>Short Phrases</h2>
+          <ul><li><strong>move forward</strong>: 向前移动</li><li><strong>the first step toward</strong>: 迈向……的第一步</li><li><strong>around the world</strong>: 全世界</li><li><strong>for fun</strong>: 为了好玩</li><li><strong>in history</strong>: 在历史上</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Hard Words</span>
+          <h2>Difficult Words</h2>
+          <ul><li><strong>inventor</strong>: 发明家</li><li><strong>pedals</strong>: 踏板</li><li><strong>rough</strong>: 颠簸的；粗糙的</li><li><strong>equal</strong>: 相等的；一样的</li><li><strong>transport</strong>: 交通；运输</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Common Words</span>
+          <h2>Useful Words</h2>
+          <ul><li><strong>strange</strong>: 奇怪的</li><li><strong>dangerous</strong>: 危险的</li><li><strong>popular</strong>: 受欢迎的</li><li><strong>travel</strong>: 旅行；出行</li><li><strong>freedom</strong>: 自由</li></ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const translationCache = new Map();
+    const words = Array.from(document.querySelectorAll(".word"));
+
+    for (const word of words) {
+      word.addEventListener("mouseenter", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("focus", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = !word.classList.contains("is-open");
+        closeWordTooltips();
+        if (willOpen) {
+          word.classList.add("is-open");
+          loadTranslation(word);
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      closeWordTooltips();
+    });
+
+    function closeWordTooltips() {
+      for (const word of words) {
+        word.classList.remove("is-open");
+      }
+    }
+
+    async function loadTranslation(word) {
+      const key = word.dataset.word || normalizeWord(word.textContent || "");
+      if (!key) {
+        word.dataset.meaning = "暂无翻译";
+        return;
+      }
+
+      if (translationCache.has(key)) {
+        word.dataset.meaning = translationCache.get(key);
+        return;
+      }
+
+      word.dataset.meaning = "翻译中...";
+
+      try {
+        const params = new URLSearchParams({
+          q: key,
+          langpair: "en|zh-CN",
+          mt: "1"
+        });
+        const response = await fetch("https://api.mymemory.translated.net/get?" + params.toString());
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        const translated =
+          data?.responseData?.translatedText ||
+          data?.matches?.find((item) => item?.translation)?.translation ||
+          "";
+
+        const clean = normalizeTranslation(translated, key);
+        const finalMeaning = clean || "暂无翻译";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      } catch (error) {
+        const fallback = localFallback(key);
+        const finalMeaning = fallback || "翻译失败，请稍后再试";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      }
+    }
+
+    function normalizeWord(value) {
+      return String(value).toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+    }
+
+    function normalizeTranslation(value, sourceWord) {
+      const text = String(value || "").trim();
+      if (!text) {
+        return "";
+      }
+
+      const lowered = text.toLowerCase();
+      if (lowered === String(sourceWord).toLowerCase()) {
+        return "";
+      }
+
+      return text.replace(/^zh-cn\|/i, "").trim();
+    }
+
+    function localFallback(word) {
+      const fallback = {
+        a: "一个",
+        an: "一个",
+        and: "和",
+        are: "是",
+        in: "在……里",
+        is: "是",
+        of: "……的",
+        on: "在……上",
+        the: "这；这个",
+        to: "到；去；用于不定式"
+      };
+      return fallback[word] || "";
+    }
+
+    function toggleTranslation(index, button) {
+      const el = document.getElementById("translation-" + index);
+      const isOpen = el.classList.toggle("show");
+      button.textContent = isOpen ? "隐藏中文翻译" : "显示中文翻译";
+    }
+  </script>
+</body>
+</html>
