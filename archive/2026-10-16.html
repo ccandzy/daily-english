@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staying Safe Online Without Losing Your Freedom</title>
+  <style>
+    :root {
+      --bg-a: #f4efe7;
+      --bg-b: #dcecf2;
+      --paper: #fffdf8;
+      --sidebar: #edf6fb;
+      --ink: #22363c;
+      --muted: #64777c;
+      --accent: #11765f;
+      --accent-deep: #0b5948;
+      --line: #cad9dd;
+      --hover: #d8f4ec;
+      --tooltip: #17353a;
+      --soft: #edf9f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 28%),
+        linear-gradient(145deg, var(--bg-a) 0%, var(--bg-b) 100%);
+    }
+
+    .page {
+      max-width: 1220px;
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card,
+    .sidebar {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 38px rgba(32, 67, 75, 0.08);
+    }
+
+    .card {
+      background: var(--paper);
+      padding: 30px;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      padding: 22px;
+      position: sticky;
+      top: 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 45px);
+      line-height: 1.12;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tip {
+      margin: 0 0 24px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      background: var(--soft);
+      color: #28544b;
+    }
+
+    .article-block {
+      margin-bottom: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .article-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .article-block p {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .toggle-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--accent);
+      color: #f7fffd;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-1px);
+      background: var(--accent-deep);
+    }
+
+    .translation {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f3fcf8;
+      color: #355556;
+      font-size: 16px;
+    }
+
+    .translation.show {
+      display: block;
+    }
+
+    .word {
+      position: relative;
+      display: inline-block;
+      padding: 0 2px;
+      border-radius: 5px;
+      cursor: help;
+      transition: background-color 0.15s ease;
+    }
+
+    .word:hover {
+      background: var(--hover);
+    }
+
+    .word:hover::after,
+    .word:active::after,
+    .word:focus-visible::after,
+    .word.is-open::after {
+      content: attr(data-meaning);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      min-width: 64px;
+      max-width: 180px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: var(--tooltip);
+      color: #f4fdfd;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      z-index: 2;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(17, 118, 95, 0.12);
+      color: var(--accent-deep);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .side-section {
+      margin-bottom: 22px;
+    }
+
+    .side-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .side-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .side-section li {
+      margin-bottom: 10px;
+      color: #304248;
+      font-size: 15px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--accent-deep);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 14px auto;
+        padding: 10px;
+      }
+
+      .card,
+      .sidebar {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .article-block p {
+        font-size: 18px;
+      }
+
+      .word:hover::after,
+      .word:active::after,
+      .word:focus-visible::after,
+      .word.is-open::after {
+        left: 0;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="layout">
+      <main class="card">
+        <h1>Staying Safe Online Without Losing Your Freedom</h1>
+        <p class="meta">Date: 2026-10-16 | Level: Beginner | Topic: Online safety and privacy</p>
+        <p class="tip">学习本课时，注意“隐私设置、密码、陌生人”等常见网络词汇，并练习用完整句子表达建议。</p>
+        <section id="article">
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="every" data-meaning="点击或悬浮可翻译">Every</span> <span class="word" tabindex="0" data-word="day" data-meaning="点击或悬浮可翻译">day</span>, <span class="word" tabindex="0" data-word="we" data-meaning="点击或悬浮可翻译">we</span> <span class="word" tabindex="0" data-word="share" data-meaning="点击或悬浮可翻译">share</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">small</span> <span class="word" tabindex="0" data-word="pieces" data-meaning="点击或悬浮可翻译">pieces</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="our" data-meaning="点击或悬浮可翻译">our</span> <span class="word" tabindex="0" data-word="lives" data-meaning="点击或悬浮可翻译">lives</span> <span class="word" tabindex="0" data-word="online" data-meaning="点击或悬浮可翻译">online.</span> <span class="word" tabindex="0" data-word="we" data-meaning="点击或悬浮可翻译">We</span> <span class="word" tabindex="0" data-word="post" data-meaning="点击或悬浮可翻译">post</span> <span class="word" tabindex="0" data-word="photos" data-meaning="点击或悬浮可翻译">photos</span>, <span class="word" tabindex="0" data-word="send" data-meaning="点击或悬浮可翻译">send</span> <span class="word" tabindex="0" data-word="messages" data-meaning="点击或悬浮可翻译">messages</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="click" data-meaning="点击或悬浮可翻译">click</span> <span class="word" tabindex="0" data-word="links" data-meaning="点击或悬浮可翻译">links</span> <span class="word" tabindex="0" data-word="without" data-meaning="点击或悬浮可翻译">without</span> <span class="word" tabindex="0" data-word="much" data-meaning="点击或悬浮可翻译">much</span> <span class="word" tabindex="0" data-word="thought" data-meaning="点击或悬浮可翻译">thought.</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">That</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="normal" data-meaning="点击或悬浮可翻译">normal.</span> <span class="word" tabindex="0" data-word="however" data-meaning="点击或悬浮可翻译">However</span>, <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="everyone" data-meaning="点击或悬浮可翻译">everyone</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="internet" data-meaning="点击或悬浮可翻译">internet</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="friendly" data-meaning="点击或悬浮可翻译">friendly.</span> <span class="word" tabindex="0" data-word="some" data-meaning="点击或悬浮可翻译">Some</span> <span class="word" tabindex="0" data-word="strangers" data-meaning="点击或悬浮可翻译">strangers</span> <span class="word" tabindex="0" data-word="may" data-meaning="点击或悬浮可翻译">may</span> <span class="word" tabindex="0" data-word="try" data-meaning="点击或悬浮可翻译">try</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="trick" data-meaning="点击或悬浮可翻译">trick</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="with" data-meaning="点击或悬浮可翻译">with</span> <span class="word" tabindex="0" data-word="fake" data-meaning="点击或悬浮可翻译">fake</span> <span class="word" tabindex="0" data-word="offers" data-meaning="点击或悬浮可翻译">offers</span>, <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">so</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="wise" data-meaning="点击或悬浮可翻译">wise</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="pause" data-meaning="点击或悬浮可翻译">pause</span> <span class="word" tabindex="0" data-word="before" data-meaning="点击或悬浮可翻译">before</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="share" data-meaning="点击或悬浮可翻译">share</span> <span class="word" tabindex="0" data-word="personal" data-meaning="点击或悬浮可翻译">personal</span> <span class="word" tabindex="0" data-word="details" data-meaning="点击或悬浮可翻译">details.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(0, this)">显示中文翻译</button>
+          <div class="translation" id="translation-0">每天，我们都在网上分享生活的小片段。我们发照片、发消息、点链接，往往没多想。这很正常。不过，网上的每个人并不都友善。有些陌生人可能用假优惠骗你，所以分享个人信息前先停一停是明智的。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="one" data-meaning="点击或悬浮可翻译">One</span> <span class="word" tabindex="0" data-word="simple" data-meaning="点击或悬浮可翻译">simple</span> <span class="word" tabindex="0" data-word="habit" data-meaning="点击或悬浮可翻译">habit</span> <span class="word" tabindex="0" data-word="helps" data-meaning="点击或悬浮可翻译">helps</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="lot" data-meaning="点击或悬浮可翻译">lot</span>: <span class="word" tabindex="0" data-word="check" data-meaning="点击或悬浮可翻译">check</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="privacy" data-meaning="点击或悬浮可翻译">privacy</span> <span class="word" tabindex="0" data-word="settings" data-meaning="点击或悬浮可翻译">settings.</span> <span class="word" tabindex="0" data-word="decide" data-meaning="点击或悬浮可翻译">Decide</span> <span class="word" tabindex="0" data-word="who" data-meaning="点击或悬浮可翻译">who</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="see" data-meaning="点击或悬浮可翻译">see</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="posts" data-meaning="点击或悬浮可翻译">posts</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="who" data-meaning="点击或悬浮可翻译">who</span> <span class="word" tabindex="0" data-word="cannot" data-meaning="点击或悬浮可翻译">cannot.</span> <span class="word" tabindex="0" data-word="use" data-meaning="点击或悬浮可翻译">Use</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="strong" data-meaning="点击或悬浮可翻译">strong</span> <span class="word" tabindex="0" data-word="password" data-meaning="点击或悬浮可翻译">password</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="never" data-meaning="点击或悬浮可翻译">never</span> <span class="word" tabindex="0" data-word="use" data-meaning="点击或悬浮可翻译">use</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="same" data-meaning="点击或悬浮可翻译">same</span> <span class="word" tabindex="0" data-word="one" data-meaning="点击或悬浮可翻译">one</span> <span class="word" tabindex="0" data-word="everywhere" data-meaning="点击或悬浮可翻译">everywhere.</span> <span class="word" tabindex="0" data-word="if" data-meaning="点击或悬浮可翻译">If</span> <span class="word" tabindex="0" data-word="an" data-meaning="点击或悬浮可翻译">an</span> <span class="word" tabindex="0" data-word="app" data-meaning="点击或悬浮可翻译">app</span> <span class="word" tabindex="0" data-word="asks" data-meaning="点击或悬浮可翻译">asks</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="too" data-meaning="点击或悬浮可翻译">too</span> <span class="word" tabindex="0" data-word="much" data-meaning="点击或悬浮可翻译">much</span> <span class="word" tabindex="0" data-word="information" data-meaning="点击或悬浮可翻译">information</span>, <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="say" data-meaning="点击或悬浮可翻译">say</span> <span class="word" tabindex="0" data-word="no" data-meaning="点击或悬浮可翻译">no.</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">You</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="allowed" data-meaning="点击或悬浮可翻译">allowed</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="keep" data-meaning="点击或悬浮可翻译">keep</span> <span class="word" tabindex="0" data-word="some" data-meaning="点击或悬浮可翻译">some</span> <span class="word" tabindex="0" data-word="things" data-meaning="点击或悬浮可翻译">things</span> <span class="word" tabindex="0" data-word="private" data-meaning="点击或悬浮可翻译">private.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(1, this)">显示中文翻译</button>
+          <div class="translation" id="translation-1">一个简单的习惯很有帮助：检查你的隐私设置。决定谁能看到你的帖子，谁不能。使用强密码，不要到处都用同一个。如果某个应用要太多信息，你可以拒绝。你有权保留一些私事。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="remember" data-meaning="点击或悬浮可翻译">Remember</span>, <span class="word" tabindex="0" data-word="safety" data-meaning="点击或悬浮可翻译">safety</span> <span class="word" tabindex="0" data-word="does" data-meaning="点击或悬浮可翻译">does</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="mean" data-meaning="点击或悬浮可翻译">mean</span> <span class="word" tabindex="0" data-word="fear" data-meaning="点击或悬浮可翻译">fear.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="simply" data-meaning="点击或悬浮可翻译">simply</span> <span class="word" tabindex="0" data-word="means" data-meaning="点击或悬浮可翻译">means</span> <span class="word" tabindex="0" data-word="thinking" data-meaning="点击或悬浮可翻译">thinking</span> <span class="word" tabindex="0" data-word="first" data-meaning="点击或悬浮可翻译">first.</span> <span class="word" tabindex="0" data-word="if" data-meaning="点击或悬浮可翻译">If</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="message" data-meaning="点击或悬浮可翻译">message</span> <span class="word" tabindex="0" data-word="feels" data-meaning="点击或悬浮可翻译">feels</span> <span class="word" tabindex="0" data-word="strange" data-meaning="点击或悬浮可翻译">strange</span> <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="too" data-meaning="点击或悬浮可翻译">too</span> <span class="word" tabindex="0" data-word="good" data-meaning="点击或悬浮可翻译">good</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="be" data-meaning="点击或悬浮可翻译">be</span> <span class="word" tabindex="0" data-word="true" data-meaning="点击或悬浮可翻译">true</span>, <span class="word" tabindex="0" data-word="do" data-meaning="点击或悬浮可翻译">do</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="reply" data-meaning="点击或悬浮可翻译">reply.</span> <span class="word" tabindex="0" data-word="talk" data-meaning="点击或悬浮可翻译">Talk</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="trusted" data-meaning="点击或悬浮可翻译">trusted</span> <span class="word" tabindex="0" data-word="friend" data-meaning="点击或悬浮可翻译">friend</span> <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="adult" data-meaning="点击或悬浮可翻译">adult.</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">Small</span> <span class="word" tabindex="0" data-word="careful" data-meaning="点击或悬浮可翻译">careful</span> <span class="word" tabindex="0" data-word="choices" data-meaning="点击或悬浮可翻译">choices</span> <span class="word" tabindex="0" data-word="protect" data-meaning="点击或悬浮可翻译">protect</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="time" data-meaning="点击或悬浮可翻译">time</span>, <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="money" data-meaning="点击或悬浮可翻译">money</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="peace" data-meaning="点击或悬浮可翻译">peace</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="mind" data-meaning="点击或悬浮可翻译">mind.</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">They</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="protect" data-meaning="点击或悬浮可翻译">protect</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="who" data-meaning="点击或悬浮可翻译">who</span> <span class="word" tabindex="0" data-word="trust" data-meaning="点击或悬浮可翻译">trust</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(2, this)">显示中文翻译</button>
+          <div class="translation" id="translation-2">记住，安全并不等于恐惧。它只是意味着先思考。如果一条消息感觉奇怪或好得不像真的，不要回复。和信任的朋友或成年人聊聊。小小的谨慎选择会保护你的时间、金钱和内心的安宁，也会保护信任你的人。</div>
+        </div>
+      </section>
+        <p class="footer">
+          AI-generated lesson for daily English reading.
+          <br>Word translation on hover or tap uses the MyMemory public translation API.
+          <br>Site: <a href="https://ccandzy.github.io/daily-english/">https://ccandzy.github.io/daily-english/</a>
+        </p>
+      </main>
+
+      <aside class="sidebar">
+        <div class="side-section">
+          <span class="label">Phrases</span>
+          <h2>Short Phrases</h2>
+          <ul><li><strong>share personal details</strong>: 分享个人信息</li><li><strong>privacy settings</strong>: 隐私设置</li><li><strong>too good to be true</strong>: 好得不像真的</li><li><strong>say no</strong>: 拒绝</li><li><strong>peace of mind</strong>: 内心安宁</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Hard Words</span>
+          <h2>Difficult Words</h2>
+          <ul><li><strong>privacy</strong>: 隐私</li><li><strong>stranger</strong>: 陌生人</li><li><strong>password</strong>: 密码</li><li><strong>trusted</strong>: 可信的</li><li><strong>protect</strong>: 保护</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Common Words</span>
+          <h2>Useful Words</h2>
+          <ul><li><strong>share</strong>: 分享</li><li><strong>message</strong>: 消息</li><li><strong>check</strong>: 检查</li><li><strong>strong</strong>: 强的</li><li><strong>reply</strong>: 回复</li></ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const translationCache = new Map();
+    const words = Array.from(document.querySelectorAll(".word"));
+
+    for (const word of words) {
+      word.addEventListener("mouseenter", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("focus", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = !word.classList.contains("is-open");
+        closeWordTooltips();
+        if (willOpen) {
+          word.classList.add("is-open");
+          loadTranslation(word);
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      closeWordTooltips();
+    });
+
+    function closeWordTooltips() {
+      for (const word of words) {
+        word.classList.remove("is-open");
+      }
+    }
+
+    async function loadTranslation(word) {
+      const key = word.dataset.word || normalizeWord(word.textContent || "");
+      if (!key) {
+        word.dataset.meaning = "暂无翻译";
+        return;
+      }
+
+      if (translationCache.has(key)) {
+        word.dataset.meaning = translationCache.get(key);
+        return;
+      }
+
+      word.dataset.meaning = "翻译中...";
+
+      try {
+        const params = new URLSearchParams({
+          q: key,
+          langpair: "en|zh-CN",
+          mt: "1"
+        });
+        const response = await fetch("https://api.mymemory.translated.net/get?" + params.toString());
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        const translated =
+          data?.responseData?.translatedText ||
+          data?.matches?.find((item) => item?.translation)?.translation ||
+          "";
+
+        const clean = normalizeTranslation(translated, key);
+        const finalMeaning = clean || "暂无翻译";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      } catch (error) {
+        const fallback = localFallback(key);
+        const finalMeaning = fallback || "翻译失败，请稍后再试";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      }
+    }
+
+    function normalizeWord(value) {
+      return String(value).toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+    }
+
+    function normalizeTranslation(value, sourceWord) {
+      const text = String(value || "").trim();
+      if (!text) {
+        return "";
+      }
+
+      const lowered = text.toLowerCase();
+      if (lowered === String(sourceWord).toLowerCase()) {
+        return "";
+      }
+
+      return text.replace(/^zh-cn\|/i, "").trim();
+    }
+
+    function localFallback(word) {
+      const fallback = {
+        a: "一个",
+        an: "一个",
+        and: "和",
+        are: "是",
+        in: "在……里",
+        is: "是",
+        of: "……的",
+        on: "在……上",
+        the: "这；这个",
+        to: "到；去；用于不定式"
+      };
+      return fallback[word] || "";
+    }
+
+    function toggleTranslation(index, button) {
+      const el = document.getElementById("translation-" + index);
+      const isOpen = el.classList.toggle("show");
+      button.textContent = isOpen ? "隐藏中文翻译" : "显示中文翻译";
+    }
+  </script>
+</body>
+</html>
