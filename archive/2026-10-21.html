@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Street Festivals: Fun in the City</title>
+  <style>
+    :root {
+      --bg-a: #f4efe7;
+      --bg-b: #dcecf2;
+      --paper: #fffdf8;
+      --sidebar: #edf6fb;
+      --ink: #22363c;
+      --muted: #64777c;
+      --accent: #11765f;
+      --accent-deep: #0b5948;
+      --line: #cad9dd;
+      --hover: #d8f4ec;
+      --tooltip: #17353a;
+      --soft: #edf9f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 28%),
+        linear-gradient(145deg, var(--bg-a) 0%, var(--bg-b) 100%);
+    }
+
+    .page {
+      max-width: 1220px;
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card,
+    .sidebar {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 38px rgba(32, 67, 75, 0.08);
+    }
+
+    .card {
+      background: var(--paper);
+      padding: 30px;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      padding: 22px;
+      position: sticky;
+      top: 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 45px);
+      line-height: 1.12;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tip {
+      margin: 0 0 24px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      background: var(--soft);
+      color: #28544b;
+    }
+
+    .article-block {
+      margin-bottom: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .article-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .article-block p {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .toggle-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--accent);
+      color: #f7fffd;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-1px);
+      background: var(--accent-deep);
+    }
+
+    .translation {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f3fcf8;
+      color: #355556;
+      font-size: 16px;
+    }
+
+    .translation.show {
+      display: block;
+    }
+
+    .word {
+      position: relative;
+      display: inline-block;
+      padding: 0 2px;
+      border-radius: 5px;
+      cursor: help;
+      transition: background-color 0.15s ease;
+    }
+
+    .word:hover {
+      background: var(--hover);
+    }
+
+    .word:hover::after,
+    .word:active::after,
+    .word:focus-visible::after,
+    .word.is-open::after {
+      content: attr(data-meaning);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      min-width: 64px;
+      max-width: 180px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: var(--tooltip);
+      color: #f4fdfd;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      z-index: 2;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(17, 118, 95, 0.12);
+      color: var(--accent-deep);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .side-section {
+      margin-bottom: 22px;
+    }
+
+    .side-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .side-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .side-section li {
+      margin-bottom: 10px;
+      color: #304248;
+      font-size: 15px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--accent-deep);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 14px auto;
+        padding: 10px;
+      }
+
+      .card,
+      .sidebar {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .article-block p {
+        font-size: 18px;
+      }
+
+      .word:hover::after,
+      .word:active::after,
+      .word:focus-visible::after,
+      .word.is-open::after {
+        left: 0;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="layout">
+      <main class="card">
+        <h1>Street Festivals: Fun in the City</h1>
+        <p class="meta">Date: 2026-10-21 | Level: Beginner | Topic: City street festivals and celebrations</p>
+        <p class="tip">先通读全文理解大意，再重点记忆文中的节庆表达和连接词。</p>
+        <section id="article">
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="street" data-meaning="点击或悬浮可翻译">Street</span> <span class="word" tabindex="0" data-word="festivals" data-meaning="点击或悬浮可翻译">festivals</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="becoming" data-meaning="点击或悬浮可翻译">becoming</span> <span class="word" tabindex="0" data-word="popular" data-meaning="点击或悬浮可翻译">popular</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="many" data-meaning="点击或悬浮可翻译">many</span> <span class="word" tabindex="0" data-word="modern" data-meaning="点击或悬浮可翻译">modern</span> <span class="word" tabindex="0" data-word="cities" data-meaning="点击或悬浮可翻译">cities.</span> <span class="word" tabindex="0" data-word="during" data-meaning="点击或悬浮可翻译">During</span> <span class="word" tabindex="0" data-word="these" data-meaning="点击或悬浮可翻译">these</span> <span class="word" tabindex="0" data-word="events" data-meaning="点击或悬浮可翻译">events</span>, <span class="word" tabindex="0" data-word="local" data-meaning="点击或悬浮可翻译">local</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="close" data-meaning="点击或悬浮可翻译">close</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="road" data-meaning="点击或悬浮可翻译">road</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="turn" data-meaning="点击或悬浮可翻译">turn</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="into" data-meaning="点击或悬浮可翻译">into</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="lively" data-meaning="点击或悬浮可翻译">lively</span> <span class="word" tabindex="0" data-word="space" data-meaning="点击或悬浮可翻译">space</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="food" data-meaning="点击或悬浮可翻译">food</span>, <span class="word" tabindex="0" data-word="music" data-meaning="点击或悬浮可翻译">music</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="games" data-meaning="点击或悬浮可翻译">games.</span> <span class="word" tabindex="0" data-word="visitors" data-meaning="点击或悬浮可翻译">Visitors</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="try" data-meaning="点击或悬浮可翻译">try</span> <span class="word" tabindex="0" data-word="homemade" data-meaning="点击或悬浮可翻译">homemade</span> <span class="word" tabindex="0" data-word="dishes" data-meaning="点击或悬浮可翻译">dishes</span>, <span class="word" tabindex="0" data-word="watch" data-meaning="点击或悬浮可翻译">watch</span> <span class="word" tabindex="0" data-word="dancers" data-meaning="点击或悬浮可翻译">dancers</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="meet" data-meaning="点击或悬浮可翻译">meet</span> <span class="word" tabindex="0" data-word="neighbours" data-meaning="点击或悬浮可翻译">neighbours</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="seldom" data-meaning="点击或悬浮可翻译">seldom</span> <span class="word" tabindex="0" data-word="see" data-meaning="点击或悬浮可翻译">see.</span> <span class="word" tabindex="0" data-word="these" data-meaning="点击或悬浮可翻译">These</span> <span class="word" tabindex="0" data-word="festivals" data-meaning="点击或悬浮可翻译">festivals</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="often" data-meaning="点击或悬浮可翻译">often</span> <span class="word" tabindex="0" data-word="free" data-meaning="点击或悬浮可翻译">free</span>, <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">so</span> <span class="word" tabindex="0" data-word="families" data-meaning="点击或悬浮可翻译">families</span> <span class="word" tabindex="0" data-word="with" data-meaning="点击或悬浮可翻译">with</span> <span class="word" tabindex="0" data-word="children" data-meaning="点击或悬浮可翻译">children</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="enjoy" data-meaning="点击或悬浮可翻译">enjoy</span> <span class="word" tabindex="0" data-word="them" data-meaning="点击或悬浮可翻译">them</span> <span class="word" tabindex="0" data-word="without" data-meaning="点击或悬浮可翻译">without</span> <span class="word" tabindex="0" data-word="spending" data-meaning="点击或悬浮可翻译">spending</span> <span class="word" tabindex="0" data-word="too" data-meaning="点击或悬浮可翻译">too</span> <span class="word" tabindex="0" data-word="much" data-meaning="点击或悬浮可翻译">much</span> <span class="word" tabindex="0" data-word="money" data-meaning="点击或悬浮可翻译">money.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(0, this)">显示中文翻译</button>
+          <div class="translation" id="translation-0">街头节庆在许多现代城市越来越受欢迎。活动期间，当地人封住一条路，把它变成热闹的美食、音乐和游戏空间。游客可以品尝家常菜、观看舞者表演，还能见到平时很少见面的邻居。这些节庆通常免费，因此有孩子的家庭不用花太多钱就能享受。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="what" data-meaning="点击或悬浮可翻译">What</span> <span class="word" tabindex="0" data-word="makes" data-meaning="点击或悬浮可翻译">makes</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="street" data-meaning="点击或悬浮可翻译">street</span> <span class="word" tabindex="0" data-word="festival" data-meaning="点击或悬浮可翻译">festival</span> <span class="word" tabindex="0" data-word="special" data-meaning="点击或悬浮可翻译">special</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="usually" data-meaning="点击或悬浮可翻译">usually</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="food" data-meaning="点击或悬浮可翻译">food.</span> <span class="word" tabindex="0" data-word="stalls" data-meaning="点击或悬浮可翻译">Stalls</span> <span class="word" tabindex="0" data-word="sell" data-meaning="点击或悬浮可翻译">sell</span> <span class="word" tabindex="0" data-word="snacks" data-meaning="点击或悬浮可翻译">snacks</span> <span class="word" tabindex="0" data-word="from" data-meaning="点击或悬浮可翻译">from</span> <span class="word" tabindex="0" data-word="different" data-meaning="点击或悬浮可翻译">different</span> <span class="word" tabindex="0" data-word="cultures" data-meaning="点击或悬浮可翻译">cultures</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="cooks" data-meaning="点击或悬浮可翻译">cooks</span> <span class="word" tabindex="0" data-word="explain" data-meaning="点击或悬浮可翻译">explain</span> <span class="word" tabindex="0" data-word="how" data-meaning="点击或悬浮可翻译">how</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="prepare" data-meaning="点击或悬浮可翻译">prepare</span> <span class="word" tabindex="0" data-word="them" data-meaning="点击或悬浮可翻译">them.</span> <span class="word" tabindex="0" data-word="some" data-meaning="点击或悬浮可翻译">Some</span> <span class="word" tabindex="0" data-word="organizers" data-meaning="点击或悬浮可翻译">organizers</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="encourage" data-meaning="点击或悬浮可翻译">encourage</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="bring" data-meaning="点击或悬浮可翻译">bring</span> <span class="word" tabindex="0" data-word="their" data-meaning="点击或悬浮可翻译">their</span> <span class="word" tabindex="0" data-word="own" data-meaning="点击或悬浮可翻译">own</span> <span class="word" tabindex="0" data-word="special" data-meaning="点击或悬浮可翻译">special</span> <span class="word" tabindex="0" data-word="dishes" data-meaning="点击或悬浮可翻译">dishes</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="share" data-meaning="点击或悬浮可翻译">share</span> <span class="word" tabindex="0" data-word="recipes" data-meaning="点击或悬浮可翻译">recipes.</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="makes" data-meaning="点击或悬浮可翻译">makes</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="festival" data-meaning="点击或悬浮可翻译">festival</span> <span class="word" tabindex="0" data-word="friendly" data-meaning="点击或悬浮可翻译">friendly</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="helps" data-meaning="点击或悬浮可翻译">helps</span> <span class="word" tabindex="0" data-word="new" data-meaning="点击或悬浮可翻译">new</span> <span class="word" tabindex="0" data-word="comers" data-meaning="点击或悬浮可翻译">comers</span> <span class="word" tabindex="0" data-word="feel" data-meaning="点击或悬浮可翻译">feel</span> <span class="word" tabindex="0" data-word="welcome" data-meaning="点击或悬浮可翻译">welcome.</span> <span class="word" tabindex="0" data-word="however" data-meaning="点击或悬浮可翻译">However</span>, <span class="word" tabindex="0" data-word="such" data-meaning="点击或悬浮可翻译">such</span> <span class="word" tabindex="0" data-word="events" data-meaning="点击或悬浮可翻译">events</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="get" data-meaning="点击或悬浮可翻译">get</span> <span class="word" tabindex="0" data-word="very" data-meaning="点击或悬浮可翻译">very</span> <span class="word" tabindex="0" data-word="crowded" data-meaning="点击或悬浮可翻译">crowded</span>, <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">so</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="wise" data-meaning="点击或悬浮可翻译">wise</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="arrive" data-meaning="点击或悬浮可翻译">arrive</span> <span class="word" tabindex="0" data-word="early" data-meaning="点击或悬浮可翻译">early.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(1, this)">显示中文翻译</button>
+          <div class="translation" id="translation-1">街头节庆特别之处通常在于食物。摊位售卖不同文化的小吃，厨师会讲解做法。有些组织者还鼓励人们带上自家特色菜并分享食谱。这让节庆更友好，也帮助新来的人感到受欢迎。不过，这类活动会很拥挤，所以早点到是明智的。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="before" data-meaning="点击或悬浮可翻译">Before</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="visit" data-meaning="点击或悬浮可翻译">visit</span>, <span class="word" tabindex="0" data-word="check" data-meaning="点击或悬浮可翻译">check</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="weather" data-meaning="点击或悬浮可翻译">weather</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="safety" data-meaning="点击或悬浮可翻译">safety</span> <span class="word" tabindex="0" data-word="advice" data-meaning="点击或悬浮可翻译">advice.</span> <span class="word" tabindex="0" data-word="wear" data-meaning="点击或悬浮可翻译">Wear</span> <span class="word" tabindex="0" data-word="comfortable" data-meaning="点击或悬浮可翻译">comfortable</span> <span class="word" tabindex="0" data-word="shoes" data-meaning="点击或悬浮可翻译">shoes</span> <span class="word" tabindex="0" data-word="because" data-meaning="点击或悬浮可翻译">because</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="will" data-meaning="点击或悬浮可翻译">will</span> <span class="word" tabindex="0" data-word="probably" data-meaning="点击或悬浮可翻译">probably</span> <span class="word" tabindex="0" data-word="walk" data-meaning="点击或悬浮可翻译">walk</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="lot" data-meaning="点击或悬浮可翻译">lot.</span> <span class="word" tabindex="0" data-word="try" data-meaning="点击或悬浮可翻译">Try</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="avoid" data-meaning="点击或悬浮可翻译">avoid</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="busiest" data-meaning="点击或悬浮可翻译">busiest</span> <span class="word" tabindex="0" data-word="hours" data-meaning="点击或悬浮可翻译">hours</span> <span class="word" tabindex="0" data-word="if" data-meaning="点击或悬浮可翻译">if</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="dislike" data-meaning="点击或悬浮可翻译">dislike</span> <span class="word" tabindex="0" data-word="large" data-meaning="点击或悬浮可翻译">large</span> <span class="word" tabindex="0" data-word="crowds" data-meaning="点击或悬浮可翻译">crowds.</span> <span class="word" tabindex="0" data-word="spend" data-meaning="点击或悬浮可翻译">Spend</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="little" data-meaning="点击或悬浮可翻译">little</span> <span class="word" tabindex="0" data-word="time" data-meaning="点击或悬浮可翻译">time</span> <span class="word" tabindex="0" data-word="watching" data-meaning="点击或悬浮可翻译">watching</span> <span class="word" tabindex="0" data-word="how" data-meaning="点击或悬浮可翻译">how</span> <span class="word" tabindex="0" data-word="local" data-meaning="点击或悬浮可翻译">local</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="enjoy" data-meaning="点击或悬浮可翻译">enjoy</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="day" data-meaning="点击或悬浮可翻译">day.</span> <span class="word" tabindex="0" data-word="street" data-meaning="点击或悬浮可翻译">Street</span> <span class="word" tabindex="0" data-word="festivals" data-meaning="点击或悬浮可翻译">festivals</span> <span class="word" tabindex="0" data-word="teach" data-meaning="点击或悬浮可翻译">teach</span> <span class="word" tabindex="0" data-word="us" data-meaning="点击或悬浮可翻译">us</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="sharing" data-meaning="点击或悬浮可翻译">sharing</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="meal" data-meaning="点击或悬浮可翻译">meal</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="warmly" data-meaning="点击或悬浮可翻译">warmly</span> <span class="word" tabindex="0" data-word="connect" data-meaning="点击或悬浮可翻译">connect</span> <span class="word" tabindex="0" data-word="strangers" data-meaning="点击或悬浮可翻译">strangers.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(2, this)">显示中文翻译</button>
+          <div class="translation" id="translation-2">去之前，看看天气和安全提示。穿舒适的鞋，因为你可能会走很多路。如果不喜欢人多，就尽量避开最忙的时段。花点时间看看当地人如何享受这一天。街头节庆告诉我们，分享一顿饭能温暖地连接陌生人。</div>
+        </div>
+      </section>
+        <p class="footer">
+          AI-generated lesson for daily English reading.
+          <br>Word translation on hover or tap uses the MyMemory public translation API.
+          <br>Site: <a href="https://ccandzy.github.io/daily-english/">https://ccandzy.github.io/daily-english/</a>
+        </p>
+      </main>
+
+      <aside class="sidebar">
+        <div class="side-section">
+          <span class="label">Phrases</span>
+          <h2>Short Phrases</h2>
+          <ul><li><strong>turn it into</strong>: 把它变成</li><li><strong>homemade dishes</strong>: 家常菜</li><li><strong>bring their own</strong>: 自带</li><li><strong>feel welcome</strong>: 感到受欢迎</li><li><strong>arrive early</strong>: 早点到</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Hard Words</span>
+          <h2>Difficult Words</h2>
+          <ul><li><strong>festival</strong>: 节庆</li><li><strong>organizer</strong>: 组织者</li><li><strong>recipe</strong>: 食谱</li><li><strong>crowded</strong>: 拥挤的</li><li><strong>stranger</strong>: 陌生人</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Common Words</span>
+          <h2>Useful Words</h2>
+          <ul><li><strong>popular</strong>: 受欢迎的</li><li><strong>visitor</strong>: 游客</li><li><strong>free</strong>: 免费的</li><li><strong>weather</strong>: 天气</li><li><strong>avoid</strong>: 避免</li></ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const translationCache = new Map();
+    const words = Array.from(document.querySelectorAll(".word"));
+
+    for (const word of words) {
+      word.addEventListener("mouseenter", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("focus", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = !word.classList.contains("is-open");
+        closeWordTooltips();
+        if (willOpen) {
+          word.classList.add("is-open");
+          loadTranslation(word);
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      closeWordTooltips();
+    });
+
+    function closeWordTooltips() {
+      for (const word of words) {
+        word.classList.remove("is-open");
+      }
+    }
+
+    async function loadTranslation(word) {
+      const key = word.dataset.word || normalizeWord(word.textContent || "");
+      if (!key) {
+        word.dataset.meaning = "暂无翻译";
+        return;
+      }
+
+      if (translationCache.has(key)) {
+        word.dataset.meaning = translationCache.get(key);
+        return;
+      }
+
+      word.dataset.meaning = "翻译中...";
+
+      try {
+        const params = new URLSearchParams({
+          q: key,
+          langpair: "en|zh-CN",
+          mt: "1"
+        });
+        const response = await fetch("https://api.mymemory.translated.net/get?" + params.toString());
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        const translated =
+          data?.responseData?.translatedText ||
+          data?.matches?.find((item) => item?.translation)?.translation ||
+          "";
+
+        const clean = normalizeTranslation(translated, key);
+        const finalMeaning = clean || "暂无翻译";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      } catch (error) {
+        const fallback = localFallback(key);
+        const finalMeaning = fallback || "翻译失败，请稍后再试";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      }
+    }
+
+    function normalizeWord(value) {
+      return String(value).toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+    }
+
+    function normalizeTranslation(value, sourceWord) {
+      const text = String(value || "").trim();
+      if (!text) {
+        return "";
+      }
+
+      const lowered = text.toLowerCase();
+      if (lowered === String(sourceWord).toLowerCase()) {
+        return "";
+      }
+
+      return text.replace(/^zh-cn\|/i, "").trim();
+    }
+
+    function localFallback(word) {
+      const fallback = {
+        a: "一个",
+        an: "一个",
+        and: "和",
+        are: "是",
+        in: "在……里",
+        is: "是",
+        of: "……的",
+        on: "在……上",
+        the: "这；这个",
+        to: "到；去；用于不定式"
+      };
+      return fallback[word] || "";
+    }
+
+    function toggleTranslation(index, button) {
+      const el = document.getElementById("translation-" + index);
+      const isOpen = el.classList.toggle("show");
+      button.textContent = isOpen ? "隐藏中文翻译" : "显示中文翻译";
+    }
+  </script>
+</body>
+</html>
