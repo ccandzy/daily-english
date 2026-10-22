@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Working from Home: The New Normal</title>
+  <style>
+    :root {
+      --bg-a: #f4efe7;
+      --bg-b: #dcecf2;
+      --paper: #fffdf8;
+      --sidebar: #edf6fb;
+      --ink: #22363c;
+      --muted: #64777c;
+      --accent: #11765f;
+      --accent-deep: #0b5948;
+      --line: #cad9dd;
+      --hover: #d8f4ec;
+      --tooltip: #17353a;
+      --soft: #edf9f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 28%),
+        linear-gradient(145deg, var(--bg-a) 0%, var(--bg-b) 100%);
+    }
+
+    .page {
+      max-width: 1220px;
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card,
+    .sidebar {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 38px rgba(32, 67, 75, 0.08);
+    }
+
+    .card {
+      background: var(--paper);
+      padding: 30px;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      padding: 22px;
+      position: sticky;
+      top: 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 45px);
+      line-height: 1.12;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tip {
+      margin: 0 0 24px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      background: var(--soft);
+      color: #28544b;
+    }
+
+    .article-block {
+      margin-bottom: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .article-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .article-block p {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .toggle-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--accent);
+      color: #f7fffd;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-1px);
+      background: var(--accent-deep);
+    }
+
+    .translation {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f3fcf8;
+      color: #355556;
+      font-size: 16px;
+    }
+
+    .translation.show {
+      display: block;
+    }
+
+    .word {
+      position: relative;
+      display: inline-block;
+      padding: 0 2px;
+      border-radius: 5px;
+      cursor: help;
+      transition: background-color 0.15s ease;
+    }
+
+    .word:hover {
+      background: var(--hover);
+    }
+
+    .word:hover::after,
+    .word:active::after,
+    .word:focus-visible::after,
+    .word.is-open::after {
+      content: attr(data-meaning);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      min-width: 64px;
+      max-width: 180px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: var(--tooltip);
+      color: #f4fdfd;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      z-index: 2;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(17, 118, 95, 0.12);
+      color: var(--accent-deep);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .side-section {
+      margin-bottom: 22px;
+    }
+
+    .side-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .side-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .side-section li {
+      margin-bottom: 10px;
+      color: #304248;
+      font-size: 15px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--accent-deep);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 14px auto;
+        padding: 10px;
+      }
+
+      .card,
+      .sidebar {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .article-block p {
+        font-size: 18px;
+      }
+
+      .word:hover::after,
+      .word:active::after,
+      .word:focus-visible::after,
+      .word.is-open::after {
+        left: 0;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="layout">
+      <main class="card">
+        <h1>Working from Home: The New Normal</h1>
+        <p class="meta">Date: 2026-10-23 | Level: Beginner | Topic: Hybrid work and modern jobs</p>
+        <p class="tip">阅读时先抓住每段的主题句，再回看细节；注意 “both...and...” 和 “between...and...” 的搭配。</p>
+        <section id="article">
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="many" data-meaning="点击或悬浮可翻译">Many</span> <span class="word" tabindex="0" data-word="offices" data-meaning="点击或悬浮可翻译">offices</span> <span class="word" tabindex="0" data-word="changed" data-meaning="点击或悬浮可翻译">changed</span> <span class="word" tabindex="0" data-word="after" data-meaning="点击或悬浮可翻译">after</span> <span class="word" tabindex="0" data-word="2020" data-meaning="点击或悬浮可翻译">2020</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="way" data-meaning="点击或悬浮可翻译">way</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="work" data-meaning="点击或悬浮可翻译">work</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="still" data-meaning="点击或悬浮可翻译">still</span> <span class="word" tabindex="0" data-word="changing" data-meaning="点击或悬浮可翻译">changing.</span> <span class="word" tabindex="0" data-word="now" data-meaning="点击或悬浮可翻译">Now</span> <span class="word" tabindex="0" data-word="some" data-meaning="点击或悬浮可翻译">some</span> <span class="word" tabindex="0" data-word="employees" data-meaning="点击或悬浮可翻译">employees</span> <span class="word" tabindex="0" data-word="go" data-meaning="点击或悬浮可翻译">go</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="office" data-meaning="点击或悬浮可翻译">office</span> <span class="word" tabindex="0" data-word="only" data-meaning="点击或悬浮可翻译">only</span> <span class="word" tabindex="0" data-word="two" data-meaning="点击或悬浮可翻译">two</span> <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="three" data-meaning="点击或悬浮可翻译">three</span> <span class="word" tabindex="0" data-word="days" data-meaning="点击或悬浮可翻译">days</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="week" data-meaning="点击或悬浮可翻译">week.</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="called" data-meaning="点击或悬浮可翻译">called</span> <span class="word" tabindex="0" data-word="hybrid" data-meaning="点击或悬浮可翻译">hybrid</span> <span class="word" tabindex="0" data-word="work" data-meaning="点击或悬浮可翻译">work.</span> <span class="word" tabindex="0" data-word="companies" data-meaning="点击或悬浮可翻译">Companies</span> <span class="word" tabindex="0" data-word="say" data-meaning="点击或悬浮可翻译">say</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="saves" data-meaning="点击或悬浮可翻译">saves</span> <span class="word" tabindex="0" data-word="money" data-meaning="点击或悬浮可翻译">money</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="workers" data-meaning="点击或悬浮可翻译">workers</span> <span class="word" tabindex="0" data-word="feel" data-meaning="点击或悬浮可翻译">feel</span> <span class="word" tabindex="0" data-word="less" data-meaning="点击或悬浮可翻译">less</span> <span class="word" tabindex="0" data-word="tired" data-meaning="点击或悬浮可翻译">tired</span> <span class="word" tabindex="0" data-word="because" data-meaning="点击或悬浮可翻译">because</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="do" data-meaning="点击或悬浮可翻译">do</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="travel" data-meaning="点击或悬浮可翻译">travel</span> <span class="word" tabindex="0" data-word="every" data-meaning="点击或悬浮可翻译">every</span> <span class="word" tabindex="0" data-word="day" data-meaning="点击或悬浮可翻译">day.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(0, this)">显示中文翻译</button>
+          <div class="translation" id="translation-0">2020年后，许多办公室发生了变化，人们的工作方式仍在改变。现在有些员工每周只去办公室两三天。这被称为混合办公。公司说这样省钱，员工因为不用每天通勤，也没那么累。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">But</span> <span class="word" tabindex="0" data-word="hybrid" data-meaning="点击或悬浮可翻译">hybrid</span> <span class="word" tabindex="0" data-word="work" data-meaning="点击或悬浮可翻译">work</span> <span class="word" tabindex="0" data-word="brings" data-meaning="点击或悬浮可翻译">brings</span> <span class="word" tabindex="0" data-word="problems" data-meaning="点击或悬浮可翻译">problems</span> <span class="word" tabindex="0" data-word="too" data-meaning="点击或悬浮可翻译">too.</span> <span class="word" tabindex="0" data-word="some" data-meaning="点击或悬浮可翻译">Some</span> <span class="word" tabindex="0" data-word="managers" data-meaning="点击或悬浮可翻译">managers</span> <span class="word" tabindex="0" data-word="worry" data-meaning="点击或悬浮可翻译">worry</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="teamwork" data-meaning="点击或悬浮可翻译">teamwork</span> <span class="word" tabindex="0" data-word="becomes" data-meaning="点击或悬浮可翻译">becomes</span> <span class="word" tabindex="0" data-word="weaker" data-meaning="点击或悬浮可翻译">weaker</span> <span class="word" tabindex="0" data-word="when" data-meaning="点击或悬浮可翻译">when</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="same" data-meaning="点击或悬浮可翻译">same</span> <span class="word" tabindex="0" data-word="room" data-meaning="点击或悬浮可翻译">room.</span> <span class="word" tabindex="0" data-word="new" data-meaning="点击或悬浮可翻译">New</span> <span class="word" tabindex="0" data-word="staff" data-meaning="点击或悬浮可翻译">staff</span> <span class="word" tabindex="0" data-word="may" data-meaning="点击或悬浮可翻译">may</span> <span class="word" tabindex="0" data-word="find" data-meaning="点击或悬浮可翻译">find</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="hard" data-meaning="点击或悬浮可翻译">hard</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="learn" data-meaning="点击或悬浮可翻译">learn</span> <span class="word" tabindex="0" data-word="from" data-meaning="点击或悬浮可翻译">from</span> <span class="word" tabindex="0" data-word="experienced" data-meaning="点击或悬浮可翻译">experienced</span> <span class="word" tabindex="0" data-word="colleagues" data-meaning="点击或悬浮可翻译">colleagues.</span> <span class="word" tabindex="0" data-word="others" data-meaning="点击或悬浮可翻译">Others</span> <span class="word" tabindex="0" data-word="say" data-meaning="点击或悬浮可翻译">say</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="work" data-meaning="点击或悬浮可翻译">work</span> <span class="word" tabindex="0" data-word="longer" data-meaning="点击或悬浮可翻译">longer</span> <span class="word" tabindex="0" data-word="hours" data-meaning="点击或悬浮可翻译">hours</span> <span class="word" tabindex="0" data-word="at" data-meaning="点击或悬浮可翻译">at</span> <span class="word" tabindex="0" data-word="home" data-meaning="点击或悬浮可翻译">home</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="cannot" data-meaning="点击或悬浮可翻译">cannot</span> <span class="word" tabindex="0" data-word="stop" data-meaning="点击或悬浮可翻译">stop</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="evening" data-meaning="点击或悬浮可翻译">evening.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(1, this)">显示中文翻译</button>
+          <div class="translation" id="translation-1">但混合办公也带来问题。一些经理担心，大家不在同一间屋里时，团队合作会变弱。新员工可能觉得很难向有经验的同事学习。还有人说在家工作时间更长，晚上也停不下来。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="experts" data-meaning="点击或悬浮可翻译">Experts</span> <span class="word" tabindex="0" data-word="suggest" data-meaning="点击或悬浮可翻译">suggest</span> <span class="word" tabindex="0" data-word="clear" data-meaning="点击或悬浮可翻译">clear</span> <span class="word" tabindex="0" data-word="rules" data-meaning="点击或悬浮可翻译">rules.</span> <span class="word" tabindex="0" data-word="teams" data-meaning="点击或悬浮可翻译">Teams</span> <span class="word" tabindex="0" data-word="should" data-meaning="点击或悬浮可翻译">should</span> <span class="word" tabindex="0" data-word="agree" data-meaning="点击或悬浮可翻译">agree</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="which" data-meaning="点击或悬浮可翻译">which</span> <span class="word" tabindex="0" data-word="days" data-meaning="点击或悬浮可翻译">days</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="meet" data-meaning="点击或悬浮可翻译">meet</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="person" data-meaning="点击或悬浮可翻译">person</span>, <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">so</span> <span class="word" tabindex="0" data-word="nobody" data-meaning="点击或悬浮可翻译">nobody</span> <span class="word" tabindex="0" data-word="feels" data-meaning="点击或悬浮可翻译">feels</span> <span class="word" tabindex="0" data-word="left" data-meaning="点击或悬浮可翻译">left</span> <span class="word" tabindex="0" data-word="out" data-meaning="点击或悬浮可翻译">out.</span> <span class="word" tabindex="0" data-word="managers" data-meaning="点击或悬浮可翻译">Managers</span> <span class="word" tabindex="0" data-word="should" data-meaning="点击或悬浮可翻译">should</span> <span class="word" tabindex="0" data-word="ask" data-meaning="点击或悬浮可翻译">ask</span> <span class="word" tabindex="0" data-word="how" data-meaning="点击或悬浮可翻译">how</span> <span class="word" tabindex="0" data-word="everyone" data-meaning="点击或悬浮可翻译">everyone</span> <span class="word" tabindex="0" data-word="feels" data-meaning="点击或悬浮可翻译">feels</span> <span class="word" tabindex="0" data-word="each" data-meaning="点击或悬浮可翻译">each</span> <span class="word" tabindex="0" data-word="week" data-meaning="点击或悬浮可翻译">week.</span> <span class="word" tabindex="0" data-word="if" data-meaning="点击或悬浮可翻译">If</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="plan" data-meaning="点击或悬浮可翻译">plan</span> <span class="word" tabindex="0" data-word="carefully" data-meaning="点击或悬浮可翻译">carefully</span>, <span class="word" tabindex="0" data-word="hybrid" data-meaning="点击或悬浮可翻译">hybrid</span> <span class="word" tabindex="0" data-word="work" data-meaning="点击或悬浮可翻译">work</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="be" data-meaning="点击或悬浮可翻译">be</span> <span class="word" tabindex="0" data-word="good" data-meaning="点击或悬浮可翻译">good</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="both" data-meaning="点击或悬浮可翻译">both</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="company" data-meaning="点击或悬浮可翻译">company</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="staff" data-meaning="点击或悬浮可翻译">staff.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="help" data-meaning="点击或悬浮可翻译">help</span> <span class="word" tabindex="0" data-word="workers" data-meaning="点击或悬浮可翻译">workers</span> <span class="word" tabindex="0" data-word="keep" data-meaning="点击或悬浮可翻译">keep</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="better" data-meaning="点击或悬浮可翻译">better</span> <span class="word" tabindex="0" data-word="balance" data-meaning="点击或悬浮可翻译">balance</span> <span class="word" tabindex="0" data-word="between" data-meaning="点击或悬浮可翻译">between</span> <span class="word" tabindex="0" data-word="job" data-meaning="点击或悬浮可翻译">job</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="life" data-meaning="点击或悬浮可翻译">life.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(2, this)">显示中文翻译</button>
+          <div class="translation" id="translation-2">专家建议制定明确的规则。团队应商定哪几天线下见面，这样没人会觉得被排除在外。经理应每周询问大家的感受。如果计划得仔细，混合办公对公司和对员工都有好处。它还能帮员工在工作和生活之间保持更好的平衡。</div>
+        </div>
+      </section>
+        <p class="footer">
+          AI-generated lesson for daily English reading.
+          <br>Word translation on hover or tap uses the MyMemory public translation API.
+          <br>Site: <a href="https://ccandzy.github.io/daily-english/">https://ccandzy.github.io/daily-english/</a>
+        </p>
+      </main>
+
+      <aside class="sidebar">
+        <div class="side-section">
+          <span class="label">Phrases</span>
+          <h2>Short Phrases</h2>
+          <ul><li><strong>go to the office</strong>: 去办公室上班</li><li><strong>in person</strong>: 亲自；面对面</li><li><strong>feel left out</strong>: 感到被冷落</li><li><strong>work longer hours</strong>: 工作时间更长</li><li><strong>a balance between job and life</strong>: 工作与生活的平衡</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Hard Words</span>
+          <h2>Difficult Words</h2>
+          <ul><li><strong>hybrid</strong>: 混合的</li><li><strong>employee</strong>: 员工</li><li><strong>colleague</strong>: 同事</li><li><strong>experienced</strong>: 有经验的</li><li><strong>balance</strong>: 平衡</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Common Words</span>
+          <h2>Useful Words</h2>
+          <ul><li><strong>office</strong>: 办公室</li><li><strong>company</strong>: 公司</li><li><strong>week</strong>: 星期；一周</li><li><strong>travel</strong>: 出行；通勤</li><li><strong>staff</strong>: 全体员工</li></ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const translationCache = new Map();
+    const words = Array.from(document.querySelectorAll(".word"));
+
+    for (const word of words) {
+      word.addEventListener("mouseenter", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("focus", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = !word.classList.contains("is-open");
+        closeWordTooltips();
+        if (willOpen) {
+          word.classList.add("is-open");
+          loadTranslation(word);
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      closeWordTooltips();
+    });
+
+    function closeWordTooltips() {
+      for (const word of words) {
+        word.classList.remove("is-open");
+      }
+    }
+
+    async function loadTranslation(word) {
+      const key = word.dataset.word || normalizeWord(word.textContent || "");
+      if (!key) {
+        word.dataset.meaning = "暂无翻译";
+        return;
+      }
+
+      if (translationCache.has(key)) {
+        word.dataset.meaning = translationCache.get(key);
+        return;
+      }
+
+      word.dataset.meaning = "翻译中...";
+
+      try {
+        const params = new URLSearchParams({
+          q: key,
+          langpair: "en|zh-CN",
+          mt: "1"
+        });
+        const response = await fetch("https://api.mymemory.translated.net/get?" + params.toString());
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        const translated =
+          data?.responseData?.translatedText ||
+          data?.matches?.find((item) => item?.translation)?.translation ||
+          "";
+
+        const clean = normalizeTranslation(translated, key);
+        const finalMeaning = clean || "暂无翻译";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      } catch (error) {
+        const fallback = localFallback(key);
+        const finalMeaning = fallback || "翻译失败，请稍后再试";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      }
+    }
+
+    function normalizeWord(value) {
+      return String(value).toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+    }
+
+    function normalizeTranslation(value, sourceWord) {
+      const text = String(value || "").trim();
+      if (!text) {
+        return "";
+      }
+
+      const lowered = text.toLowerCase();
+      if (lowered === String(sourceWord).toLowerCase()) {
+        return "";
+      }
+
+      return text.replace(/^zh-cn\|/i, "").trim();
+    }
+
+    function localFallback(word) {
+      const fallback = {
+        a: "一个",
+        an: "一个",
+        and: "和",
+        are: "是",
+        in: "在……里",
+        is: "是",
+        of: "……的",
+        on: "在……上",
+        the: "这；这个",
+        to: "到；去；用于不定式"
+      };
+      return fallback[word] || "";
+    }
+
+    function toggleTranslation(index, button) {
+      const el = document.getElementById("translation-" + index);
+      const isOpen = el.classList.toggle("show");
+      button.textContent = isOpen ? "隐藏中文翻译" : "显示中文翻译";
+    }
+  </script>
+</body>
+</html>
