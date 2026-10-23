@@ -16,36 +16,67 @@ const shanghaiDate = new Intl.DateTimeFormat("en-CA", {
 }).format(now);
 
 // ---------- Topic rotation: topic pool + recent-topic check ----------
-// 扩展后的主题池（你可以继续补充）
+// Use specific angles across science, society, culture and everyday decisions.
 const topicPool = [
-  "health and exercise",
-  "food and cooking",
-  "travel and tourism",
-  "technology (gadgets)",
-  "climate and environment",
-  "education and study tips",
-  "work and jobs",
-  "sports",
-  "culture and festivals",
-  "daily routines",
-  "hobbies and crafts",
-  "pets and animals",
-  "books and reading",
-  "movies and entertainment",
-  "weather and seasons",
-  "city life and transport (non-electric)",
-  "nature and outdoors",
-  "science discoveries",
-  "simple history stories",
-  "holidays and celebrations",
-  "markets and shopping",
-  "money saving tips",
-  "online safety and privacy",
-  "language learning tips",
-  "career skills and interviews"
+  "sleep science and daily energy",
+  "exercise habits and long-term motivation",
+  "nutrition labels and food choices",
+  "mental well-being and stress management",
+  "fermentation and food culture",
+  "food waste and sustainable kitchens",
+  "public transport and urban planning",
+  "electric vehicles and charging infrastructure",
+  "walkable cities and public spaces",
+  "tourism and local communities",
+  "migration and cultural identity",
+  "language change and bilingual life",
+  "art restoration and cultural heritage",
+  "architecture and the way people live",
+  "music and human emotions",
+  "film storytelling and visual techniques",
+  "literature and different perspectives",
+  "museums and the return of historical objects",
+  "archaeology and evidence about the past",
+  "the history of everyday inventions",
+  "trade routes and cultural exchange",
+  "space exploration and its practical benefits",
+  "ocean exploration and marine ecosystems",
+  "animal intelligence and communication",
+  "biodiversity and wildlife conservation",
+  "microbes and human health",
+  "scientific experiments and reliable evidence",
+  "renewable energy and electricity storage",
+  "climate adaptation and extreme weather",
+  "water scarcity and resource management",
+  "the circular economy and product repair",
+  "artificial intelligence and creative work",
+  "automation and changing careers",
+  "digital privacy and personal data",
+  "cybersecurity and online scams",
+  "algorithms and social media recommendations",
+  "misinformation and media literacy",
+  "technology accessibility and inclusive design",
+  "remote work and team communication",
+  "lifelong learning and career changes",
+  "education inequality and access to learning",
+  "critical thinking and decision-making",
+  "memory and effective learning strategies",
+  "behavioral economics and shopping habits",
+  "inflation and household budgets",
+  "supply chains and global trade",
+  "small businesses and entrepreneurship",
+  "advertising and consumer psychology",
+  "volunteering and community trust",
+  "population aging and intergenerational support",
+  "sports psychology and performance under pressure",
+  "fair play and technology in sports",
+  "ethical choices in everyday life",
+  "risk perception and uncertainty",
+  "negotiation and resolving disagreements",
+  "citizen science and public participation"
 ];
 
-function getRecentTopics(archiveDir, lookback = 12) {
+function getRecentTopics(archiveDir, lookback = 30) {
   const recent = [];
   try {
     if (!fsSync.existsSync(archiveDir)) return recent;
@@ -78,7 +109,7 @@ function shuffleArray(arr) {
 }
 
 const archiveDirPath = path.join(process.cwd(), "archive");
-const recentTopics = getRecentTopics(archiveDirPath, 12);
+const recentTopics = getRecentTopics(archiveDirPath, 30);
 
 let chosenTopic = "";
 for (const t of shuffleArray(topicPool)) {
@@ -96,21 +127,26 @@ if (!chosenTopic) {
 // ---------- End topic rotation ----------
 
 const prompt = `
-You are creating a daily English lesson for a Chinese learner with basic foundation.
+You are creating a daily English reading lesson for a Chinese learner progressing from intermediate to upper-intermediate English (CEFR B1-B2).
 
 Preferred topic: ${chosenTopic}.
-Topic can be a light current event or a safe general-interest modern topic. Avoid repeating recent topics found in the site's archive.
+Explore the preferred topic through one specific question, mechanism, comparison, or trade-off.
+Recent archive topics (avoid repeating their main subject or angle, even under a different title):
+${recentTopics.length ? recentTopics.map((topic) => `- ${topic}`).join("\n") : "- No recent topics available."}
+Keep the Topic metadata close to the preferred topic so future rotation can detect overlap.
 
 Return content in the following Markdown format. Do not include markdown code fences or any text before/after.
 
 Requirements:
-- About 150 to 180 words of English total.
-- Use slightly more challenging but still clear English (around CEFR A2-B1).
-- Topic can be a light current event or a safe general-interest modern topic.
+- Write 240 to 300 words of English body text in total, excluding headings, translations, and vocabulary lists.
+- Target CEFR B1-B2: use precise vocabulary, varied sentence lengths, relative clauses, and natural cause-and-effect or contrast structures. Avoid dense academic prose and unexplained jargon.
+- Develop an idea rather than merely listing facts: introduce a concrete situation, explain how or why it works, then discuss an implication, limitation, or competing view.
+- Use concrete examples to explain unfamiliar concepts; do not invent quotations, statistics, or research findings.
+- Introduce 5 useful B2-level words naturally in the body and reinforce 5 reusable collocations or short phrases.
 - If you are not sure about a breaking-news fact, avoid specific claims and choose a safer topic.
-- Output exactly 3 short paragraphs.
+- Output exactly 3 paragraphs of roughly 80 to 100 English words each.
 - After each English paragraph, provide a natural Chinese translation.
-- Include 5 short phrases, 5 difficult words, and 5 common useful words.
+- Include 5 short phrases, 5 difficult words, and 5 common useful words, all taken from the English body. Give their meanings in this context, not generic dictionary definitions.
 - Use concise Chinese translations.
 
 Markdown format:
@@ -411,7 +447,7 @@ function buildMessages() {
     {
       role: "system",
       content:
-        "You generate safe, learner-friendly English study materials in Markdown format. Keep the language slightly challenging but still clear for CEFR A2-B1 learners. Return only the Markdown content, no explanations or code fences.",
+        "You generate safe, learner-friendly English study materials in Markdown format. Target CEFR B1-B2 with clear explanations, varied sentence structures, and precise vocabulary. Follow the user requirements for body length and topic diversity. Return only the Markdown content, no explanations or code fences.",
     },
     {
       role: "user",
@@ -541,10 +577,16 @@ function describePayload(payload) {
 }
 
 function wrapWords(text) {
-  return escapeHtml(text).replace(/[A-Za-z0-9.'-]+/g, (token) => {
-    const normalized = normalizeWord(token);
-    return `<span class="word" tabindex="0" data-word="${escapeHtml(normalized)}" data-meaning="点击或悬浮可翻译">${token}</span>`;
-  });
+  // Tokenize before escaping so HTML entities remain intact.
+  return String(text)
+    .split(/([A-Za-z0-9.'-]+)/g)
+    .map((part, index) => {
+      if (index % 2 === 0) return escapeHtml(part);
+
+      const normalized = normalizeWord(part);
+      return `<span class="word" tabindex="0" data-word="${escapeHtml(normalized)}" data-meaning="点击或悬浮可翻译">${escapeHtml(part)}</span>`;
+    })
+    .join("");
 }
 
 function normalizeWord(word) {
@@ -949,7 +991,7 @@ function buildHtml(lessonData, currentSiteUrl) {
     <div class="layout">
       <main class="card">
         <h1>${safeTitle}</h1>
-        <p class="meta">Date: ${safeDate} | Level: Beginner | Topic: ${safeTopic}</p>
+        <p class="meta">Date: ${safeDate} | Level: ${lessonData.sourceNote?.startsWith("Local fallback") ? "Basic (local fallback)" : "B1–B2 (target)"} | Topic: ${safeTopic}</p>
         <p class="tip">${safeTip}</p>
         <section id="article">${articleHtml}</section>
         <p class="footer">
