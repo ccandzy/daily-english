@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>When Antibiotics Help and Hurt: The Gut Microbe Trade-off</title>
+  <style>
+    :root {
+      --bg-a: #f4efe7;
+      --bg-b: #dcecf2;
+      --paper: #fffdf8;
+      --sidebar: #edf6fb;
+      --ink: #22363c;
+      --muted: #64777c;
+      --accent: #11765f;
+      --accent-deep: #0b5948;
+      --line: #cad9dd;
+      --hover: #d8f4ec;
+      --tooltip: #17353a;
+      --soft: #edf9f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 28%),
+        linear-gradient(145deg, var(--bg-a) 0%, var(--bg-b) 100%);
+    }
+
+    .page {
+      max-width: 1220px;
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card,
+    .sidebar {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 38px rgba(32, 67, 75, 0.08);
+    }
+
+    .card {
+      background: var(--paper);
+      padding: 30px;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      padding: 22px;
+      position: sticky;
+      top: 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 45px);
+      line-height: 1.12;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tip {
+      margin: 0 0 24px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      background: var(--soft);
+      color: #28544b;
+    }
+
+    .article-block {
+      margin-bottom: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .article-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .article-block p {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .toggle-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--accent);
+      color: #f7fffd;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-1px);
+      background: var(--accent-deep);
+    }
+
+    .translation {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f3fcf8;
+      color: #355556;
+      font-size: 16px;
+    }
+
+    .translation.show {
+      display: block;
+    }
+
+    .word {
+      position: relative;
+      display: inline-block;
+      padding: 0 2px;
+      border-radius: 5px;
+      cursor: help;
+      transition: background-color 0.15s ease;
+    }
+
+    .word:hover {
+      background: var(--hover);
+    }
+
+    .word:hover::after,
+    .word:active::after,
+    .word:focus-visible::after,
+    .word.is-open::after {
+      content: attr(data-meaning);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      min-width: 64px;
+      max-width: 180px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: var(--tooltip);
+      color: #f4fdfd;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      z-index: 2;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(17, 118, 95, 0.12);
+      color: var(--accent-deep);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .side-section {
+      margin-bottom: 22px;
+    }
+
+    .side-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .side-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .side-section li {
+      margin-bottom: 10px;
+      color: #304248;
+      font-size: 15px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--accent-deep);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 14px auto;
+        padding: 10px;
+      }
+
+      .card,
+      .sidebar {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .article-block p {
+        font-size: 18px;
+      }
+
+      .word:hover::after,
+      .word:active::after,
+      .word:focus-visible::after,
+      .word.is-open::after {
+        left: 0;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="layout">
+      <main class="card">
+        <h1>When Antibiotics Help and Hurt: The Gut Microbe Trade-off</h1>
+        <p class="meta">Date: 2026-10-24 | Level: B1–B2 (target) | Topic: microbes and human health — the antibiotic trade-off for gut bacteria</p>
+        <p class="tip">阅读时先抓住“取舍关系”：抗生素何时有益、何时带来代价；再留意因果与让步表达。</p>
+        <section id="article">
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="when" data-meaning="点击或悬浮可翻译">When</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="take" data-meaning="点击或悬浮可翻译">take</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="course" data-meaning="点击或悬浮可翻译">course</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="antibiotics" data-meaning="点击或悬浮可翻译">antibiotics</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="throat" data-meaning="点击或悬浮可翻译">throat</span> <span class="word" tabindex="0" data-word="infection" data-meaning="点击或悬浮可翻译">infection</span>, <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="medicine" data-meaning="点击或悬浮可翻译">medicine</span> <span class="word" tabindex="0" data-word="does" data-meaning="点击或悬浮可翻译">does</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="target" data-meaning="点击或悬浮可翻译">target</span> <span class="word" tabindex="0" data-word="only" data-meaning="点击或悬浮可翻译">only</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="harmful" data-meaning="点击或悬浮可翻译">harmful</span> <span class="word" tabindex="0" data-word="bacteria" data-meaning="点击或悬浮可翻译">bacteria.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="disrupt" data-meaning="点击或悬浮可翻译">disrupt</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="helpful" data-meaning="点击或悬浮可翻译">helpful</span> <span class="word" tabindex="0" data-word="microbes" data-meaning="点击或悬浮可翻译">microbes</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="live" data-meaning="点击或悬浮可翻译">live</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="gut" data-meaning="点击或悬浮可翻译">gut</span>, <span class="word" tabindex="0" data-word="at" data-meaning="点击或悬浮可翻译">at</span> <span class="word" tabindex="0" data-word="least" data-meaning="点击或悬浮可翻译">least</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="while" data-meaning="点击或悬浮可翻译">while.</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="real" data-meaning="点击或悬浮可翻译">real</span> <span class="word" tabindex="0" data-word="trade-off" data-meaning="点击或悬浮可翻译">trade-off</span>: <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="treatment" data-meaning="点击或悬浮可翻译">treatment</span> <span class="word" tabindex="0" data-word="may" data-meaning="点击或悬浮可翻译">may</span> <span class="word" tabindex="0" data-word="clear" data-meaning="点击或悬浮可翻译">clear</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="infection" data-meaning="点击或悬浮可翻译">infection</span> <span class="word" tabindex="0" data-word="quickly" data-meaning="点击或悬浮可翻译">quickly</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="leave" data-meaning="点击或悬浮可翻译">leave</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="inner" data-meaning="点击或悬浮可翻译">inner</span> <span class="word" tabindex="0" data-word="community" data-meaning="点击或悬浮可翻译">community</span> <span class="word" tabindex="0" data-word="less" data-meaning="点击或悬浮可翻译">less</span> <span class="word" tabindex="0" data-word="diverse" data-meaning="点击或悬浮可翻译">diverse.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="diverse" data-meaning="点击或悬浮可翻译">diverse</span> <span class="word" tabindex="0" data-word="gut" data-meaning="点击或悬浮可翻译">gut</span> <span class="word" tabindex="0" data-word="community" data-meaning="点击或悬浮可翻译">community</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="often" data-meaning="点击或悬浮可翻译">often</span> <span class="word" tabindex="0" data-word="more" data-meaning="点击或悬浮可翻译">more</span> <span class="word" tabindex="0" data-word="resilient" data-meaning="点击或悬浮可翻译">resilient</span>, <span class="word" tabindex="0" data-word="meaning" data-meaning="点击或悬浮可翻译">meaning</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="resist" data-meaning="点击或悬浮可翻译">resist</span> <span class="word" tabindex="0" data-word="invaders" data-meaning="点击或悬浮可翻译">invaders</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="recover" data-meaning="点击或悬浮可翻译">recover</span> <span class="word" tabindex="0" data-word="after" data-meaning="点击或悬浮可翻译">after</span> <span class="word" tabindex="0" data-word="disturbance" data-meaning="点击或悬浮可翻译">disturbance.</span> <span class="word" tabindex="0" data-word="understanding" data-meaning="点击或悬浮可翻译">Understanding</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">this</span> <span class="word" tabindex="0" data-word="helps" data-meaning="点击或悬浮可翻译">helps</span> <span class="word" tabindex="0" data-word="patients" data-meaning="点击或悬浮可翻译">patients</span> <span class="word" tabindex="0" data-word="ask" data-meaning="点击或悬浮可翻译">ask</span> <span class="word" tabindex="0" data-word="better" data-meaning="点击或悬浮可翻译">better</span> <span class="word" tabindex="0" data-word="questions" data-meaning="点击或悬浮可翻译">questions.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(0, this)">显示中文翻译</button>
+          <div class="translation" id="translation-0">当你因喉咙感染服用一个疗程的抗生素时，药物并不只针对有害细菌。它还可能暂时扰乱肠道里的有益微生物。这是一个真实的取舍：治疗也许能迅速清除感染，却会让肠道内的微生物群落多样性下降。多样的肠道群落往往更有韧性，也就是说，它能抵抗入侵者并在受扰后恢复。理解这一点有助于患者提出更好的问题。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="broad-spectrum" data-meaning="点击或悬浮可翻译">Broad-spectrum</span> <span class="word" tabindex="0" data-word="antibiotics" data-meaning="点击或悬浮可翻译">antibiotics</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="like" data-meaning="点击或悬浮可翻译">like</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="wide" data-meaning="点击或悬浮可翻译">wide</span> <span class="word" tabindex="0" data-word="net" data-meaning="点击或悬浮可翻译">net</span> <span class="word" tabindex="0" data-word="rather" data-meaning="点击或悬浮可翻译">rather</span> <span class="word" tabindex="0" data-word="than" data-meaning="点击或悬浮可翻译">than</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="key" data-meaning="点击或悬浮可翻译">key.</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">They</span> <span class="word" tabindex="0" data-word="kill" data-meaning="点击或悬浮可翻译">kill</span> <span class="word" tabindex="0" data-word="many" data-meaning="点击或悬浮可翻译">many</span> <span class="word" tabindex="0" data-word="kinds" data-meaning="点击或悬浮可翻译">kinds</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="bacteria" data-meaning="点击或悬浮可翻译">bacteria</span>, <span class="word" tabindex="0" data-word="including" data-meaning="点击或悬浮可翻译">including</span> <span class="word" tabindex="0" data-word="species" data-meaning="点击或悬浮可翻译">species</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="help" data-meaning="点击或悬浮可翻译">help</span> <span class="word" tabindex="0" data-word="digest" data-meaning="点击或悬浮可翻译">digest</span> <span class="word" tabindex="0" data-word="fiber" data-meaning="点击或悬浮可翻译">fiber</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="produce" data-meaning="点击或悬浮可翻译">produce</span> <span class="word" tabindex="0" data-word="useful" data-meaning="点击或悬浮可翻译">useful</span> <span class="word" tabindex="0" data-word="substances" data-meaning="点击或悬浮可翻译">substances.</span> <span class="word" tabindex="0" data-word="after" data-meaning="点击或悬浮可翻译">After</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="course" data-meaning="点击或悬浮可翻译">course</span>, <span class="word" tabindex="0" data-word="some" data-meaning="点击或悬浮可翻译">some</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="notice" data-meaning="点击或悬浮可翻译">notice</span> <span class="word" tabindex="0" data-word="loose" data-meaning="点击或悬浮可翻译">loose</span> <span class="word" tabindex="0" data-word="stools" data-meaning="点击或悬浮可翻译">stools</span> <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="low" data-meaning="点击或悬浮可翻译">low</span> <span class="word" tabindex="0" data-word="energy" data-meaning="点击或悬浮可翻译">energy</span>, <span class="word" tabindex="0" data-word="though" data-meaning="点击或悬浮可翻译">though</span> <span class="word" tabindex="0" data-word="most" data-meaning="点击或悬浮可翻译">most</span> <span class="word" tabindex="0" data-word="recover" data-meaning="点击或悬浮可翻译">recover.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="problem" data-meaning="点击或悬浮可翻译">problem</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="community" data-meaning="点击或悬浮可翻译">community</span> <span class="word" tabindex="0" data-word="may" data-meaning="点击或悬浮可翻译">may</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="bounce" data-meaning="点击或悬浮可翻译">bounce</span> <span class="word" tabindex="0" data-word="back" data-meaning="点击或悬浮可翻译">back</span> <span class="word" tabindex="0" data-word="at" data-meaning="点击或悬浮可翻译">at</span> <span class="word" tabindex="0" data-word="once" data-meaning="点击或悬浮可翻译">once.</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">In</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="meantime" data-meaning="点击或悬浮可翻译">meantime</span>, <span class="word" tabindex="0" data-word="eating" data-meaning="点击或悬浮可翻译">eating</span> <span class="word" tabindex="0" data-word="fiber-rich" data-meaning="点击或悬浮可翻译">fiber-rich</span> <span class="word" tabindex="0" data-word="foods" data-meaning="点击或悬浮可翻译">foods</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="fermented" data-meaning="点击或悬浮可翻译">fermented</span> <span class="word" tabindex="0" data-word="foods" data-meaning="点击或悬浮可翻译">foods</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="support" data-meaning="点击或悬浮可翻译">support</span> <span class="word" tabindex="0" data-word="beneficial" data-meaning="点击或悬浮可翻译">beneficial</span> <span class="word" tabindex="0" data-word="microbes" data-meaning="点击或悬浮可翻译">microbes</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="cannot" data-meaning="点击或悬浮可翻译">cannot</span> <span class="word" tabindex="0" data-word="guarantee" data-meaning="点击或悬浮可翻译">guarantee</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="perfect" data-meaning="点击或悬浮可翻译">perfect</span> <span class="word" tabindex="0" data-word="reset" data-meaning="点击或悬浮可翻译">reset.</span> <span class="word" tabindex="0" data-word="some" data-meaning="点击或悬浮可翻译">Some</span> <span class="word" tabindex="0" data-word="doctors" data-meaning="点击或悬浮可翻译">doctors</span> <span class="word" tabindex="0" data-word="therefore" data-meaning="点击或悬浮可翻译">therefore</span> <span class="word" tabindex="0" data-word="prefer" data-meaning="点击或悬浮可翻译">prefer</span> <span class="word" tabindex="0" data-word="narrow-spectrum" data-meaning="点击或悬浮可翻译">narrow-spectrum</span> <span class="word" tabindex="0" data-word="drugs" data-meaning="点击或悬浮可翻译">drugs</span> <span class="word" tabindex="0" data-word="when" data-meaning="点击或悬浮可翻译">when</span> <span class="word" tabindex="0" data-word="tests" data-meaning="点击或悬浮可翻译">tests</span> <span class="word" tabindex="0" data-word="show" data-meaning="点击或悬浮可翻译">show</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="enough" data-meaning="点击或悬浮可翻译">enough.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(1, this)">显示中文翻译</button>
+          <div class="translation" id="translation-1">广谱抗生素像一张大网，而不是一把钥匙。它们会杀死许多种细菌，包括帮助消化纤维、产生有用物质的菌种。一个疗程后，有些人会腹泻或乏力，不过大多数人会恢复。问题在于，肠道群落可能不会立刻恢复。与此同时，多吃富含纤维的食物和发酵食品可以支持有益微生物，但不能保证完全复原。因此，当检测显示足够时，有些医生更倾向使用窄谱药物。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="yet" data-meaning="点击或悬浮可翻译">Yet</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="trade-off" data-meaning="点击或悬浮可翻译">trade-off</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="reason" data-meaning="点击或悬浮可翻译">reason</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="avoid" data-meaning="点击或悬浮可翻译">avoid</span> <span class="word" tabindex="0" data-word="antibiotics" data-meaning="点击或悬浮可翻译">antibiotics</span> <span class="word" tabindex="0" data-word="when" data-meaning="点击或悬浮可翻译">when</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="needed" data-meaning="点击或悬浮可翻译">needed.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="severe" data-meaning="点击或悬浮可翻译">severe</span> <span class="word" tabindex="0" data-word="infection" data-meaning="点击或悬浮可翻译">infection</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="be" data-meaning="点击或悬浮可翻译">be</span> <span class="word" tabindex="0" data-word="dangerous" data-meaning="点击或悬浮可翻译">dangerous</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="saving" data-meaning="点击或悬浮可翻译">saving</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="gut" data-meaning="点击或悬浮可翻译">gut</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="more" data-meaning="点击或悬浮可翻译">more</span> <span class="word" tabindex="0" data-word="important" data-meaning="点击或悬浮可翻译">important</span> <span class="word" tabindex="0" data-word="than" data-meaning="点击或悬浮可翻译">than</span> <span class="word" tabindex="0" data-word="treating" data-meaning="点击或悬浮可翻译">treating</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="wiser" data-meaning="点击或悬浮可翻译">wiser</span> <span class="word" tabindex="0" data-word="lesson" data-meaning="点击或悬浮可翻译">lesson</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="use" data-meaning="点击或悬浮可翻译">use</span> <span class="word" tabindex="0" data-word="these" data-meaning="点击或悬浮可翻译">these</span> <span class="word" tabindex="0" data-word="drugs" data-meaning="点击或悬浮可翻译">drugs</span> <span class="word" tabindex="0" data-word="carefully" data-meaning="点击或悬浮可翻译">carefully</span>: <span class="word" tabindex="0" data-word="take" data-meaning="点击或悬浮可翻译">take</span> <span class="word" tabindex="0" data-word="them" data-meaning="点击或悬浮可翻译">them</span> <span class="word" tabindex="0" data-word="only" data-meaning="点击或悬浮可翻译">only</span> <span class="word" tabindex="0" data-word="when" data-meaning="点击或悬浮可翻译">when</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="doctor" data-meaning="点击或悬浮可翻译">doctor</span> <span class="word" tabindex="0" data-word="recommends" data-meaning="点击或悬浮可翻译">recommends</span> <span class="word" tabindex="0" data-word="them" data-meaning="点击或悬浮可翻译">them</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="do" data-meaning="点击或悬浮可翻译">do</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="demand" data-meaning="点击或悬浮可翻译">demand</span> <span class="word" tabindex="0" data-word="them" data-meaning="点击或悬浮可翻译">them</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="common" data-meaning="点击或悬浮可翻译">common</span> <span class="word" tabindex="0" data-word="cold" data-meaning="点击或悬浮可翻译">cold.</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">In</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="long" data-meaning="点击或悬浮可翻译">long</span> <span class="word" tabindex="0" data-word="run" data-meaning="点击或悬浮可翻译">run</span>, <span class="word" tabindex="0" data-word="protecting" data-meaning="点击或悬浮可翻译">protecting</span> <span class="word" tabindex="0" data-word="microbial" data-meaning="点击或悬浮可翻译">microbial</span> <span class="word" tabindex="0" data-word="diversity" data-meaning="点击或悬浮可翻译">diversity</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="part" data-meaning="点击或悬浮可翻译">part</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="good" data-meaning="点击或悬浮可翻译">good</span> <span class="word" tabindex="0" data-word="health" data-meaning="点击或悬浮可翻译">health</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="should" data-meaning="点击或悬浮可翻译">should</span> <span class="word" tabindex="0" data-word="work" data-meaning="点击或悬浮可翻译">work</span> <span class="word" tabindex="0" data-word="alongside" data-meaning="点击或悬浮可翻译">alongside</span>, <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="against" data-meaning="点击或悬浮可翻译">against</span>, <span class="word" tabindex="0" data-word="effective" data-meaning="点击或悬浮可翻译">effective</span> <span class="word" tabindex="0" data-word="medical" data-meaning="点击或悬浮可翻译">medical</span> <span class="word" tabindex="0" data-word="care" data-meaning="点击或悬浮可翻译">care.</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">That</span> <span class="word" tabindex="0" data-word="balance" data-meaning="点击或悬浮可翻译">balance</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="real" data-meaning="点击或悬浮可翻译">real</span> <span class="word" tabindex="0" data-word="point" data-meaning="点击或悬浮可翻译">point.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(2, this)">显示中文翻译</button>
+          <div class="translation" id="translation-2">然而，这种取舍并不是在有需要时避免抗生素的理由。严重感染可能很危险，保护肠道并不比治疗感染更重要。更明智的做法是谨慎使用这些药物：只在医生建议时服用，不要为普通感冒要求使用。从长远看，保护微生物多样性是健康的一部分，但它应与有效的医疗配合，而不是对抗。这种平衡才是关键。</div>
+        </div>
+      </section>
+        <p class="footer">
+          AI-generated lesson for daily English reading.
+          <br>Word translation on hover or tap uses the MyMemory public translation API.
+          <br>Site: <a href="https://ccandzy.github.io/daily-english/">https://ccandzy.github.io/daily-english/</a>
+        </p>
+      </main>
+
+      <aside class="sidebar">
+        <div class="side-section">
+          <span class="label">Phrases</span>
+          <h2>Short Phrases</h2>
+          <ul><li><strong>take a course of antibiotics</strong>: 按疗程服用抗生素</li><li><strong>for a while</strong>: 暂时；一段时间内</li><li><strong>bounce back</strong>: 恢复；回升（这里指肠道菌群恢复）</li><li><strong>in the meantime</strong>: 在此期间</li><li><strong>in the long run</strong>: 从长远来看</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Hard Words</span>
+          <h2>Difficult Words</h2>
+          <ul><li><strong>disrupt</strong>: 扰乱；打乱（这里指抗生素干扰肠道微生物）</li><li><strong>beneficial</strong>: 有益的（这里指对肠道有帮助的微生物）</li><li><strong>resilient</strong>: 有韧性的</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Common Words</span>
+          <h2>Useful Words</h2>
+          <ul><li class="empty-item">本组内容暂未完整生成</li></ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const translationCache = new Map();
+    const words = Array.from(document.querySelectorAll(".word"));
+
+    for (const word of words) {
+      word.addEventListener("mouseenter", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("focus", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = !word.classList.contains("is-open");
+        closeWordTooltips();
+        if (willOpen) {
+          word.classList.add("is-open");
+          loadTranslation(word);
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      closeWordTooltips();
+    });
+
+    function closeWordTooltips() {
+      for (const word of words) {
+        word.classList.remove("is-open");
+      }
+    }
+
+    async function loadTranslation(word) {
+      const key = word.dataset.word || normalizeWord(word.textContent || "");
+      if (!key) {
+        word.dataset.meaning = "暂无翻译";
+        return;
+      }
+
+      if (translationCache.has(key)) {
+        word.dataset.meaning = translationCache.get(key);
+        return;
+      }
+
+      word.dataset.meaning = "翻译中...";
+
+      try {
+        const params = new URLSearchParams({
+          q: key,
+          langpair: "en|zh-CN",
+          mt: "1"
+        });
+        const response = await fetch("https://api.mymemory.translated.net/get?" + params.toString());
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        const translated =
+          data?.responseData?.translatedText ||
+          data?.matches?.find((item) => item?.translation)?.translation ||
+          "";
+
+        const clean = normalizeTranslation(translated, key);
+        const finalMeaning = clean || "暂无翻译";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      } catch (error) {
+        const fallback = localFallback(key);
+        const finalMeaning = fallback || "翻译失败，请稍后再试";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      }
+    }
+
+    function normalizeWord(value) {
+      return String(value).toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+    }
+
+    function normalizeTranslation(value, sourceWord) {
+      const text = String(value || "").trim();
+      if (!text) {
+        return "";
+      }
+
+      const lowered = text.toLowerCase();
+      if (lowered === String(sourceWord).toLowerCase()) {
+        return "";
+      }
+
+      return text.replace(/^zh-cn\|/i, "").trim();
+    }
+
+    function localFallback(word) {
+      const fallback = {
+        a: "一个",
+        an: "一个",
+        and: "和",
+        are: "是",
+        in: "在……里",
+        is: "是",
+        of: "……的",
+        on: "在……上",
+        the: "这；这个",
+        to: "到；去；用于不定式"
+      };
+      return fallback[word] || "";
+    }
+
+    function toggleTranslation(index, button) {
+      const el = document.getElementById("translation-" + index);
+      const isOpen = el.classList.toggle("show");
+      button.textContent = isOpen ? "隐藏中文翻译" : "显示中文翻译";
+    }
+  </script>
+</body>
+</html>
