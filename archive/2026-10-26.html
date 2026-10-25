@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Home or a Rubbish Dump? How Archaeologists Read Everyday Evidence</title>
+  <style>
+    :root {
+      --bg-a: #f4efe7;
+      --bg-b: #dcecf2;
+      --paper: #fffdf8;
+      --sidebar: #edf6fb;
+      --ink: #22363c;
+      --muted: #64777c;
+      --accent: #11765f;
+      --accent-deep: #0b5948;
+      --line: #cad9dd;
+      --hover: #d8f4ec;
+      --tooltip: #17353a;
+      --soft: #edf9f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 28%),
+        linear-gradient(145deg, var(--bg-a) 0%, var(--bg-b) 100%);
+    }
+
+    .page {
+      max-width: 1220px;
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card,
+    .sidebar {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 38px rgba(32, 67, 75, 0.08);
+    }
+
+    .card {
+      background: var(--paper);
+      padding: 30px;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      padding: 22px;
+      position: sticky;
+      top: 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 45px);
+      line-height: 1.12;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tip {
+      margin: 0 0 24px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      background: var(--soft);
+      color: #28544b;
+    }
+
+    .article-block {
+      margin-bottom: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .article-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .article-block p {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .toggle-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--accent);
+      color: #f7fffd;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-1px);
+      background: var(--accent-deep);
+    }
+
+    .translation {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f3fcf8;
+      color: #355556;
+      font-size: 16px;
+    }
+
+    .translation.show {
+      display: block;
+    }
+
+    .word {
+      position: relative;
+      display: inline-block;
+      padding: 0 2px;
+      border-radius: 5px;
+      cursor: help;
+      transition: background-color 0.15s ease;
+    }
+
+    .word:hover {
+      background: var(--hover);
+    }
+
+    .word:hover::after,
+    .word:active::after,
+    .word:focus-visible::after,
+    .word.is-open::after {
+      content: attr(data-meaning);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      min-width: 64px;
+      max-width: 180px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: var(--tooltip);
+      color: #f4fdfd;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      z-index: 2;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(17, 118, 95, 0.12);
+      color: var(--accent-deep);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .side-section {
+      margin-bottom: 22px;
+    }
+
+    .side-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .side-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .side-section li {
+      margin-bottom: 10px;
+      color: #304248;
+      font-size: 15px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--accent-deep);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 14px auto;
+        padding: 10px;
+      }
+
+      .card,
+      .sidebar {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .article-block p {
+        font-size: 18px;
+      }
+
+      .word:hover::after,
+      .word:active::after,
+      .word:focus-visible::after,
+      .word.is-open::after {
+        left: 0;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="layout">
+      <main class="card">
+        <h1>A Home or a Rubbish Dump? How Archaeologists Read Everyday Evidence</h1>
+        <p class="meta">Date: 2026-10-26 | Level: B1–B2 (target) | Topic: archaeology and evidence about the past — telling homes from rubbish dumps</p>
+        <p class="tip">阅读时注意：考古判断常来自物品的位置和组合，而不是单件发现。</p>
+        <section id="article">
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="when" data-meaning="点击或悬浮可翻译">When</span> <span class="word" tabindex="0" data-word="archaeologists" data-meaning="点击或悬浮可翻译">archaeologists</span> <span class="word" tabindex="0" data-word="open" data-meaning="点击或悬浮可翻译">open</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="site" data-meaning="点击或悬浮可翻译">site</span>, <span class="word" tabindex="0" data-word="one" data-meaning="点击或悬浮可翻译">one</span> <span class="word" tabindex="0" data-word="simple" data-meaning="点击或悬浮可翻译">simple</span> <span class="word" tabindex="0" data-word="question" data-meaning="点击或悬浮可翻译">question</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="be" data-meaning="点击或悬浮可翻译">be</span> <span class="word" tabindex="0" data-word="surprisingly" data-meaning="点击或悬浮可翻译">surprisingly</span> <span class="word" tabindex="0" data-word="hard" data-meaning="点击或悬浮可翻译">hard</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="answer" data-meaning="点击或悬浮可翻译">answer</span>: <span class="word" tabindex="0" data-word="was" data-meaning="点击或悬浮可翻译">was</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">this</span> <span class="word" tabindex="0" data-word="place" data-meaning="点击或悬浮可翻译">place</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="home" data-meaning="点击或悬浮可翻译">home</span>, <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="rubbish" data-meaning="点击或悬浮可翻译">rubbish</span> <span class="word" tabindex="0" data-word="dump" data-meaning="点击或悬浮可翻译">dump</span>? <span class="word" tabindex="0" data-word="both" data-meaning="点击或悬浮可翻译">Both</span> <span class="word" tabindex="0" data-word="may" data-meaning="点击或悬浮可翻译">may</span> <span class="word" tabindex="0" data-word="contain" data-meaning="点击或悬浮可翻译">contain</span> <span class="word" tabindex="0" data-word="broken" data-meaning="点击或悬浮可翻译">broken</span> <span class="word" tabindex="0" data-word="pottery" data-meaning="点击或悬浮可翻译">pottery</span>, <span class="word" tabindex="0" data-word="animal" data-meaning="点击或悬浮可翻译">animal</span> <span class="word" tabindex="0" data-word="bones" data-meaning="点击或悬浮可翻译">bones</span>, <span class="word" tabindex="0" data-word="ash" data-meaning="点击或悬浮可翻译">ash</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="seeds" data-meaning="点击或悬浮可翻译">seeds.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="single" data-meaning="点击或悬浮可翻译">single</span> <span class="word" tabindex="0" data-word="object" data-meaning="点击或悬浮可翻译">object</span> <span class="word" tabindex="0" data-word="proves" data-meaning="点击或悬浮可翻译">proves</span> <span class="word" tabindex="0" data-word="little" data-meaning="点击或悬浮可翻译">little</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="its" data-meaning="点击或悬浮可翻译">its</span> <span class="word" tabindex="0" data-word="own" data-meaning="点击或悬浮可翻译">own.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="key" data-meaning="点击或悬浮可翻译">key</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="context" data-meaning="点击或悬浮可翻译">context</span>: <span class="word" tabindex="0" data-word="where" data-meaning="点击或悬浮可翻译">where</span> <span class="word" tabindex="0" data-word="things" data-meaning="点击或悬浮可翻译">things</span> <span class="word" tabindex="0" data-word="were" data-meaning="点击或悬浮可翻译">were</span> <span class="word" tabindex="0" data-word="found" data-meaning="点击或悬浮可翻译">found</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="what" data-meaning="点击或悬浮可翻译">what</span> <span class="word" tabindex="0" data-word="was" data-meaning="点击或悬浮可翻译">was</span> <span class="word" tabindex="0" data-word="found" data-meaning="点击或悬浮可翻译">found</span> <span class="word" tabindex="0" data-word="with" data-meaning="点击或悬浮可翻译">with</span> <span class="word" tabindex="0" data-word="them" data-meaning="点击或悬浮可翻译">them.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="cooking" data-meaning="点击或悬浮可翻译">cooking</span> <span class="word" tabindex="0" data-word="pot" data-meaning="点击或悬浮可翻译">pot</span> <span class="word" tabindex="0" data-word="beside" data-meaning="点击或悬浮可翻译">beside</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="hearth" data-meaning="点击或悬浮可翻译">hearth</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="worn" data-meaning="点击或悬浮可翻译">worn</span> <span class="word" tabindex="0" data-word="floor" data-meaning="点击或悬浮可翻译">floor</span> <span class="word" tabindex="0" data-word="may" data-meaning="点击或悬浮可翻译">may</span> <span class="word" tabindex="0" data-word="suggest" data-meaning="点击或悬浮可翻译">suggest</span> <span class="word" tabindex="0" data-word="daily" data-meaning="点击或悬浮可翻译">daily</span> <span class="word" tabindex="0" data-word="life" data-meaning="点击或悬浮可翻译">life.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="same" data-meaning="点击或悬浮可翻译">same</span> <span class="word" tabindex="0" data-word="pot" data-meaning="点击或悬浮可翻译">pot</span>, <span class="word" tabindex="0" data-word="smashed" data-meaning="点击或悬浮可翻译">smashed</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="mixed" data-meaning="点击或悬浮可翻译">mixed</span> <span class="word" tabindex="0" data-word="with" data-meaning="点击或悬浮可翻译">with</span> <span class="word" tabindex="0" data-word="ash" data-meaning="点击或悬浮可翻译">ash</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="food" data-meaning="点击或悬浮可翻译">food</span> <span class="word" tabindex="0" data-word="waste" data-meaning="点击或悬浮可翻译">waste</span>, <span class="word" tabindex="0" data-word="may" data-meaning="点击或悬浮可翻译">may</span> <span class="word" tabindex="0" data-word="point" data-meaning="点击或悬浮可翻译">point</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="rubbish" data-meaning="点击或悬浮可翻译">rubbish.</span> <span class="word" tabindex="0" data-word="archaeologists" data-meaning="点击或悬浮可翻译">Archaeologists</span> <span class="word" tabindex="0" data-word="try" data-meaning="点击或悬浮可翻译">try</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="tell" data-meaning="点击或悬浮可翻译">tell</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="difference" data-meaning="点击或悬浮可翻译">difference</span> <span class="word" tabindex="0" data-word="between" data-meaning="点击或悬浮可翻译">between</span> <span class="word" tabindex="0" data-word="ordinary" data-meaning="点击或悬浮可翻译">ordinary</span> <span class="word" tabindex="0" data-word="domestic" data-meaning="点击或悬浮可翻译">domestic</span> <span class="word" tabindex="0" data-word="activity" data-meaning="点击或悬浮可翻译">activity</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="waste" data-meaning="点击或悬浮可翻译">waste</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="accumulated" data-meaning="点击或悬浮可翻译">accumulated</span> <span class="word" tabindex="0" data-word="over" data-meaning="点击或悬浮可翻译">over</span> <span class="word" tabindex="0" data-word="time" data-meaning="点击或悬浮可翻译">time.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(0, this)">显示中文翻译</button>
+          <div class="translation" id="translation-0">当考古学家打开一处遗址时，一个简单的问题可能出乎意料地难回答：这里是住所，还是垃圾堆？两者都可能包含破碎的陶器、动物骨头、灰烬和种子。单件物品本身说明不了什么。关键在于出土环境：物品在哪里被发现，以及和什么一起被发现。炉灶旁的煮饭锅和磨损的地面可能暗示日常生活。同一个锅，如果被砸碎并与灰烬和食物垃圾混在一起，就可能指向垃圾。考古学家试图区分普通的家庭活动和随着时间堆积起来的废弃物。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">To</span> <span class="word" tabindex="0" data-word="build" data-meaning="点击或悬浮可翻译">build</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="stronger" data-meaning="点击或悬浮可翻译">stronger</span> <span class="word" tabindex="0" data-word="case" data-meaning="点击或悬浮可翻译">case</span>, <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="compare" data-meaning="点击或悬浮可翻译">compare</span> <span class="word" tabindex="0" data-word="patterns" data-meaning="点击或悬浮可翻译">patterns</span> <span class="word" tabindex="0" data-word="across" data-meaning="点击或悬浮可翻译">across</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="whole" data-meaning="点击或悬浮可翻译">whole</span> <span class="word" tabindex="0" data-word="site" data-meaning="点击或悬浮可翻译">site.</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">They</span> <span class="word" tabindex="0" data-word="record" data-meaning="点击或悬浮可翻译">record</span> <span class="word" tabindex="0" data-word="how" data-meaning="点击或悬浮可翻译">how</span> <span class="word" tabindex="0" data-word="objects" data-meaning="点击或悬浮可翻译">objects</span> <span class="word" tabindex="0" data-word="lie" data-meaning="点击或悬浮可翻译">lie</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="soil" data-meaning="点击或悬浮可翻译">soil</span>, <span class="word" tabindex="0" data-word="because" data-meaning="点击或悬浮可翻译">because</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">this</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="fragile" data-meaning="点击或悬浮可翻译">fragile</span> <span class="word" tabindex="0" data-word="evidence" data-meaning="点击或悬浮可翻译">evidence</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="digging" data-meaning="点击或悬浮可翻译">digging</span> <span class="word" tabindex="0" data-word="quickly" data-meaning="点击或悬浮可翻译">quickly</span> <span class="word" tabindex="0" data-word="disturbs" data-meaning="点击或悬浮可翻译">disturbs.</span> <span class="word" tabindex="0" data-word="if" data-meaning="点击或悬浮可翻译">If</span> <span class="word" tabindex="0" data-word="tools" data-meaning="点击或悬浮可翻译">tools</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="bowls" data-meaning="点击或悬浮可翻译">bowls</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="found" data-meaning="点击或悬浮可翻译">found</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="groups" data-meaning="点击或悬浮可翻译">groups</span> <span class="word" tabindex="0" data-word="near" data-meaning="点击或悬浮可翻译">near</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="hearth" data-meaning="点击或悬浮可翻译">hearth</span>, <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="may" data-meaning="点击或悬浮可翻译">may</span> <span class="word" tabindex="0" data-word="have" data-meaning="点击或悬浮可翻译">have</span> <span class="word" tabindex="0" data-word="used" data-meaning="点击或悬浮可翻译">used</span> <span class="word" tabindex="0" data-word="them" data-meaning="点击或悬浮可翻译">them</span> <span class="word" tabindex="0" data-word="together" data-meaning="点击或悬浮可翻译">together.</span> <span class="word" tabindex="0" data-word="if" data-meaning="点击或悬浮可翻译">If</span> <span class="word" tabindex="0" data-word="bones" data-meaning="点击或悬浮可翻译">bones</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="cracked" data-meaning="点击或悬浮可翻译">cracked</span> <span class="word" tabindex="0" data-word="open" data-meaning="点击或悬浮可翻译">open</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="pottery" data-meaning="点击或悬浮可翻译">pottery</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="badly" data-meaning="点击或悬浮可翻译">badly</span> <span class="word" tabindex="0" data-word="broken" data-meaning="点击或悬浮可翻译">broken</span>, <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="often" data-meaning="点击或悬浮可翻译">often</span> <span class="word" tabindex="0" data-word="suggests" data-meaning="点击或悬浮可翻译">suggests</span> <span class="word" tabindex="0" data-word="food" data-meaning="点击或悬浮可翻译">food</span> <span class="word" tabindex="0" data-word="waste" data-meaning="点击或悬浮可翻译">waste</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="rough" data-meaning="点击或悬浮可翻译">rough</span> <span class="word" tabindex="0" data-word="handling" data-meaning="点击或悬浮可翻译">handling.</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">They</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="study" data-meaning="点击或悬浮可翻译">study</span> <span class="word" tabindex="0" data-word="wear" data-meaning="点击或悬浮可翻译">wear</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="tear" data-meaning="点击或悬浮可翻译">tear</span>: <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="bowl" data-meaning="点击或悬浮可翻译">bowl</span> <span class="word" tabindex="0" data-word="used" data-meaning="点击或悬浮可翻译">used</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="years" data-meaning="点击或悬浮可翻译">years</span> <span class="word" tabindex="0" data-word="may" data-meaning="点击或悬浮可翻译">may</span> <span class="word" tabindex="0" data-word="have" data-meaning="点击或悬浮可翻译">have</span> <span class="word" tabindex="0" data-word="smooth" data-meaning="点击或悬浮可翻译">smooth</span> <span class="word" tabindex="0" data-word="patches" data-meaning="点击或悬浮可翻译">patches.</span> <span class="word" tabindex="0" data-word="these" data-meaning="点击或悬浮可翻译">These</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">small</span> <span class="word" tabindex="0" data-word="details" data-meaning="点击或悬浮可翻译">details</span> <span class="word" tabindex="0" data-word="help" data-meaning="点击或悬浮可翻译">help</span> <span class="word" tabindex="0" data-word="piece" data-meaning="点击或悬浮可翻译">piece</span> <span class="word" tabindex="0" data-word="together" data-meaning="点击或悬浮可翻译">together</span> <span class="word" tabindex="0" data-word="day-to-day" data-meaning="点击或悬浮可翻译">day-to-day</span> <span class="word" tabindex="0" data-word="life" data-meaning="点击或悬浮可翻译">life</span> <span class="word" tabindex="0" data-word="rather" data-meaning="点击或悬浮可翻译">rather</span> <span class="word" tabindex="0" data-word="than" data-meaning="点击或悬浮可翻译">than</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="single" data-meaning="点击或悬浮可翻译">single</span> <span class="word" tabindex="0" data-word="dramatic" data-meaning="点击或悬浮可翻译">dramatic</span> <span class="word" tabindex="0" data-word="discovery" data-meaning="点击或悬浮可翻译">discovery.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(1, this)">显示中文翻译</button>
+          <div class="translation" id="translation-1">为了建立更有力的判断，他们会比较整个遗址中的模式。他们记录物品在土壤中的分布方式，因为这是挖掘很快会扰动的脆弱证据。如果工具和碗成组出现在炉灶附近，人们可能曾一起使用它们。如果骨头被敲开、陶器破损严重，这通常暗示食物垃圾和粗暴处理。他们还研究磨损痕迹：一个用了多年的碗可能会有光滑的斑块。这些细节有助于还原日常生活，而不是只关注一次戏剧性的发现。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">But</span> <span class="word" tabindex="0" data-word="every" data-meaning="点击或悬浮可翻译">every</span> <span class="word" tabindex="0" data-word="excavation" data-meaning="点击或悬浮可翻译">excavation</span> <span class="word" tabindex="0" data-word="has" data-meaning="点击或悬浮可翻译">has</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="trade-off" data-meaning="点击或悬浮可翻译">trade-off.</span> <span class="word" tabindex="0" data-word="digging" data-meaning="点击或悬浮可翻译">Digging</span> <span class="word" tabindex="0" data-word="destroys" data-meaning="点击或悬浮可翻译">destroys</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="very" data-meaning="点击或悬浮可翻译">very</span> <span class="word" tabindex="0" data-word="evidence" data-meaning="点击或悬浮可翻译">evidence</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="future" data-meaning="点击或悬浮可翻译">future</span> <span class="word" tabindex="0" data-word="methods" data-meaning="点击或悬浮可翻译">methods</span> <span class="word" tabindex="0" data-word="might" data-meaning="点击或悬浮可翻译">might</span> <span class="word" tabindex="0" data-word="interpret" data-meaning="点击或悬浮可翻译">interpret</span> <span class="word" tabindex="0" data-word="better" data-meaning="点击或悬浮可翻译">better</span>, <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">so</span> <span class="word" tabindex="0" data-word="archaeologists" data-meaning="点击或悬浮可翻译">archaeologists</span> <span class="word" tabindex="0" data-word="often" data-meaning="点击或悬浮可翻译">often</span> <span class="word" tabindex="0" data-word="leave" data-meaning="点击或悬浮可翻译">leave</span> <span class="word" tabindex="0" data-word="parts" data-meaning="点击或悬浮可翻译">parts</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="site" data-meaning="点击或悬浮可翻译">site</span> <span class="word" tabindex="0" data-word="under" data-meaning="点击或悬浮可翻译">under</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="surface" data-meaning="点击或悬浮可翻译">surface.</span> <span class="word" tabindex="0" data-word="some" data-meaning="点击或悬浮可翻译">Some</span> <span class="word" tabindex="0" data-word="argue" data-meaning="点击或悬浮可翻译">argue</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="we" data-meaning="点击或悬浮可翻译">we</span> <span class="word" tabindex="0" data-word="should" data-meaning="点击或悬浮可翻译">should</span> <span class="word" tabindex="0" data-word="dig" data-meaning="点击或悬浮可翻译">dig</span> <span class="word" tabindex="0" data-word="now" data-meaning="点击或悬浮可翻译">now</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="protect" data-meaning="点击或悬浮可翻译">protect</span> <span class="word" tabindex="0" data-word="sites" data-meaning="点击或悬浮可翻译">sites</span> <span class="word" tabindex="0" data-word="from" data-meaning="点击或悬浮可翻译">from</span> <span class="word" tabindex="0" data-word="roads" data-meaning="点击或悬浮可翻译">roads</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="weather" data-meaning="点击或悬浮可翻译">weather</span>; <span class="word" tabindex="0" data-word="others" data-meaning="点击或悬浮可翻译">others</span> <span class="word" tabindex="0" data-word="prefer" data-meaning="点击或悬浮可翻译">prefer</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="wait" data-meaning="点击或悬浮可翻译">wait</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="preserve" data-meaning="点击或悬浮可翻译">preserve</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="evidence" data-meaning="点击或悬浮可翻译">evidence</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="later" data-meaning="点击或悬浮可翻译">later</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(2, this)">显示中文翻译</button>
+          <div class="translation" id="translation-2">本段暂未生成中文翻译。</div>
+        </div>
+      </section>
+        <p class="footer">
+          AI-generated lesson for daily English reading.
+          <br>Word translation on hover or tap uses the MyMemory public translation API.
+          <br>Site: <a href="https://ccandzy.github.io/daily-english/">https://ccandzy.github.io/daily-english/</a>
+        </p>
+      </main>
+
+      <aside class="sidebar">
+        <div class="side-section">
+          <span class="label">Phrases</span>
+          <h2>Short Phrases</h2>
+          <ul><li class="empty-item">本组内容暂未完整生成</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Hard Words</span>
+          <h2>Difficult Words</h2>
+          <ul><li class="empty-item">本组内容暂未完整生成</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Common Words</span>
+          <h2>Useful Words</h2>
+          <ul><li class="empty-item">本组内容暂未完整生成</li></ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const translationCache = new Map();
+    const words = Array.from(document.querySelectorAll(".word"));
+
+    for (const word of words) {
+      word.addEventListener("mouseenter", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("focus", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = !word.classList.contains("is-open");
+        closeWordTooltips();
+        if (willOpen) {
+          word.classList.add("is-open");
+          loadTranslation(word);
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      closeWordTooltips();
+    });
+
+    function closeWordTooltips() {
+      for (const word of words) {
+        word.classList.remove("is-open");
+      }
+    }
+
+    async function loadTranslation(word) {
+      const key = word.dataset.word || normalizeWord(word.textContent || "");
+      if (!key) {
+        word.dataset.meaning = "暂无翻译";
+        return;
+      }
+
+      if (translationCache.has(key)) {
+        word.dataset.meaning = translationCache.get(key);
+        return;
+      }
+
+      word.dataset.meaning = "翻译中...";
+
+      try {
+        const params = new URLSearchParams({
+          q: key,
+          langpair: "en|zh-CN",
+          mt: "1"
+        });
+        const response = await fetch("https://api.mymemory.translated.net/get?" + params.toString());
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        const translated =
+          data?.responseData?.translatedText ||
+          data?.matches?.find((item) => item?.translation)?.translation ||
+          "";
+
+        const clean = normalizeTranslation(translated, key);
+        const finalMeaning = clean || "暂无翻译";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      } catch (error) {
+        const fallback = localFallback(key);
+        const finalMeaning = fallback || "翻译失败，请稍后再试";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      }
+    }
+
+    function normalizeWord(value) {
+      return String(value).toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+    }
+
+    function normalizeTranslation(value, sourceWord) {
+      const text = String(value || "").trim();
+      if (!text) {
+        return "";
+      }
+
+      const lowered = text.toLowerCase();
+      if (lowered === String(sourceWord).toLowerCase()) {
+        return "";
+      }
+
+      return text.replace(/^zh-cn\|/i, "").trim();
+    }
+
+    function localFallback(word) {
+      const fallback = {
+        a: "一个",
+        an: "一个",
+        and: "和",
+        are: "是",
+        in: "在……里",
+        is: "是",
+        of: "……的",
+        on: "在……上",
+        the: "这；这个",
+        to: "到；去；用于不定式"
+      };
+      return fallback[word] || "";
+    }
+
+    function toggleTranslation(index, button) {
+      const el = document.getElementById("translation-" + index);
+      const isOpen = el.classList.toggle("show");
+      button.textContent = isOpen ? "隐藏中文翻译" : "显示中文翻译";
+    }
+  </script>
+</body>
+</html>
