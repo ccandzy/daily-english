@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Why Did the Zipper Take So Long to Catch On?</title>
+  <style>
+    :root {
+      --bg-a: #f4efe7;
+      --bg-b: #dcecf2;
+      --paper: #fffdf8;
+      --sidebar: #edf6fb;
+      --ink: #22363c;
+      --muted: #64777c;
+      --accent: #11765f;
+      --accent-deep: #0b5948;
+      --line: #cad9dd;
+      --hover: #d8f4ec;
+      --tooltip: #17353a;
+      --soft: #edf9f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 28%),
+        linear-gradient(145deg, var(--bg-a) 0%, var(--bg-b) 100%);
+    }
+
+    .page {
+      max-width: 1220px;
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card,
+    .sidebar {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 38px rgba(32, 67, 75, 0.08);
+    }
+
+    .card {
+      background: var(--paper);
+      padding: 30px;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      padding: 22px;
+      position: sticky;
+      top: 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 45px);
+      line-height: 1.12;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tip {
+      margin: 0 0 24px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      background: var(--soft);
+      color: #28544b;
+    }
+
+    .article-block {
+      margin-bottom: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .article-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .article-block p {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .toggle-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--accent);
+      color: #f7fffd;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-1px);
+      background: var(--accent-deep);
+    }
+
+    .translation {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f3fcf8;
+      color: #355556;
+      font-size: 16px;
+    }
+
+    .translation.show {
+      display: block;
+    }
+
+    .word {
+      position: relative;
+      display: inline-block;
+      padding: 0 2px;
+      border-radius: 5px;
+      cursor: help;
+      transition: background-color 0.15s ease;
+    }
+
+    .word:hover {
+      background: var(--hover);
+    }
+
+    .word:hover::after,
+    .word:active::after,
+    .word:focus-visible::after,
+    .word.is-open::after {
+      content: attr(data-meaning);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      min-width: 64px;
+      max-width: 180px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: var(--tooltip);
+      color: #f4fdfd;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      z-index: 2;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(17, 118, 95, 0.12);
+      color: var(--accent-deep);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .side-section {
+      margin-bottom: 22px;
+    }
+
+    .side-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .side-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .side-section li {
+      margin-bottom: 10px;
+      color: #304248;
+      font-size: 15px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--accent-deep);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 14px auto;
+        padding: 10px;
+      }
+
+      .card,
+      .sidebar {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .article-block p {
+        font-size: 18px;
+      }
+
+      .word:hover::after,
+      .word:active::after,
+      .word:focus-visible::after,
+      .word.is-open::after {
+        left: 0;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="layout">
+      <main class="card">
+        <h1>Why Did the Zipper Take So Long to Catch On?</h1>
+        <p class="meta">Date: 2026-10-27 | Level: B1–B2 (target) | Topic: the history of everyday inventions — the zipper’s slow adoption</p>
+        <p class="tip">阅读时注意“发明成功”不仅靠设计，还靠生产、标准和维修体系。</p>
+        <section id="article">
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="imagine" data-meaning="点击或悬浮可翻译">Imagine</span> <span class="word" tabindex="0" data-word="rushing" data-meaning="点击或悬浮可翻译">rushing</span> <span class="word" tabindex="0" data-word="out" data-meaning="点击或悬浮可翻译">out</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="door" data-meaning="点击或悬浮可翻译">door</span>, <span class="word" tabindex="0" data-word="pulling" data-meaning="点击或悬浮可翻译">pulling</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="jacket" data-meaning="点击或悬浮可翻译">jacket</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="discovering" data-meaning="点击或悬浮可翻译">discovering</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="zipper" data-meaning="点击或悬浮可翻译">zipper</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="stuck" data-meaning="点击或悬浮可翻译">stuck</span> <span class="word" tabindex="0" data-word="halfway" data-meaning="点击或悬浮可翻译">halfway.</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">For</span> <span class="word" tabindex="0" data-word="most" data-meaning="点击或悬浮可翻译">most</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="us" data-meaning="点击或悬浮可翻译">us</span>, <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">this</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">small</span> <span class="word" tabindex="0" data-word="metal" data-meaning="点击或悬浮可翻译">metal</span> <span class="word" tabindex="0" data-word="track" data-meaning="点击或悬浮可翻译">track</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="ordinary" data-meaning="点击或悬浮可翻译">ordinary</span>, <span class="word" tabindex="0" data-word="yet" data-meaning="点击或悬浮可翻译">yet</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="took" data-meaning="点击或悬浮可翻译">took</span> <span class="word" tabindex="0" data-word="decades" data-meaning="点击或悬浮可翻译">decades</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="win" data-meaning="点击或悬浮可翻译">win</span> <span class="word" tabindex="0" data-word="acceptance" data-meaning="点击或悬浮可翻译">acceptance.</span> <span class="word" tabindex="0" data-word="early" data-meaning="点击或悬浮可翻译">Early</span> <span class="word" tabindex="0" data-word="fasteners" data-meaning="点击或悬浮可翻译">fasteners</span> <span class="word" tabindex="0" data-word="used" data-meaning="点击或悬浮可翻译">used</span> <span class="word" tabindex="0" data-word="hooks" data-meaning="点击或悬浮可翻译">hooks</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="eyes" data-meaning="点击或悬浮可翻译">eyes</span> <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="buttons" data-meaning="点击或悬浮可翻译">buttons</span>, <span class="word" tabindex="0" data-word="which" data-meaning="点击或悬浮可翻译">which</span> <span class="word" tabindex="0" data-word="were" data-meaning="点击或悬浮可翻译">were</span> <span class="word" tabindex="0" data-word="slow" data-meaning="点击或悬浮可翻译">slow</span> <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="easy" data-meaning="点击或悬浮可翻译">easy</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="repair" data-meaning="点击或悬浮可翻译">repair.</span> <span class="word" tabindex="0" data-word="inventors" data-meaning="点击或悬浮可翻译">Inventors</span> <span class="word" tabindex="0" data-word="dreamed" data-meaning="点击或悬浮可翻译">dreamed</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="smooth" data-meaning="点击或悬浮可翻译">smooth</span>, <span class="word" tabindex="0" data-word="continuous" data-meaning="点击或悬浮可翻译">continuous</span> <span class="word" tabindex="0" data-word="closure" data-meaning="点击或悬浮可翻译">closure</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="making" data-meaning="点击或悬浮可翻译">making</span> <span class="word" tabindex="0" data-word="one" data-meaning="点击或悬浮可翻译">one</span> <span class="word" tabindex="0" data-word="required" data-meaning="点击或悬浮可翻译">required</span> <span class="word" tabindex="0" data-word="unusual" data-meaning="点击或悬浮可翻译">unusual</span> <span class="word" tabindex="0" data-word="precision" data-meaning="点击或悬浮可翻译">precision.</span> <span class="word" tabindex="0" data-word="if" data-meaning="点击或悬浮可翻译">If</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="two" data-meaning="点击或悬浮可翻译">two</span> <span class="word" tabindex="0" data-word="sides" data-meaning="点击或悬浮可翻译">sides</span> <span class="word" tabindex="0" data-word="did" data-meaning="点击或悬浮可翻译">did</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="line" data-meaning="点击或悬浮可翻译">line</span> <span class="word" tabindex="0" data-word="up" data-meaning="点击或悬浮可翻译">up</span> <span class="word" tabindex="0" data-word="perfectly" data-meaning="点击或悬浮可翻译">perfectly</span>, <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="teeth" data-meaning="点击或悬浮可翻译">teeth</span> <span class="word" tabindex="0" data-word="jammed" data-meaning="点击或悬浮可翻译">jammed</span> <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="separated" data-meaning="点击或悬浮可翻译">separated</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="cheap" data-meaning="点击或悬浮可翻译">cheap</span> <span class="word" tabindex="0" data-word="coat" data-meaning="点击或悬浮可翻译">coat</span> <span class="word" tabindex="0" data-word="could" data-meaning="点击或悬浮可翻译">could</span> <span class="word" tabindex="0" data-word="become" data-meaning="点击或悬浮可翻译">become</span> <span class="word" tabindex="0" data-word="useless" data-meaning="点击或悬浮可翻译">useless.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(0, this)">显示中文翻译</button>
+          <div class="translation" id="translation-0">想象你匆忙出门，穿上夹克，却发现拉链卡在一半。对我们大多数人来说，这条小小的金属轨道很普通，但它花了几十年才被接受。早期的扣件用钩眼或纽扣，虽然慢，却容易修。发明者梦想有一种顺滑、连续的闭合方式，但制作它需要非同寻常的精确度。如果两边没有完全对齐，齿就会卡住或分开，一件便宜的外套也可能变得没法穿。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="real" data-meaning="点击或悬浮可翻译">real</span> <span class="word" tabindex="0" data-word="challenge" data-meaning="点击或悬浮可翻译">challenge</span> <span class="word" tabindex="0" data-word="was" data-meaning="点击或悬浮可翻译">was</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="idea" data-meaning="点击或悬浮可翻译">idea</span> <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="system" data-meaning="点击或悬浮可翻译">system</span> <span class="word" tabindex="0" data-word="around" data-meaning="点击或悬浮可翻译">around</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it.</span> <span class="word" tabindex="0" data-word="manufacturers" data-meaning="点击或悬浮可翻译">Manufacturers</span> <span class="word" tabindex="0" data-word="had" data-meaning="点击或悬浮可翻译">had</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="cut" data-meaning="点击或悬浮可翻译">cut</span> <span class="word" tabindex="0" data-word="tiny" data-meaning="点击或悬浮可翻译">tiny</span> <span class="word" tabindex="0" data-word="parts" data-meaning="点击或悬浮可翻译">parts</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="same" data-meaning="点击或悬浮可翻译">same</span> <span class="word" tabindex="0" data-word="size" data-meaning="点击或悬浮可翻译">size</span>, <span class="word" tabindex="0" data-word="set" data-meaning="点击或悬浮可翻译">set</span> <span class="word" tabindex="0" data-word="up" data-meaning="点击或悬浮可翻译">up</span> <span class="word" tabindex="0" data-word="machines" data-meaning="点击或悬浮可翻译">machines</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="teach" data-meaning="点击或悬浮可翻译">teach</span> <span class="word" tabindex="0" data-word="workers" data-meaning="点击或悬浮可翻译">workers</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="assemble" data-meaning="点击或悬浮可翻译">assemble</span> <span class="word" tabindex="0" data-word="them" data-meaning="点击或悬浮可翻译">them</span> <span class="word" tabindex="0" data-word="reliably" data-meaning="点击或悬浮可翻译">reliably.</span> <span class="word" tabindex="0" data-word="standard" data-meaning="点击或悬浮可翻译">Standard</span> <span class="word" tabindex="0" data-word="sizes" data-meaning="点击或悬浮可翻译">sizes</span> <span class="word" tabindex="0" data-word="helped" data-meaning="点击或悬浮可翻译">helped</span>, <span class="word" tabindex="0" data-word="because" data-meaning="点击或悬浮可翻译">because</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="zip" data-meaning="点击或悬浮可翻译">zip</span> <span class="word" tabindex="0" data-word="from" data-meaning="点击或悬浮可翻译">from</span> <span class="word" tabindex="0" data-word="one" data-meaning="点击或悬浮可翻译">one</span> <span class="word" tabindex="0" data-word="factory" data-meaning="点击或悬浮可翻译">factory</span> <span class="word" tabindex="0" data-word="could" data-meaning="点击或悬浮可翻译">could</span> <span class="word" tabindex="0" data-word="then" data-meaning="点击或悬浮可翻译">then</span> <span class="word" tabindex="0" data-word="fit" data-meaning="点击或悬浮可翻译">fit</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="coat" data-meaning="点击或悬浮可翻译">coat</span> <span class="word" tabindex="0" data-word="made" data-meaning="点击或悬浮可翻译">made</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="another" data-meaning="点击或悬浮可翻译">another.</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="shift" data-meaning="点击或悬浮可翻译">shift</span> <span class="word" tabindex="0" data-word="was" data-meaning="点击或悬浮可翻译">was</span> <span class="word" tabindex="0" data-word="expensive" data-meaning="点击或悬浮可翻译">expensive</span> <span class="word" tabindex="0" data-word="at" data-meaning="点击或悬浮可翻译">at</span> <span class="word" tabindex="0" data-word="first" data-meaning="点击或悬浮可翻译">first</span>, <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">so</span> <span class="word" tabindex="0" data-word="zippers" data-meaning="点击或悬浮可翻译">zippers</span> <span class="word" tabindex="0" data-word="appeared" data-meaning="点击或悬浮可翻译">appeared</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="boots" data-meaning="点击或悬浮可翻译">boots</span>, <span class="word" tabindex="0" data-word="bags" data-meaning="点击或悬浮可翻译">bags</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="luxury" data-meaning="点击或悬浮可翻译">luxury</span> <span class="word" tabindex="0" data-word="clothing" data-meaning="点击或悬浮可翻译">clothing</span> <span class="word" tabindex="0" data-word="before" data-meaning="点击或悬浮可翻译">before</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="reached" data-meaning="点击或悬浮可翻译">reached</span> <span class="word" tabindex="0" data-word="everyday" data-meaning="点击或悬浮可翻译">everyday</span> <span class="word" tabindex="0" data-word="trousers" data-meaning="点击或悬浮可翻译">trousers.</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">In</span> <span class="word" tabindex="0" data-word="other" data-meaning="点击或悬浮可翻译">other</span> <span class="word" tabindex="0" data-word="words" data-meaning="点击或悬浮可翻译">words</span>, <span class="word" tabindex="0" data-word="convenience" data-meaning="点击或悬浮可翻译">convenience</span> <span class="word" tabindex="0" data-word="arrived" data-meaning="点击或悬浮可翻译">arrived</span> <span class="word" tabindex="0" data-word="only" data-meaning="点击或悬浮可翻译">only</span> <span class="word" tabindex="0" data-word="after" data-meaning="点击或悬浮可翻译">after</span> <span class="word" tabindex="0" data-word="industry" data-meaning="点击或悬浮可翻译">industry</span> <span class="word" tabindex="0" data-word="learned" data-meaning="点击或悬浮可翻译">learned</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="cooperate" data-meaning="点击或悬浮可翻译">cooperate.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(1, this)">显示中文翻译</button>
+          <div class="translation" id="translation-1">真正的挑战不是想法本身，而是它周围的体系。制造商必须把微小零件切成同样尺寸，安装机器，并教工人可靠地组装它们。标准尺寸起了作用，因为一家工厂的拉链随后能配另一家做的外套。这种转变起初很昂贵，所以拉链先出现在靴子、包和奢侈服装上，之后才进入日常裤子。换句话说，便利只有在行业学会合作之后才到来。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="today" data-meaning="点击或悬浮可翻译">Today</span>, <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="trade-off" data-meaning="点击或悬浮可翻译">trade-off</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="clearer" data-meaning="点击或悬浮可翻译">clearer.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="zipper" data-meaning="点击或悬浮可翻译">zipper</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="fast" data-meaning="点击或悬浮可翻译">fast</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="neat" data-meaning="点击或悬浮可翻译">neat</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="when" data-meaning="点击或悬浮可翻译">when</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="breaks" data-meaning="点击或悬浮可翻译">breaks</span>, <span class="word" tabindex="0" data-word="many" data-meaning="点击或悬浮可翻译">many</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="replace" data-meaning="点击或悬浮可翻译">replace</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="whole" data-meaning="点击或悬浮可翻译">whole</span> <span class="word" tabindex="0" data-word="item" data-meaning="点击或悬浮可翻译">item</span> <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="take" data-meaning="点击或悬浮可翻译">take</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="specialist" data-meaning="点击或悬浮可翻译">specialist.</span> <span class="word" tabindex="0" data-word="buttons" data-meaning="点击或悬浮可翻译">Buttons</span>, <span class="word" tabindex="0" data-word="by" data-meaning="点击或悬浮可翻译">by</span> <span class="word" tabindex="0" data-word="contrast" data-meaning="点击或悬浮可翻译">contrast</span>, <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="be" data-meaning="点击或悬浮可翻译">be</span> <span class="word" tabindex="0" data-word="sewn" data-meaning="点击或悬浮可翻译">sewn</span> <span class="word" tabindex="0" data-word="back" data-meaning="点击或悬浮可翻译">back</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="at" data-meaning="点击或悬浮可翻译">at</span> <span class="word" tabindex="0" data-word="home" data-meaning="点击或悬浮可翻译">home.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="zipper" data-meaning="点击或悬浮可翻译">zipper</span> <span class="word" tabindex="0" data-word="therefore" data-meaning="点击或悬浮可翻译">therefore</span> <span class="word" tabindex="0" data-word="shows" data-meaning="点击或悬浮可翻译">shows</span> <span class="word" tabindex="0" data-word="how" data-meaning="点击或悬浮可翻译">how</span> <span class="word" tabindex="0" data-word="everyday" data-meaning="点击或悬浮可翻译">everyday</span> <span class="word" tabindex="0" data-word="inventions" data-meaning="点击或悬浮可翻译">inventions</span> <span class="word" tabindex="0" data-word="succeed" data-meaning="点击或悬浮可翻译">succeed</span> <span class="word" tabindex="0" data-word="through" data-meaning="点击或悬浮可翻译">through</span> <span class="word" tabindex="0" data-word="hidden" data-meaning="点击或悬浮可翻译">hidden</span> <span class="word" tabindex="0" data-word="networks" data-meaning="点击或悬浮可翻译">networks</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="factories" data-meaning="点击或悬浮可翻译">factories</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="standards" data-meaning="点击或悬浮可翻译">standards</span>, <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="just" data-meaning="点击或悬浮可翻译">just</span> <span class="word" tabindex="0" data-word="clever" data-meaning="点击或悬浮可翻译">clever</span> <span class="word" tabindex="0" data-word="design" data-meaning="点击或悬浮可翻译">design.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="reminds" data-meaning="点击或悬浮可翻译">reminds</span> <span class="word" tabindex="0" data-word="us" data-meaning="点击或悬浮可翻译">us</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="progress" data-meaning="点击或悬浮可翻译">progress</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="be" data-meaning="点击或悬浮可翻译">be</span> <span class="word" tabindex="0" data-word="uneven" data-meaning="点击或悬浮可翻译">uneven</span>: <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="product" data-meaning="点击或悬浮可翻译">product</span> <span class="word" tabindex="0" data-word="may" data-meaning="点击或悬浮可翻译">may</span> <span class="word" tabindex="0" data-word="be" data-meaning="点击或悬浮可翻译">be</span> <span class="word" tabindex="0" data-word="technically" data-meaning="点击或悬浮可翻译">technically</span> <span class="word" tabindex="0" data-word="ready" data-meaning="点击或悬浮可翻译">ready</span> <span class="word" tabindex="0" data-word="long" data-meaning="点击或悬浮可翻译">long</span> <span class="word" tabindex="0" data-word="before" data-meaning="点击或悬浮可翻译">before</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="becomes" data-meaning="点击或悬浮可翻译">becomes</span> <span class="word" tabindex="0" data-word="cheap" data-meaning="点击或悬浮可翻译">cheap</span>, <span class="word" tabindex="0" data-word="trusted" data-meaning="点击或悬浮可翻译">trusted</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="easy" data-meaning="点击或悬浮可翻译">easy</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="fix" data-meaning="点击或悬浮可翻译">fix.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(2, this)">显示中文翻译</button>
+          <div class="translation" id="translation-2">今天，这种取舍更清楚了。拉链又快又整齐，但它坏掉时，很多人会换掉整件物品，或把它送到专业人员那里。相比之下，纽扣可以在家里缝回去。因此，拉链说明了日常发明如何通过工厂和标准的隐形网络成功，而不只是靠巧妙设计。它还提醒我们，进步可能并不均衡：一个产品可能在技术上早已成熟，但很久以后才变得便宜、可靠、容易修理。</div>
+        </div>
+      </section>
+        <p class="footer">
+          AI-generated lesson for daily English reading.
+          <br>Word translation on hover or tap uses the MyMemory public translation API.
+          <br>Site: <a href="https://ccandzy.github.io/daily-english/">https://ccandzy.github.io/daily-english/</a>
+        </p>
+      </main>
+
+      <aside class="sidebar">
+        <div class="side-section">
+          <span class="label">Phrases</span>
+          <h2>Short Phrases</h2>
+          <ul><li><strong>win acceptance</strong>: 被接受，获得认可</li><li><strong>line up</strong>: 对齐，排成一条线</li><li><strong>set up</strong>: 安装，建立</li><li><strong>in other words</strong>: 换句话说</li><li><strong>by contrast</strong>: 相比之下</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Hard Words</span>
+          <h2>Difficult Words</h2>
+          <ul><li><strong>precision</strong>: 精确度；这里指拉链齿必须做得非常准确</li><li><strong>assemble</strong>: 组装；这里指把细小零件装成拉链</li><li><strong>continuous</strong>: 连续的；这里指没有间断的闭合方式</li><li><strong>specialist</strong>: 专业人员；这里指专门修理拉链或衣物的人</li><li><strong>uneven</strong>: 不均衡的；这里指进步在不同阶段速度不同</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Common Words</span>
+          <h2>Useful Words</h2>
+          <ul><li><strong>ordinary</strong>: 普通的；这里指拉链看起来很平常</li><li><strong>repair</strong>: 修理；这里指修好旧式扣件</li><li><strong>convenience</strong>: 便利；这里指拉链带来的方便</li><li><strong>replace</strong>: 替换；这里指换掉坏拉链所在的整件物品</li><li><strong>trusted</strong>: 被信任的；这里指产品被认为可靠</li></ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const translationCache = new Map();
+    const words = Array.from(document.querySelectorAll(".word"));
+
+    for (const word of words) {
+      word.addEventListener("mouseenter", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("focus", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = !word.classList.contains("is-open");
+        closeWordTooltips();
+        if (willOpen) {
+          word.classList.add("is-open");
+          loadTranslation(word);
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      closeWordTooltips();
+    });
+
+    function closeWordTooltips() {
+      for (const word of words) {
+        word.classList.remove("is-open");
+      }
+    }
+
+    async function loadTranslation(word) {
+      const key = word.dataset.word || normalizeWord(word.textContent || "");
+      if (!key) {
+        word.dataset.meaning = "暂无翻译";
+        return;
+      }
+
+      if (translationCache.has(key)) {
+        word.dataset.meaning = translationCache.get(key);
+        return;
+      }
+
+      word.dataset.meaning = "翻译中...";
+
+      try {
+        const params = new URLSearchParams({
+          q: key,
+          langpair: "en|zh-CN",
+          mt: "1"
+        });
+        const response = await fetch("https://api.mymemory.translated.net/get?" + params.toString());
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        const translated =
+          data?.responseData?.translatedText ||
+          data?.matches?.find((item) => item?.translation)?.translation ||
+          "";
+
+        const clean = normalizeTranslation(translated, key);
+        const finalMeaning = clean || "暂无翻译";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      } catch (error) {
+        const fallback = localFallback(key);
+        const finalMeaning = fallback || "翻译失败，请稍后再试";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      }
+    }
+
+    function normalizeWord(value) {
+      return String(value).toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+    }
+
+    function normalizeTranslation(value, sourceWord) {
+      const text = String(value || "").trim();
+      if (!text) {
+        return "";
+      }
+
+      const lowered = text.toLowerCase();
+      if (lowered === String(sourceWord).toLowerCase()) {
+        return "";
+      }
+
+      return text.replace(/^zh-cn\|/i, "").trim();
+    }
+
+    function localFallback(word) {
+      const fallback = {
+        a: "一个",
+        an: "一个",
+        and: "和",
+        are: "是",
+        in: "在……里",
+        is: "是",
+        of: "……的",
+        on: "在……上",
+        the: "这；这个",
+        to: "到；去；用于不定式"
+      };
+      return fallback[word] || "";
+    }
+
+    function toggleTranslation(index, button) {
+      const el = document.getElementById("translation-" + index);
+      const isOpen = el.classList.toggle("show");
+      button.textContent = isOpen ? "隐藏中文翻译" : "显示中文翻译";
+    }
+  </script>
+</body>
+</html>
