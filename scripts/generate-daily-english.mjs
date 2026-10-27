@@ -127,7 +127,7 @@ if (!chosenTopic) {
 // ---------- End topic rotation ----------
 
 const prompt = `
-You are creating a daily English reading lesson for a Chinese learner progressing from intermediate to upper-intermediate English (CEFR B1-B2).
+You are creating a daily English reading lesson for a Chinese learner building confidence at intermediate English (CEFR B1).
 
 Preferred topic: ${chosenTopic}.
 Explore the preferred topic through one specific question, mechanism, comparison, or trade-off.
@@ -138,13 +138,13 @@ Keep the Topic metadata close to the preferred topic so future rotation can dete
 Return content in the following Markdown format. Do not include markdown code fences or any text before/after.
 
 Requirements:
-- Write 240 to 300 words of English body text in total, excluding headings, translations, and vocabulary lists.
-- Target CEFR B1-B2: use precise vocabulary, varied sentence lengths, relative clauses, and natural cause-and-effect or contrast structures. Avoid dense academic prose and unexplained jargon.
-- Develop an idea rather than merely listing facts: introduce a concrete situation, explain how or why it works, then discuss an implication, limitation, or competing view.
+- Write 180 to 220 words of English body text in total, excluding headings, translations, and vocabulary lists.
+- Target CEFR B1: use familiar everyday vocabulary and mostly short sentences of about 10 to 18 words. Use at most one more complex sentence per paragraph, with a simple relative clause or a clear connector such as because, although, or however. Avoid nested clauses, dense academic prose, and unexplained jargon.
+- Start with a concrete everyday example, explain one main idea in simple steps, then give a practical takeaway. For science, economics, or social topics, explain the basic idea without assuming specialist knowledge or requiring abstract debate.
 - Use concrete examples to explain unfamiliar concepts; do not invent quotations, statistics, or research findings.
-- Introduce 5 useful B2-level words naturally in the body and reinforce 5 reusable collocations or short phrases.
+- Introduce only 3 to 5 potentially unfamiliar words in the body, mostly at B1 with at most 2 B2 words. Make their meanings clear through context or a brief plain-English explanation. Reuse familiar words naturally and include 5 everyday collocations or short phrases. The 5 difficult-word entries should be the relatively harder words from this article, not a reason to add more advanced vocabulary.
 - If you are not sure about a breaking-news fact, avoid specific claims and choose a safer topic.
-- Output exactly 3 paragraphs of roughly 80 to 100 English words each.
+- Output exactly 3 paragraphs of roughly 60 to 75 English words each, keeping the total within 180 to 220 words.
 - After each English paragraph, provide a natural Chinese translation.
 - Include 5 short phrases, 5 difficult words, and 5 common useful words, all taken from the English body. Give their meanings in this context, not generic dictionary definitions.
 - Use concise Chinese translations.
@@ -447,7 +447,7 @@ function buildMessages() {
     {
       role: "system",
       content:
-        "You generate safe, learner-friendly English study materials in Markdown format. Target CEFR B1-B2 with clear explanations, varied sentence structures, and precise vocabulary. Follow the user requirements for body length and topic diversity. Return only the Markdown content, no explanations or code fences.",
+        "You generate safe, learner-friendly English study materials in Markdown format. Target CEFR B1 with familiar vocabulary, mostly short sentences, and concrete examples. Limit unfamiliar words and explain them in context; avoid nested clauses and abstract debate. Follow the user requirements for body length and topic diversity. Return only the Markdown content, no explanations or code fences.",
     },
     {
       role: "user",
@@ -991,7 +991,7 @@ function buildHtml(lessonData, currentSiteUrl) {
     <div class="layout">
       <main class="card">
         <h1>${safeTitle}</h1>
-        <p class="meta">Date: ${safeDate} | Level: ${lessonData.sourceNote?.startsWith("Local fallback") ? "Basic (local fallback)" : "B1–B2 (target)"} | Topic: ${safeTopic}</p>
+        <p class="meta">Date: ${safeDate} | Level: ${lessonData.sourceNote?.startsWith("Local fallback") ? "Basic (local fallback)" : "B1 (target)"} | Topic: ${safeTopic}</p>
         <p class="tip">${safeTip}</p>
         <section id="article">${articleHtml}</section>
         <p class="footer">
