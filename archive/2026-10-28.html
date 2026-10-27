@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Why a Free Lesson Is Not Always Equal Learning</title>
+  <style>
+    :root {
+      --bg-a: #f4efe7;
+      --bg-b: #dcecf2;
+      --paper: #fffdf8;
+      --sidebar: #edf6fb;
+      --ink: #22363c;
+      --muted: #64777c;
+      --accent: #11765f;
+      --accent-deep: #0b5948;
+      --line: #cad9dd;
+      --hover: #d8f4ec;
+      --tooltip: #17353a;
+      --soft: #edf9f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 28%),
+        linear-gradient(145deg, var(--bg-a) 0%, var(--bg-b) 100%);
+    }
+
+    .page {
+      max-width: 1220px;
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card,
+    .sidebar {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 38px rgba(32, 67, 75, 0.08);
+    }
+
+    .card {
+      background: var(--paper);
+      padding: 30px;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      padding: 22px;
+      position: sticky;
+      top: 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 45px);
+      line-height: 1.12;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tip {
+      margin: 0 0 24px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      background: var(--soft);
+      color: #28544b;
+    }
+
+    .article-block {
+      margin-bottom: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .article-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .article-block p {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .toggle-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--accent);
+      color: #f7fffd;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-1px);
+      background: var(--accent-deep);
+    }
+
+    .translation {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f3fcf8;
+      color: #355556;
+      font-size: 16px;
+    }
+
+    .translation.show {
+      display: block;
+    }
+
+    .word {
+      position: relative;
+      display: inline-block;
+      padding: 0 2px;
+      border-radius: 5px;
+      cursor: help;
+      transition: background-color 0.15s ease;
+    }
+
+    .word:hover {
+      background: var(--hover);
+    }
+
+    .word:hover::after,
+    .word:active::after,
+    .word:focus-visible::after,
+    .word.is-open::after {
+      content: attr(data-meaning);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      min-width: 64px;
+      max-width: 180px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: var(--tooltip);
+      color: #f4fdfd;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      z-index: 2;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(17, 118, 95, 0.12);
+      color: var(--accent-deep);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .side-section {
+      margin-bottom: 22px;
+    }
+
+    .side-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .side-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .side-section li {
+      margin-bottom: 10px;
+      color: #304248;
+      font-size: 15px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--accent-deep);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 14px auto;
+        padding: 10px;
+      }
+
+      .card,
+      .sidebar {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .article-block p {
+        font-size: 18px;
+      }
+
+      .word:hover::after,
+      .word:active::after,
+      .word:focus-visible::after,
+      .word.is-open::after {
+        left: 0;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="layout">
+      <main class="card">
+        <h1>Why a Free Lesson Is Not Always Equal Learning</h1>
+        <p class="meta">Date: 2026-10-28 | Level: B1 (target) | Topic: education inequality and access to learning — a free online lesson and home support</p>
+        <p class="tip">阅读时先找“免费”和“真正能学”之间的差别，再用自己的话复述三个小步骤。</p>
+        <section id="article">
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="two" data-meaning="点击或悬浮可翻译">Two</span> <span class="word" tabindex="0" data-word="students" data-meaning="点击或悬浮可翻译">students</span> <span class="word" tabindex="0" data-word="get" data-meaning="点击或悬浮可翻译">get</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="same" data-meaning="点击或悬浮可翻译">same</span> <span class="word" tabindex="0" data-word="free" data-meaning="点击或悬浮可翻译">free</span> <span class="word" tabindex="0" data-word="online" data-meaning="点击或悬浮可翻译">online</span> <span class="word" tabindex="0" data-word="lesson" data-meaning="点击或悬浮可翻译">lesson.</span> <span class="word" tabindex="0" data-word="one" data-meaning="点击或悬浮可翻译">One</span> <span class="word" tabindex="0" data-word="has" data-meaning="点击或悬浮可翻译">has</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="quiet" data-meaning="点击或悬浮可翻译">quiet</span> <span class="word" tabindex="0" data-word="desk" data-meaning="点击或悬浮可翻译">desk</span>, <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="good" data-meaning="点击或悬浮可翻译">good</span> <span class="word" tabindex="0" data-word="phone" data-meaning="点击或悬浮可翻译">phone</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="parent" data-meaning="点击或悬浮可翻译">parent</span> <span class="word" tabindex="0" data-word="who" data-meaning="点击或悬浮可翻译">who</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="help" data-meaning="点击或悬浮可翻译">help.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="other" data-meaning="点击或悬浮可翻译">other</span> <span class="word" tabindex="0" data-word="shares" data-meaning="点击或悬浮可翻译">shares</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="room" data-meaning="点击或悬浮可翻译">room</span>, <span class="word" tabindex="0" data-word="uses" data-meaning="点击或悬浮可翻译">uses</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="slow" data-meaning="点击或悬浮可翻译">slow</span> <span class="word" tabindex="0" data-word="phone" data-meaning="点击或悬浮可翻译">phone</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="works" data-meaning="点击或悬浮可翻译">works</span> <span class="word" tabindex="0" data-word="late" data-meaning="点击或悬浮可翻译">late.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="lesson" data-meaning="点击或悬浮可翻译">lesson</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="free" data-meaning="点击或悬浮可翻译">free</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="both" data-meaning="点击或悬浮可翻译">both</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="their" data-meaning="点击或悬浮可翻译">their</span> <span class="word" tabindex="0" data-word="access" data-meaning="点击或悬浮可翻译">access</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="learning" data-meaning="点击或悬浮可翻译">learning</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="same" data-meaning="点击或悬浮可翻译">same.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="class" data-meaning="点击或悬浮可翻译">class</span> <span class="word" tabindex="0" data-word="may" data-meaning="点击或悬浮可翻译">may</span> <span class="word" tabindex="0" data-word="be" data-meaning="点击或悬浮可翻译">be</span> <span class="word" tabindex="0" data-word="equal" data-meaning="点击或悬浮可翻译">equal</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="chance" data-meaning="点击或悬浮可翻译">chance</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="use" data-meaning="点击或悬浮可翻译">use</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not.</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="one" data-meaning="点击或悬浮可翻译">one</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">small</span> <span class="word" tabindex="0" data-word="face" data-meaning="点击或悬浮可翻译">face</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="education" data-meaning="点击或悬浮可翻译">education</span> <span class="word" tabindex="0" data-word="inequality" data-meaning="点击或悬浮可翻译">inequality.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(0, this)">显示中文翻译</button>
+          <div class="translation" id="translation-0">两名学生上同一节免费在线课。一个人有安静的书桌、好用的手机，还有能帮忙的家长。另一个人和别人合住一间房，用慢手机，还要很晚干活。这节课对两人都免费，但他们获得学习的机会并不一样。课堂也许平等，使用课堂的机会却不平等。这是教育不平等的一个小侧面。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="schools" data-meaning="点击或悬浮可翻译">Schools</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="free" data-meaning="点击或悬浮可翻译">free</span> <span class="word" tabindex="0" data-word="programs" data-meaning="点击或悬浮可翻译">programs</span> <span class="word" tabindex="0" data-word="often" data-meaning="点击或悬浮可翻译">often</span> <span class="word" tabindex="0" data-word="measure" data-meaning="点击或悬浮可翻译">measure</span> <span class="word" tabindex="0" data-word="access" data-meaning="点击或悬浮可翻译">access</span> <span class="word" tabindex="0" data-word="by" data-meaning="点击或悬浮可翻译">by</span> <span class="word" tabindex="0" data-word="counting" data-meaning="点击或悬浮可翻译">counting</span> <span class="word" tabindex="0" data-word="places" data-meaning="点击或悬浮可翻译">places</span> <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="lessons" data-meaning="点击或悬浮可翻译">lessons.</span> <span class="word" tabindex="0" data-word="however" data-meaning="点击或悬浮可翻译">However</span>, <span class="word" tabindex="0" data-word="learning" data-meaning="点击或悬浮可翻译">learning</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="needs" data-meaning="点击或悬浮可翻译">needs</span> <span class="word" tabindex="0" data-word="time" data-meaning="点击或悬浮可翻译">time</span>, <span class="word" tabindex="0" data-word="quiet" data-meaning="点击或悬浮可翻译">quiet</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="support" data-meaning="点击或悬浮可翻译">support.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="student" data-meaning="点击或悬浮可翻译">student</span> <span class="word" tabindex="0" data-word="who" data-meaning="点击或悬浮可翻译">who</span> <span class="word" tabindex="0" data-word="must" data-meaning="点击或悬浮可翻译">must</span> <span class="word" tabindex="0" data-word="cook" data-meaning="点击或悬浮可翻译">cook</span>, <span class="word" tabindex="0" data-word="care" data-meaning="点击或悬浮可翻译">care</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="younger" data-meaning="点击或悬浮可翻译">younger</span> <span class="word" tabindex="0" data-word="sister" data-meaning="点击或悬浮可翻译">sister</span>, <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="travel" data-meaning="点击或悬浮可翻译">travel</span> <span class="word" tabindex="0" data-word="far" data-meaning="点击或悬浮可翻译">far</span> <span class="word" tabindex="0" data-word="may" data-meaning="点击或悬浮可翻译">may</span> <span class="word" tabindex="0" data-word="miss" data-meaning="点击或悬浮可翻译">miss</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="class" data-meaning="点击或悬浮可翻译">class.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="free" data-meaning="点击或悬浮可翻译">free</span> <span class="word" tabindex="0" data-word="lesson" data-meaning="点击或悬浮可翻译">lesson</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="still" data-meaning="点击或悬浮可翻译">still</span> <span class="word" tabindex="0" data-word="cost" data-meaning="点击或悬浮可翻译">cost</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="family" data-meaning="点击或悬浮可翻译">family</span> <span class="word" tabindex="0" data-word="time" data-meaning="点击或悬浮可翻译">time</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="energy" data-meaning="点击或悬浮可翻译">energy.</span> <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">So</span>, <span class="word" tabindex="0" data-word="access" data-meaning="点击或悬浮可翻译">access</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="just" data-meaning="点击或悬浮可翻译">just</span> <span class="word" tabindex="0" data-word="an" data-meaning="点击或悬浮可翻译">an</span> <span class="word" tabindex="0" data-word="open" data-meaning="点击或悬浮可翻译">open</span> <span class="word" tabindex="0" data-word="door" data-meaning="点击或悬浮可翻译">door.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="whole" data-meaning="点击或悬浮可翻译">whole</span> <span class="word" tabindex="0" data-word="path" data-meaning="点击或悬浮可翻译">path</span> <span class="word" tabindex="0" data-word="through" data-meaning="点击或悬浮可翻译">through</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="door" data-meaning="点击或悬浮可翻译">door.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(1, this)">显示中文翻译</button>
+          <div class="translation" id="translation-1">学校和免费项目常常通过数名额或课程来衡量“可获得性”。然而，学习还需要时间、安静和支持。一个学生如果必须做饭、照顾妹妹，或走很远的路，就可能错过课程。一节免费课仍可能花掉家庭的时间和精力。所以，获得学习机会不只是打开一扇门。它是走完门后的整条路。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="simple" data-meaning="点击或悬浮可翻译">simple</span> <span class="word" tabindex="0" data-word="takeaway" data-meaning="点击或悬浮可翻译">takeaway</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="ask" data-meaning="点击或悬浮可翻译">ask</span> <span class="word" tabindex="0" data-word="what" data-meaning="点击或悬浮可翻译">what</span> <span class="word" tabindex="0" data-word="else" data-meaning="点击或悬浮可翻译">else</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="learner" data-meaning="点击或悬浮可翻译">learner</span> <span class="word" tabindex="0" data-word="needs" data-meaning="点击或悬浮可翻译">needs.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="school" data-meaning="点击或悬浮可翻译">school</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="offer" data-meaning="点击或悬浮可翻译">offer</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="quiet" data-meaning="点击或悬浮可翻译">quiet</span> <span class="word" tabindex="0" data-word="study" data-meaning="点击或悬浮可翻译">study</span> <span class="word" tabindex="0" data-word="room" data-meaning="点击或悬浮可翻译">room</span> <span class="word" tabindex="0" data-word="after" data-meaning="点击或悬浮可翻译">after</span> <span class="word" tabindex="0" data-word="class" data-meaning="点击或悬浮可翻译">class.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="free" data-meaning="点击或悬浮可翻译">free</span> <span class="word" tabindex="0" data-word="program" data-meaning="点击或悬浮可翻译">program</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="lend" data-meaning="点击或悬浮可翻译">lend</span> <span class="word" tabindex="0" data-word="tablets" data-meaning="点击或悬浮可翻译">tablets</span> <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="share" data-meaning="点击或悬浮可翻译">share</span> <span class="word" tabindex="0" data-word="bus" data-meaning="点击或悬浮可翻译">bus</span> <span class="word" tabindex="0" data-word="tickets" data-meaning="点击或悬浮可翻译">tickets.</span> <span class="word" tabindex="0" data-word="families" data-meaning="点击或悬浮可翻译">Families</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="take" data-meaning="点击或悬浮可翻译">take</span> <span class="word" tabindex="0" data-word="turns" data-meaning="点击或悬浮可翻译">turns</span> <span class="word" tabindex="0" data-word="watching" data-meaning="点击或悬浮可翻译">watching</span> <span class="word" tabindex="0" data-word="young" data-meaning="点击或悬浮可翻译">young</span> <span class="word" tabindex="0" data-word="children" data-meaning="点击或悬浮可翻译">children.</span> <span class="word" tabindex="0" data-word="these" data-meaning="点击或悬浮可翻译">These</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">small</span> <span class="word" tabindex="0" data-word="steps" data-meaning="点击或悬浮可翻译">steps</span> <span class="word" tabindex="0" data-word="do" data-meaning="点击或悬浮可翻译">do</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="fix" data-meaning="点击或悬浮可翻译">fix</span> <span class="word" tabindex="0" data-word="inequality" data-meaning="点击或悬浮可翻译">inequality</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="help" data-meaning="点击或悬浮可翻译">help</span> <span class="word" tabindex="0" data-word="more" data-meaning="点击或悬浮可翻译">more</span> <span class="word" tabindex="0" data-word="students" data-meaning="点击或悬浮可翻译">students</span> <span class="word" tabindex="0" data-word="use" data-meaning="点击或悬浮可翻译">use</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="chance" data-meaning="点击或悬浮可翻译">chance</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="already" data-meaning="点击或悬浮可翻译">already</span> <span class="word" tabindex="0" data-word="have" data-meaning="点击或悬浮可翻译">have.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="about" data-meaning="点击或悬浮可翻译">about</span> <span class="word" tabindex="0" data-word="more" data-meaning="点击或悬浮可翻译">more</span> <span class="word" tabindex="0" data-word="lessons" data-meaning="点击或悬浮可翻译">lessons</span> <span class="word" tabindex="0" data-word="alone" data-meaning="点击或悬浮可翻译">alone</span>; <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="about" data-meaning="点击或悬浮可翻译">about</span> <span class="word" tabindex="0" data-word="making" data-meaning="点击或悬浮可翻译">making</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="path" data-meaning="点击或悬浮可翻译">path</span> <span class="word" tabindex="0" data-word="easier" data-meaning="点击或悬浮可翻译">easier.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(2, this)">显示中文翻译</button>
+          <div class="translation" id="translation-2">一个简单的要点是：问问学习者还需要什么。学校可以在课后提供一间安静的自习室。免费项目可以借出平板电脑，或分担公交车票。家人可以轮流照看年幼的孩子。这些小事不能解决不平等，但能帮助更多学生用上已有的机会。这不只是多上几节课的问题，而是让这条路更容易走。</div>
+        </div>
+      </section>
+        <p class="footer">
+          AI-generated lesson for daily English reading.
+          <br>Word translation on hover or tap uses the MyMemory public translation API.
+          <br>Site: <a href="https://ccandzy.github.io/daily-english/">https://ccandzy.github.io/daily-english/</a>
+        </p>
+      </main>
+
+      <aside class="sidebar">
+        <div class="side-section">
+          <span class="label">Phrases</span>
+          <h2>Short Phrases</h2>
+          <ul><li><strong>access to learning</strong>: 获得学习的机会；接触学习的条件</li><li><strong>free online lesson</strong>: 免费在线课程</li><li><strong>care for</strong>: 照顾；照看</li><li><strong>after class</strong>: 课后</li><li><strong>take turns</strong>: 轮流</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Hard Words</span>
+          <h2>Difficult Words</h2>
+          <ul><li><strong>inequality</strong>: 不平等；这里指学习机会的差距</li><li><strong>access</strong>: 获得或使用机会的通道；这里指接触学习条件</li><li><strong>measure</strong>: 衡量、判断；这里指用数名额的方式判断机会</li><li><strong>support</strong>: 支持、帮助；这里指家长或他人的帮助</li><li><strong>lend</strong>: 借出；这里指项目把平板借给学生用</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Common Words</span>
+          <h2>Useful Words</h2>
+          <ul><li><strong>same</strong>: 相同的；这里指同一节免费课</li><li><strong>help</strong>: 帮助；这里指家长能帮忙</li><li><strong>time</strong>: 时间；这里指学习需要的时间</li><li><strong>class</strong>: 课；这里指在线课</li><li><strong>free</strong>: 免费的；这里指课程不收费</li></ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const translationCache = new Map();
+    const words = Array.from(document.querySelectorAll(".word"));
+
+    for (const word of words) {
+      word.addEventListener("mouseenter", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("focus", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = !word.classList.contains("is-open");
+        closeWordTooltips();
+        if (willOpen) {
+          word.classList.add("is-open");
+          loadTranslation(word);
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      closeWordTooltips();
+    });
+
+    function closeWordTooltips() {
+      for (const word of words) {
+        word.classList.remove("is-open");
+      }
+    }
+
+    async function loadTranslation(word) {
+      const key = word.dataset.word || normalizeWord(word.textContent || "");
+      if (!key) {
+        word.dataset.meaning = "暂无翻译";
+        return;
+      }
+
+      if (translationCache.has(key)) {
+        word.dataset.meaning = translationCache.get(key);
+        return;
+      }
+
+      word.dataset.meaning = "翻译中...";
+
+      try {
+        const params = new URLSearchParams({
+          q: key,
+          langpair: "en|zh-CN",
+          mt: "1"
+        });
+        const response = await fetch("https://api.mymemory.translated.net/get?" + params.toString());
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        const translated =
+          data?.responseData?.translatedText ||
+          data?.matches?.find((item) => item?.translation)?.translation ||
+          "";
+
+        const clean = normalizeTranslation(translated, key);
+        const finalMeaning = clean || "暂无翻译";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      } catch (error) {
+        const fallback = localFallback(key);
+        const finalMeaning = fallback || "翻译失败，请稍后再试";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      }
+    }
+
+    function normalizeWord(value) {
+      return String(value).toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+    }
+
+    function normalizeTranslation(value, sourceWord) {
+      const text = String(value || "").trim();
+      if (!text) {
+        return "";
+      }
+
+      const lowered = text.toLowerCase();
+      if (lowered === String(sourceWord).toLowerCase()) {
+        return "";
+      }
+
+      return text.replace(/^zh-cn\|/i, "").trim();
+    }
+
+    function localFallback(word) {
+      const fallback = {
+        a: "一个",
+        an: "一个",
+        and: "和",
+        are: "是",
+        in: "在……里",
+        is: "是",
+        of: "……的",
+        on: "在……上",
+        the: "这；这个",
+        to: "到；去；用于不定式"
+      };
+      return fallback[word] || "";
+    }
+
+    function toggleTranslation(index, button) {
+      const el = document.getElementById("translation-" + index);
+      const isOpen = el.classList.toggle("show");
+      button.textContent = isOpen ? "隐藏中文翻译" : "显示中文翻译";
+    }
+  </script>
+</body>
+</html>
