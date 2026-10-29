@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exercise Habits: Start Small, Stay Steady</title>
+  <style>
+    :root {
+      --bg-a: #f4efe7;
+      --bg-b: #dcecf2;
+      --paper: #fffdf8;
+      --sidebar: #edf6fb;
+      --ink: #22363c;
+      --muted: #64777c;
+      --accent: #11765f;
+      --accent-deep: #0b5948;
+      --line: #cad9dd;
+      --hover: #d8f4ec;
+      --tooltip: #17353a;
+      --soft: #edf9f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 28%),
+        linear-gradient(145deg, var(--bg-a) 0%, var(--bg-b) 100%);
+    }
+
+    .page {
+      max-width: 1220px;
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card,
+    .sidebar {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 38px rgba(32, 67, 75, 0.08);
+    }
+
+    .card {
+      background: var(--paper);
+      padding: 30px;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      padding: 22px;
+      position: sticky;
+      top: 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 45px);
+      line-height: 1.12;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tip {
+      margin: 0 0 24px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      background: var(--soft);
+      color: #28544b;
+    }
+
+    .article-block {
+      margin-bottom: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .article-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .article-block p {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .toggle-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--accent);
+      color: #f7fffd;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-1px);
+      background: var(--accent-deep);
+    }
+
+    .translation {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f3fcf8;
+      color: #355556;
+      font-size: 16px;
+    }
+
+    .translation.show {
+      display: block;
+    }
+
+    .word {
+      position: relative;
+      display: inline-block;
+      padding: 0 2px;
+      border-radius: 5px;
+      cursor: help;
+      transition: background-color 0.15s ease;
+    }
+
+    .word:hover {
+      background: var(--hover);
+    }
+
+    .word:hover::after,
+    .word:active::after,
+    .word:focus-visible::after,
+    .word.is-open::after {
+      content: attr(data-meaning);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      min-width: 64px;
+      max-width: 180px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: var(--tooltip);
+      color: #f4fdfd;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      z-index: 2;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(17, 118, 95, 0.12);
+      color: var(--accent-deep);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .side-section {
+      margin-bottom: 22px;
+    }
+
+    .side-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .side-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .side-section li {
+      margin-bottom: 10px;
+      color: #304248;
+      font-size: 15px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--accent-deep);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 14px auto;
+        padding: 10px;
+      }
+
+      .card,
+      .sidebar {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .article-block p {
+        font-size: 18px;
+      }
+
+      .word:hover::after,
+      .word:active::after,
+      .word:focus-visible::after,
+      .word.is-open::after {
+        left: 0;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="layout">
+      <main class="card">
+        <h1>Exercise Habits: Start Small, Stay Steady</h1>
+        <p class="meta">Date: 2026-10-29 | Level: B1 (target) | Topic: exercise habits and long-term motivation — using a fixed signal instead of waiting to feel ready</p>
+        <p class="tip">学习建议：把“想不想练”换成固定的开始信号，先做几分钟，再决定是否加量。</p>
+        <section id="article">
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">On</span> <span class="word" tabindex="0" data-word="monday" data-meaning="点击或悬浮可翻译">Monday</span>, <span class="word" tabindex="0" data-word="mei" data-meaning="点击或悬浮可翻译">Mei</span> <span class="word" tabindex="0" data-word="plans" data-meaning="点击或悬浮可翻译">plans</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="run" data-meaning="点击或悬浮可翻译">run</span> <span class="word" tabindex="0" data-word="after" data-meaning="点击或悬浮可翻译">after</span> <span class="word" tabindex="0" data-word="work" data-meaning="点击或悬浮可翻译">work.</span> <span class="word" tabindex="0" data-word="by" data-meaning="点击或悬浮可翻译">By</span> <span class="word" tabindex="0" data-word="six" data-meaning="点击或悬浮可翻译">six</span> <span class="word" tabindex="0" data-word="o" data-meaning="点击或悬浮可翻译">o</span>’<span class="word" tabindex="0" data-word="clock" data-meaning="点击或悬浮可翻译">clock</span>, <span class="word" tabindex="0" data-word="she" data-meaning="点击或悬浮可翻译">she</span> <span class="word" tabindex="0" data-word="feels" data-meaning="点击或悬浮可翻译">feels</span> <span class="word" tabindex="0" data-word="tired" data-meaning="点击或悬浮可翻译">tired</span>, <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">so</span> <span class="word" tabindex="0" data-word="she" data-meaning="点击或悬浮可翻译">she</span> <span class="word" tabindex="0" data-word="sits" data-meaning="点击或悬浮可翻译">sits</span> <span class="word" tabindex="0" data-word="down" data-meaning="点击或悬浮可翻译">down.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="plan" data-meaning="点击或悬浮可翻译">plan</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="good" data-meaning="点击或悬浮可翻译">good</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="her" data-meaning="点击或悬浮可翻译">her</span> <span class="word" tabindex="0" data-word="motivation" data-meaning="点击或悬浮可翻译">motivation</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="low" data-meaning="点击或悬浮可翻译">low.</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="common" data-meaning="点击或悬浮可翻译">common.</span> <span class="word" tabindex="0" data-word="motivation" data-meaning="点击或悬浮可翻译">Motivation</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="feeling" data-meaning="点击或悬浮可翻译">feeling</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="want" data-meaning="点击或悬浮可翻译">want</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="do" data-meaning="点击或悬浮可翻译">do</span> <span class="word" tabindex="0" data-word="something" data-meaning="点击或悬浮可翻译">something.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="changes" data-meaning="点击或悬浮可翻译">changes</span> <span class="word" tabindex="0" data-word="from" data-meaning="点击或悬浮可翻译">from</span> <span class="word" tabindex="0" data-word="day" data-meaning="点击或悬浮可翻译">day</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="day" data-meaning="点击或悬浮可翻译">day</span>, <span class="word" tabindex="0" data-word="like" data-meaning="点击或悬浮可翻译">like</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="weather" data-meaning="点击或悬浮可翻译">weather.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="long-term" data-meaning="点击或悬浮可翻译">long-term</span> <span class="word" tabindex="0" data-word="exercise" data-meaning="点击或悬浮可翻译">exercise</span> <span class="word" tabindex="0" data-word="habit" data-meaning="点击或悬浮可翻译">habit</span> <span class="word" tabindex="0" data-word="cannot" data-meaning="点击或悬浮可翻译">cannot</span> <span class="word" tabindex="0" data-word="depend" data-meaning="点击或悬浮可翻译">depend</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">this</span> <span class="word" tabindex="0" data-word="feeling" data-meaning="点击或悬浮可翻译">feeling</span> <span class="word" tabindex="0" data-word="every" data-meaning="点击或悬浮可翻译">every</span> <span class="word" tabindex="0" data-word="time" data-meaning="点击或悬浮可翻译">time.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(0, this)">显示中文翻译</button>
+          <div class="translation" id="translation-0">周一，梅计划下班后去跑步。到了六点，她觉得很累，就坐下了。这个计划很好，但她的动力很低。这很常见。动力就是你想要做某事的感受。它像天气一样，天天都会变。长期的运动习惯不能每次都靠这种感觉。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="simple" data-meaning="点击或悬浮可翻译">simple</span> <span class="word" tabindex="0" data-word="answer" data-meaning="点击或悬浮可翻译">answer</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="use" data-meaning="点击或悬浮可翻译">use</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="signal" data-meaning="点击或悬浮可翻译">signal</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">small</span> <span class="word" tabindex="0" data-word="routine" data-meaning="点击或悬浮可翻译">routine.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="signal" data-meaning="点击或悬浮可翻译">signal</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="clear" data-meaning="点击或悬浮可翻译">clear</span> <span class="word" tabindex="0" data-word="sign" data-meaning="点击或悬浮可翻译">sign</span>, <span class="word" tabindex="0" data-word="such" data-meaning="点击或悬浮可翻译">such</span> <span class="word" tabindex="0" data-word="as" data-meaning="点击或悬浮可翻译">as</span> <span class="word" tabindex="0" data-word="after" data-meaning="点击或悬浮可翻译">after</span> <span class="word" tabindex="0" data-word="breakfast" data-meaning="点击或悬浮可翻译">breakfast</span> <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="before" data-meaning="点击或悬浮可翻译">before</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="evening" data-meaning="点击或悬浮可翻译">evening</span> <span class="word" tabindex="0" data-word="shower" data-meaning="点击或悬浮可翻译">shower.</span> <span class="word" tabindex="0" data-word="put" data-meaning="点击或悬浮可翻译">Put</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="shoes" data-meaning="点击或悬浮可翻译">shoes</span> <span class="word" tabindex="0" data-word="near" data-meaning="点击或悬浮可翻译">near</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="door" data-meaning="点击或悬浮可翻译">door.</span> <span class="word" tabindex="0" data-word="then" data-meaning="点击或悬浮可翻译">Then</span> <span class="word" tabindex="0" data-word="do" data-meaning="点击或悬浮可翻译">do</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="short" data-meaning="点击或悬浮可翻译">short</span> <span class="word" tabindex="0" data-word="session" data-meaning="点击或悬浮可翻译">session</span>, <span class="word" tabindex="0" data-word="even" data-meaning="点击或悬浮可翻译">even</span> <span class="word" tabindex="0" data-word="five" data-meaning="点击或悬浮可翻译">five</span> <span class="word" tabindex="0" data-word="minutes" data-meaning="点击或悬浮可翻译">minutes.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="routine" data-meaning="点击或悬浮可翻译">routine</span> <span class="word" tabindex="0" data-word="should" data-meaning="点击或悬浮可翻译">should</span> <span class="word" tabindex="0" data-word="be" data-meaning="点击或悬浮可翻译">be</span> <span class="word" tabindex="0" data-word="easy" data-meaning="点击或悬浮可翻译">easy</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="start" data-meaning="点击或悬浮可翻译">start</span>, <span class="word" tabindex="0" data-word="because" data-meaning="点击或悬浮可翻译">because</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">small</span> <span class="word" tabindex="0" data-word="start" data-meaning="点击或悬浮可翻译">start</span> <span class="word" tabindex="0" data-word="needs" data-meaning="点击或悬浮可翻译">needs</span> <span class="word" tabindex="0" data-word="less" data-meaning="点击或悬浮可翻译">less</span> <span class="word" tabindex="0" data-word="effort" data-meaning="点击或悬浮可翻译">effort.</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">You</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="still" data-meaning="点击或悬浮可翻译">still</span> <span class="word" tabindex="0" data-word="do" data-meaning="点击或悬浮可翻译">do</span> <span class="word" tabindex="0" data-word="more" data-meaning="点击或悬浮可翻译">more</span> <span class="word" tabindex="0" data-word="when" data-meaning="点击或悬浮可翻译">when</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="feel" data-meaning="点击或悬浮可翻译">feel</span> <span class="word" tabindex="0" data-word="good" data-meaning="点击或悬浮可翻译">good.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(1, this)">显示中文翻译</button>
+          <div class="translation" id="translation-1">一个简单的办法是使用一个信号和一个小常规。信号是一个清楚的提示，比如早餐后或晚上洗澡前。把鞋子放在门边。然后做一小段运动，哪怕只有五分钟。这个常规应该容易开始，因为小小的开始需要的力气更少。感觉好的时候，你仍然可以多做一点。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="waiting" data-meaning="点击或悬浮可翻译">Waiting</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="feel" data-meaning="点击或悬浮可翻译">feel</span> <span class="word" tabindex="0" data-word="ready" data-meaning="点击或悬浮可翻译">ready</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="trap" data-meaning="点击或悬浮可翻译">trap.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="useful" data-meaning="点击或悬浮可翻译">useful</span> <span class="word" tabindex="0" data-word="balance" data-meaning="点击或悬浮可翻译">balance</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="fixed" data-meaning="点击或悬浮可翻译">fixed</span> <span class="word" tabindex="0" data-word="signal" data-meaning="点击或悬浮可翻译">signal</span> <span class="word" tabindex="0" data-word="with" data-meaning="点击或悬浮可翻译">with</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="flexible" data-meaning="点击或悬浮可翻译">flexible</span> <span class="word" tabindex="0" data-word="amount" data-meaning="点击或悬浮可翻译">amount.</span> <span class="word" tabindex="0" data-word="do" data-meaning="点击或悬浮可翻译">Do</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="short" data-meaning="点击或悬浮可翻译">short</span> <span class="word" tabindex="0" data-word="session" data-meaning="点击或悬浮可翻译">session</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="busy" data-meaning="点击或悬浮可翻译">busy</span> <span class="word" tabindex="0" data-word="days" data-meaning="点击或悬浮可翻译">days</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="longer" data-meaning="点击或悬浮可翻译">longer</span> <span class="word" tabindex="0" data-word="one" data-meaning="点击或悬浮可翻译">one</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="easy" data-meaning="点击或悬浮可翻译">easy</span> <span class="word" tabindex="0" data-word="days" data-meaning="点击或悬浮可翻译">days.</span> <span class="word" tabindex="0" data-word="over" data-meaning="点击或悬浮可翻译">Over</span> <span class="word" tabindex="0" data-word="months" data-meaning="点击或悬浮可翻译">months</span>, <span class="word" tabindex="0" data-word="consistency" data-meaning="点击或悬浮可翻译">consistency</span> <span class="word" tabindex="0" data-word="matters" data-meaning="点击或悬浮可翻译">matters</span> <span class="word" tabindex="0" data-word="more" data-meaning="点击或悬浮可翻译">more</span> <span class="word" tabindex="0" data-word="than" data-meaning="点击或悬浮可翻译">than</span> <span class="word" tabindex="0" data-word="one" data-meaning="点击或悬浮可翻译">one</span> <span class="word" tabindex="0" data-word="big" data-meaning="点击或悬浮可翻译">big</span> <span class="word" tabindex="0" data-word="effort" data-meaning="点击或悬浮可翻译">effort.</span> <span class="word" tabindex="0" data-word="if" data-meaning="点击或悬浮可翻译">If</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="miss" data-meaning="点击或悬浮可翻译">miss</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="day" data-meaning="点击或悬浮可翻译">day</span>, <span class="word" tabindex="0" data-word="do" data-meaning="点击或悬浮可翻译">do</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="quit" data-meaning="点击或悬浮可翻译">quit.</span> <span class="word" tabindex="0" data-word="just" data-meaning="点击或悬浮可翻译">Just</span> <span class="word" tabindex="0" data-word="use" data-meaning="点击或悬浮可翻译">use</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="same" data-meaning="点击或悬浮可翻译">same</span> <span class="word" tabindex="0" data-word="signal" data-meaning="点击或悬浮可翻译">signal</span> <span class="word" tabindex="0" data-word="again" data-meaning="点击或悬浮可翻译">again</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="get" data-meaning="点击或悬浮可翻译">get</span> <span class="word" tabindex="0" data-word="back" data-meaning="点击或悬浮可翻译">back</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="track" data-meaning="点击或悬浮可翻译">track.</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">Your</span> <span class="word" tabindex="0" data-word="habit" data-meaning="点击或悬浮可翻译">habit</span> <span class="word" tabindex="0" data-word="becomes" data-meaning="点击或悬浮可翻译">becomes</span> <span class="word" tabindex="0" data-word="more" data-meaning="点击或悬浮可翻译">more</span> <span class="word" tabindex="0" data-word="automatic" data-meaning="点击或悬浮可翻译">automatic.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(2, this)">显示中文翻译</button>
+          <div class="translation" id="translation-2">等着自己“感觉准备好了”是一个陷阱。一个有用的平衡是：固定信号，弹性安排运动量。忙的日子做短的那次，轻松的日子做长一点。几个月下来，坚持比一次大努力更重要。如果漏了一天，不要放弃。只要再次使用同一个信号，回到正轨。你的习惯会变得更自动。</div>
+        </div>
+      </section>
+        <p class="footer">
+          AI-generated lesson for daily English reading.
+          <br>Word translation on hover or tap uses the MyMemory public translation API.
+          <br>Site: <a href="https://ccandzy.github.io/daily-english/">https://ccandzy.github.io/daily-english/</a>
+        </p>
+      </main>
+
+      <aside class="sidebar">
+        <div class="side-section">
+          <span class="label">Phrases</span>
+          <h2>Short Phrases</h2>
+          <ul><li><strong>after work</strong>: 下班后</li><li><strong>a clear sign</strong>: 一个清楚的提示；一个明确的信号</li><li><strong>near the door</strong>: 在门边</li><li><strong>on busy days</strong>: 在忙碌的日子里</li><li><strong>get back on track</strong>: 回到正轨；重新坚持</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Hard Words</span>
+          <h2>Difficult Words</h2>
+          <ul><li><strong>motivation</strong>: 想去做某事的动力；文中指“想锻炼的感觉”</li><li><strong>routine</strong>: 固定流程；文中指按信号重复的一组小动作</li><li><strong>effort</strong>: 力气；做某事需要付出的精力</li><li><strong>consistency</strong>: 坚持；长期有规律地做</li><li><strong>automatic</strong>: 自动的；不用每次下决心就会发生</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Common Words</span>
+          <h2>Useful Words</h2>
+          <ul><li><strong>plan</strong>: 计划</li><li><strong>tired</strong>: 累的，疲倦的</li><li><strong>easy</strong>: 容易的</li><li><strong>start</strong>: 开始</li><li><strong>quit</strong>: 放弃；停止</li></ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const translationCache = new Map();
+    const words = Array.from(document.querySelectorAll(".word"));
+
+    for (const word of words) {
+      word.addEventListener("mouseenter", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("focus", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = !word.classList.contains("is-open");
+        closeWordTooltips();
+        if (willOpen) {
+          word.classList.add("is-open");
+          loadTranslation(word);
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      closeWordTooltips();
+    });
+
+    function closeWordTooltips() {
+      for (const word of words) {
+        word.classList.remove("is-open");
+      }
+    }
+
+    async function loadTranslation(word) {
+      const key = word.dataset.word || normalizeWord(word.textContent || "");
+      if (!key) {
+        word.dataset.meaning = "暂无翻译";
+        return;
+      }
+
+      if (translationCache.has(key)) {
+        word.dataset.meaning = translationCache.get(key);
+        return;
+      }
+
+      word.dataset.meaning = "翻译中...";
+
+      try {
+        const params = new URLSearchParams({
+          q: key,
+          langpair: "en|zh-CN",
+          mt: "1"
+        });
+        const response = await fetch("https://api.mymemory.translated.net/get?" + params.toString());
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        const translated =
+          data?.responseData?.translatedText ||
+          data?.matches?.find((item) => item?.translation)?.translation ||
+          "";
+
+        const clean = normalizeTranslation(translated, key);
+        const finalMeaning = clean || "暂无翻译";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      } catch (error) {
+        const fallback = localFallback(key);
+        const finalMeaning = fallback || "翻译失败，请稍后再试";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      }
+    }
+
+    function normalizeWord(value) {
+      return String(value).toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+    }
+
+    function normalizeTranslation(value, sourceWord) {
+      const text = String(value || "").trim();
+      if (!text) {
+        return "";
+      }
+
+      const lowered = text.toLowerCase();
+      if (lowered === String(sourceWord).toLowerCase()) {
+        return "";
+      }
+
+      return text.replace(/^zh-cn\|/i, "").trim();
+    }
+
+    function localFallback(word) {
+      const fallback = {
+        a: "一个",
+        an: "一个",
+        and: "和",
+        are: "是",
+        in: "在……里",
+        is: "是",
+        of: "……的",
+        on: "在……上",
+        the: "这；这个",
+        to: "到；去；用于不定式"
+      };
+      return fallback[word] || "";
+    }
+
+    function toggleTranslation(index, button) {
+      const el = document.getElementById("translation-" + index);
+      const isOpen = el.classList.toggle("show");
+      button.textContent = isOpen ? "隐藏中文翻译" : "显示中文翻译";
+    }
+  </script>
+</body>
+</html>
