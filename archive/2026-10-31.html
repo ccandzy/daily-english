@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Why Salt Makes Fermented Cabbage Sour and Crunchy</title>
+  <style>
+    :root {
+      --bg-a: #f4efe7;
+      --bg-b: #dcecf2;
+      --paper: #fffdf8;
+      --sidebar: #edf6fb;
+      --ink: #22363c;
+      --muted: #64777c;
+      --accent: #11765f;
+      --accent-deep: #0b5948;
+      --line: #cad9dd;
+      --hover: #d8f4ec;
+      --tooltip: #17353a;
+      --soft: #edf9f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 28%),
+        linear-gradient(145deg, var(--bg-a) 0%, var(--bg-b) 100%);
+    }
+
+    .page {
+      max-width: 1220px;
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card,
+    .sidebar {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 38px rgba(32, 67, 75, 0.08);
+    }
+
+    .card {
+      background: var(--paper);
+      padding: 30px;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      padding: 22px;
+      position: sticky;
+      top: 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 45px);
+      line-height: 1.12;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tip {
+      margin: 0 0 24px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      background: var(--soft);
+      color: #28544b;
+    }
+
+    .article-block {
+      margin-bottom: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .article-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .article-block p {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .toggle-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--accent);
+      color: #f7fffd;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-1px);
+      background: var(--accent-deep);
+    }
+
+    .translation {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f3fcf8;
+      color: #355556;
+      font-size: 16px;
+    }
+
+    .translation.show {
+      display: block;
+    }
+
+    .word {
+      position: relative;
+      display: inline-block;
+      padding: 0 2px;
+      border-radius: 5px;
+      cursor: help;
+      transition: background-color 0.15s ease;
+    }
+
+    .word:hover {
+      background: var(--hover);
+    }
+
+    .word:hover::after,
+    .word:active::after,
+    .word:focus-visible::after,
+    .word.is-open::after {
+      content: attr(data-meaning);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      min-width: 64px;
+      max-width: 180px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: var(--tooltip);
+      color: #f4fdfd;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      z-index: 2;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(17, 118, 95, 0.12);
+      color: var(--accent-deep);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .side-section {
+      margin-bottom: 22px;
+    }
+
+    .side-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .side-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .side-section li {
+      margin-bottom: 10px;
+      color: #304248;
+      font-size: 15px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--accent-deep);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 14px auto;
+        padding: 10px;
+      }
+
+      .card,
+      .sidebar {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .article-block p {
+        font-size: 18px;
+      }
+
+      .word:hover::after,
+      .word:active::after,
+      .word:focus-visible::after,
+      .word.is-open::after {
+        left: 0;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="layout">
+      <main class="card">
+        <h1>Why Salt Makes Fermented Cabbage Sour and Crunchy</h1>
+        <p class="meta">Date: 2026-10-31 | Level: B1 (target) | Topic: fermentation and food culture — salt in cabbage fermentation</p>
+        <p class="tip">学习重点：理解盐在发酵中的双重作用，并注意 however 引出的转折。</p>
+        <section id="article">
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="imagine" data-meaning="点击或悬浮可翻译">Imagine</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="jar" data-meaning="点击或悬浮可翻译">jar</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="cabbage" data-meaning="点击或悬浮可翻译">cabbage</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="kitchen" data-meaning="点击或悬浮可翻译">kitchen</span> <span class="word" tabindex="0" data-word="table" data-meaning="点击或悬浮可翻译">table.</span> <span class="word" tabindex="0" data-word="after" data-meaning="点击或悬浮可翻译">After</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="few" data-meaning="点击或悬浮可翻译">few</span> <span class="word" tabindex="0" data-word="days" data-meaning="点击或悬浮可翻译">days</span>, <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="smells" data-meaning="点击或悬浮可翻译">smells</span> <span class="word" tabindex="0" data-word="sour" data-meaning="点击或悬浮可翻译">sour</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="tastes" data-meaning="点击或悬浮可翻译">tastes</span> <span class="word" tabindex="0" data-word="sharp" data-meaning="点击或悬浮可翻译">sharp.</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="fermentation" data-meaning="点击或悬浮可翻译">fermentation.</span> <span class="word" tabindex="0" data-word="tiny" data-meaning="点击或悬浮可翻译">Tiny</span> <span class="word" tabindex="0" data-word="living" data-meaning="点击或悬浮可翻译">living</span> <span class="word" tabindex="0" data-word="things" data-meaning="点击或悬浮可翻译">things</span> <span class="word" tabindex="0" data-word="called" data-meaning="点击或悬浮可翻译">called</span> <span class="word" tabindex="0" data-word="bacteria" data-meaning="点击或悬浮可翻译">bacteria</span> <span class="word" tabindex="0" data-word="change" data-meaning="点击或悬浮可翻译">change</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="sugar" data-meaning="点击或悬浮可翻译">sugar</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="cabbage" data-meaning="点击或悬浮可翻译">cabbage.</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">In</span> <span class="word" tabindex="0" data-word="food" data-meaning="点击或悬浮可翻译">food</span> <span class="word" tabindex="0" data-word="culture" data-meaning="点击或悬浮可翻译">culture</span>, <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="use" data-meaning="点击或悬浮可翻译">use</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">this</span> <span class="word" tabindex="0" data-word="old" data-meaning="点击或悬浮可翻译">old</span> <span class="word" tabindex="0" data-word="method" data-meaning="点击或悬浮可翻译">method</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="keep" data-meaning="点击或悬浮可翻译">keep</span> <span class="word" tabindex="0" data-word="vegetables" data-meaning="点击或悬浮可翻译">vegetables</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="winter" data-meaning="点击或悬浮可翻译">winter.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="question" data-meaning="点击或悬浮可翻译">question</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="simple" data-meaning="点击或悬浮可翻译">simple</span>: <span class="word" tabindex="0" data-word="why" data-meaning="点击或悬浮可翻译">why</span> <span class="word" tabindex="0" data-word="do" data-meaning="点击或悬浮可翻译">do</span> <span class="word" tabindex="0" data-word="we" data-meaning="点击或悬浮可翻译">we</span> <span class="word" tabindex="0" data-word="add" data-meaning="点击或悬浮可翻译">add</span> <span class="word" tabindex="0" data-word="salt" data-meaning="点击或悬浮可翻译">salt</span> <span class="word" tabindex="0" data-word="first" data-meaning="点击或悬浮可翻译">first</span>? <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="sounds" data-meaning="点击或悬浮可翻译">sounds</span> <span class="word" tabindex="0" data-word="strange" data-meaning="点击或悬浮可翻译">strange</span> <span class="word" tabindex="0" data-word="because" data-meaning="点击或悬浮可翻译">because</span> <span class="word" tabindex="0" data-word="salt" data-meaning="点击或悬浮可翻译">salt</span> <span class="word" tabindex="0" data-word="does" data-meaning="点击或悬浮可翻译">does</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="feed" data-meaning="点击或悬浮可翻译">feed</span> <span class="word" tabindex="0" data-word="bacteria" data-meaning="点击或悬浮可翻译">bacteria.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(0, this)">显示中文翻译</button>
+          <div class="translation" id="translation-0">想象厨房桌上有一罐卷心菜。几天后，它闻起来酸，吃起来味道很冲。这就是发酵。叫做细菌的微小生物会改变卷心菜里的糖。在饮食文化中，人们用这种古老方法把蔬菜存到冬天。问题很简单：为什么我们要先加盐？这听起来很奇怪，因为盐并不喂养细菌。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="salt" data-meaning="点击或悬浮可翻译">Salt</span> <span class="word" tabindex="0" data-word="does" data-meaning="点击或悬浮可翻译">does</span> <span class="word" tabindex="0" data-word="two" data-meaning="点击或悬浮可翻译">two</span> <span class="word" tabindex="0" data-word="useful" data-meaning="点击或悬浮可翻译">useful</span> <span class="word" tabindex="0" data-word="jobs" data-meaning="点击或悬浮可翻译">jobs.</span> <span class="word" tabindex="0" data-word="first" data-meaning="点击或悬浮可翻译">First</span>, <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="pulls" data-meaning="点击或悬浮可翻译">pulls</span> <span class="word" tabindex="0" data-word="water" data-meaning="点击或悬浮可翻译">water</span> <span class="word" tabindex="0" data-word="out" data-meaning="点击或悬浮可翻译">out</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="cabbage" data-meaning="点击或悬浮可翻译">cabbage</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="makes" data-meaning="点击或悬浮可翻译">makes</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="salty" data-meaning="点击或悬浮可翻译">salty</span> <span class="word" tabindex="0" data-word="liquid" data-meaning="点击或悬浮可翻译">liquid</span> <span class="word" tabindex="0" data-word="called" data-meaning="点击或悬浮可翻译">called</span> <span class="word" tabindex="0" data-word="brine" data-meaning="点击或悬浮可翻译">brine.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="brine" data-meaning="点击或悬浮可翻译">brine</span> <span class="word" tabindex="0" data-word="covers" data-meaning="点击或悬浮可翻译">covers</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="cabbage" data-meaning="点击或悬浮可翻译">cabbage</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="keeps" data-meaning="点击或悬浮可翻译">keeps</span> <span class="word" tabindex="0" data-word="air" data-meaning="点击或悬浮可翻译">air</span> <span class="word" tabindex="0" data-word="away" data-meaning="点击或悬浮可翻译">away.</span> <span class="word" tabindex="0" data-word="second" data-meaning="点击或悬浮可翻译">Second</span>, <span class="word" tabindex="0" data-word="salt" data-meaning="点击或悬浮可翻译">salt</span> <span class="word" tabindex="0" data-word="slows" data-meaning="点击或悬浮可翻译">slows</span> <span class="word" tabindex="0" data-word="many" data-meaning="点击或悬浮可翻译">many</span> <span class="word" tabindex="0" data-word="bad" data-meaning="点击或悬浮可翻译">bad</span> <span class="word" tabindex="0" data-word="bacteria" data-meaning="点击或悬浮可翻译">bacteria.</span> <span class="word" tabindex="0" data-word="good" data-meaning="点击或悬浮可翻译">Good</span> <span class="word" tabindex="0" data-word="bacteria" data-meaning="点击或悬浮可翻译">bacteria</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="still" data-meaning="点击或悬浮可翻译">still</span> <span class="word" tabindex="0" data-word="work" data-meaning="点击或悬浮可翻译">work</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="more" data-meaning="点击或悬浮可翻译">more</span> <span class="word" tabindex="0" data-word="slowly" data-meaning="点击或悬浮可翻译">slowly.</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="gives" data-meaning="点击或悬浮可翻译">gives</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="good" data-meaning="点击或悬浮可翻译">good</span> <span class="word" tabindex="0" data-word="bacteria" data-meaning="点击或悬浮可翻译">bacteria</span> <span class="word" tabindex="0" data-word="time" data-meaning="点击或悬浮可翻译">time</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="make" data-meaning="点击或悬浮可翻译">make</span> <span class="word" tabindex="0" data-word="acid" data-meaning="点击或悬浮可翻译">acid.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="acid" data-meaning="点击或悬浮可翻译">acid</span> <span class="word" tabindex="0" data-word="makes" data-meaning="点击或悬浮可翻译">makes</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="food" data-meaning="点击或悬浮可翻译">food</span> <span class="word" tabindex="0" data-word="sour" data-meaning="点击或悬浮可翻译">sour</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="safe" data-meaning="点击或悬浮可翻译">safe.</span> <span class="word" tabindex="0" data-word="however" data-meaning="点击或悬浮可翻译">However</span>, <span class="word" tabindex="0" data-word="too" data-meaning="点击或悬浮可翻译">too</span> <span class="word" tabindex="0" data-word="much" data-meaning="点击或悬浮可翻译">much</span> <span class="word" tabindex="0" data-word="salt" data-meaning="点击或悬浮可翻译">salt</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="stop" data-meaning="点击或悬浮可翻译">stop</span> <span class="word" tabindex="0" data-word="everything" data-meaning="点击或悬浮可翻译">everything</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="make" data-meaning="点击或悬浮可翻译">make</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="cabbage" data-meaning="点击或悬浮可翻译">cabbage</span> <span class="word" tabindex="0" data-word="very" data-meaning="点击或悬浮可翻译">very</span> <span class="word" tabindex="0" data-word="salty" data-meaning="点击或悬浮可翻译">salty.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(1, this)">显示中文翻译</button>
+          <div class="translation" id="translation-1">盐有两个有用的作用。第一，它把水从卷心菜里拉出来，形成一种叫盐水的咸液体。盐水盖住卷心菜，并隔绝空气。第二，盐会减慢许多坏细菌。好细菌仍能工作，但会更慢。这给好细菌时间产生酸。酸让食物变酸并变得安全。然而，盐太多会阻止一切，还会让卷心菜非常咸。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">For</span> <span class="word" tabindex="0" data-word="home" data-meaning="点击或悬浮可翻译">home</span> <span class="word" tabindex="0" data-word="cooks" data-meaning="点击或悬浮可翻译">cooks</span>, <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="lesson" data-meaning="点击或悬浮可翻译">lesson</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="weigh" data-meaning="点击或悬浮可翻译">weigh</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="salt" data-meaning="点击或悬浮可翻译">salt</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="keep" data-meaning="点击或悬浮可翻译">keep</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="cabbage" data-meaning="点击或悬浮可翻译">cabbage</span> <span class="word" tabindex="0" data-word="under" data-meaning="点击或悬浮可翻译">under</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="brine" data-meaning="点击或悬浮可翻译">brine.</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">You</span> <span class="word" tabindex="0" data-word="do" data-meaning="点击或悬浮可翻译">do</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="need" data-meaning="点击或悬浮可翻译">need</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="special" data-meaning="点击或悬浮可翻译">special</span> <span class="word" tabindex="0" data-word="machine" data-meaning="点击或悬浮可翻译">machine.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="clean" data-meaning="点击或悬浮可翻译">clean</span> <span class="word" tabindex="0" data-word="jar" data-meaning="点击或悬浮可翻译">jar</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="little" data-meaning="点击或悬浮可翻译">little</span> <span class="word" tabindex="0" data-word="patience" data-meaning="点击或悬浮可翻译">patience</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="enough" data-meaning="点击或悬浮可翻译">enough.</span> <span class="word" tabindex="0" data-word="taste" data-meaning="点击或悬浮可翻译">Taste</span> <span class="word" tabindex="0" data-word="after" data-meaning="点击或悬浮可翻译">after</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="few" data-meaning="点击或悬浮可翻译">few</span> <span class="word" tabindex="0" data-word="days" data-meaning="点击或悬浮可翻译">days</span>, <span class="word" tabindex="0" data-word="then" data-meaning="点击或悬浮可翻译">then</span> <span class="word" tabindex="0" data-word="move" data-meaning="点击或悬浮可翻译">move</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="jar" data-meaning="点击或悬浮可翻译">jar</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="fridge" data-meaning="点击或悬浮可翻译">fridge.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="salt" data-meaning="点击或悬浮可翻译">salt</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="just" data-meaning="点击或悬浮可翻译">just</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="flavor" data-meaning="点击或悬浮可翻译">flavor.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="helps" data-meaning="点击或悬浮可翻译">helps</span> <span class="word" tabindex="0" data-word="decide" data-meaning="点击或悬浮可翻译">decide</span> <span class="word" tabindex="0" data-word="which" data-meaning="点击或悬浮可翻译">which</span> <span class="word" tabindex="0" data-word="bacteria" data-meaning="点击或悬浮可翻译">bacteria</span> <span class="word" tabindex="0" data-word="grow" data-meaning="点击或悬浮可翻译">grow</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="how" data-meaning="点击或悬浮可翻译">how</span> <span class="word" tabindex="0" data-word="crunchy" data-meaning="点击或悬浮可翻译">crunchy</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="cabbage" data-meaning="点击或悬浮可翻译">cabbage</span> <span class="word" tabindex="0" data-word="stays" data-meaning="点击或悬浮可翻译">stays.</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">That</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">small</span> <span class="word" tabindex="0" data-word="balance" data-meaning="点击或悬浮可翻译">balance</span> <span class="word" tabindex="0" data-word="between" data-meaning="点击或悬浮可翻译">between</span> <span class="word" tabindex="0" data-word="safety" data-meaning="点击或悬浮可翻译">safety</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="speed" data-meaning="点击或悬浮可翻译">speed.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(2, this)">显示中文翻译</button>
+          <div class="translation" id="translation-2">对家庭厨师来说，要点是称好盐，并让卷心菜保持在盐水下面。你不需要特别的机器。一个干净的罐子和一点耐心就够了。几天后尝一尝，然后把罐子放进冰箱。盐不只是为了味道。它帮助决定哪些细菌生长，以及卷心菜能保持多脆。这是安全与速度之间的小平衡。</div>
+        </div>
+      </section>
+        <p class="footer">
+          AI-generated lesson for daily English reading.
+          <br>Word translation on hover or tap uses the MyMemory public translation API.
+          <br>Site: <a href="https://ccandzy.github.io/daily-english/">https://ccandzy.github.io/daily-english/</a>
+        </p>
+      </main>
+
+      <aside class="sidebar">
+        <div class="side-section">
+          <span class="label">Phrases</span>
+          <h2>Short Phrases</h2>
+          <ul><li><strong>a jar of cabbage</strong>: 一罐卷心菜</li><li><strong>after a few days</strong>: 几天后</li><li><strong>pulls water out of</strong>: 把水从……中拉出来</li><li><strong>keeps air away</strong>: 隔绝空气</li><li><strong>under the brine</strong>: 在盐水下面</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Hard Words</span>
+          <h2>Difficult Words</h2>
+          <ul><li><strong>fermentation</strong>: 发酵，用细菌等改变食物的过程</li><li><strong>bacteria</strong>: 细菌，极小的生物</li><li><strong>brine</strong>: 盐水，这里指盐和菜汁形成的咸液体</li><li><strong>acid</strong>: 酸，让发酵食物变酸的物质</li><li><strong>crunchy</strong>: 脆的，咬起来有清脆感</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Common Words</span>
+          <h2>Useful Words</h2>
+          <ul><li><strong>cabbage</strong>: 卷心菜</li><li><strong>salt</strong>: 盐</li><li><strong>water</strong>: 水</li><li><strong>air</strong>: 空气</li><li><strong>jar</strong>: 罐子</li></ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const translationCache = new Map();
+    const words = Array.from(document.querySelectorAll(".word"));
+
+    for (const word of words) {
+      word.addEventListener("mouseenter", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("focus", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = !word.classList.contains("is-open");
+        closeWordTooltips();
+        if (willOpen) {
+          word.classList.add("is-open");
+          loadTranslation(word);
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      closeWordTooltips();
+    });
+
+    function closeWordTooltips() {
+      for (const word of words) {
+        word.classList.remove("is-open");
+      }
+    }
+
+    async function loadTranslation(word) {
+      const key = word.dataset.word || normalizeWord(word.textContent || "");
+      if (!key) {
+        word.dataset.meaning = "暂无翻译";
+        return;
+      }
+
+      if (translationCache.has(key)) {
+        word.dataset.meaning = translationCache.get(key);
+        return;
+      }
+
+      word.dataset.meaning = "翻译中...";
+
+      try {
+        const params = new URLSearchParams({
+          q: key,
+          langpair: "en|zh-CN",
+          mt: "1"
+        });
+        const response = await fetch("https://api.mymemory.translated.net/get?" + params.toString());
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        const translated =
+          data?.responseData?.translatedText ||
+          data?.matches?.find((item) => item?.translation)?.translation ||
+          "";
+
+        const clean = normalizeTranslation(translated, key);
+        const finalMeaning = clean || "暂无翻译";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      } catch (error) {
+        const fallback = localFallback(key);
+        const finalMeaning = fallback || "翻译失败，请稍后再试";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      }
+    }
+
+    function normalizeWord(value) {
+      return String(value).toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+    }
+
+    function normalizeTranslation(value, sourceWord) {
+      const text = String(value || "").trim();
+      if (!text) {
+        return "";
+      }
+
+      const lowered = text.toLowerCase();
+      if (lowered === String(sourceWord).toLowerCase()) {
+        return "";
+      }
+
+      return text.replace(/^zh-cn\|/i, "").trim();
+    }
+
+    function localFallback(word) {
+      const fallback = {
+        a: "一个",
+        an: "一个",
+        and: "和",
+        are: "是",
+        in: "在……里",
+        is: "是",
+        of: "……的",
+        on: "在……上",
+        the: "这；这个",
+        to: "到；去；用于不定式"
+      };
+      return fallback[word] || "";
+    }
+
+    function toggleTranslation(index, button) {
+      const el = document.getElementById("translation-" + index);
+      const isOpen = el.classList.toggle("show");
+      button.textContent = isOpen ? "隐藏中文翻译" : "显示中文翻译";
+    }
+  </script>
+</body>
+</html>
