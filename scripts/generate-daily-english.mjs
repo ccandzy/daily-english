@@ -138,16 +138,12 @@ Keep the Topic metadata close to the preferred topic so future rotation can dete
 Return content in the following Markdown format. Do not include markdown code fences or any text before/after.
 
 Requirements:
-- Write 180 to 220 words of English body text in total, excluding headings, translations, and vocabulary lists.
-- Target CEFR B1: use familiar everyday vocabulary and mostly short sentences of about 10 to 18 words. Use at most one more complex sentence per paragraph, with a simple relative clause or a clear connector such as because, although, or however. Avoid nested clauses, dense academic prose, and unexplained jargon.
-- Start with a concrete everyday example, explain one main idea in simple steps, then give a practical takeaway. For science, economics, or social topics, explain the basic idea without assuming specialist knowledge or requiring abstract debate.
-- Use concrete examples to explain unfamiliar concepts; do not invent quotations, statistics, or research findings.
-- Introduce only 3 to 5 potentially unfamiliar words in the body, mostly at B1 with at most 2 B2 words. Make their meanings clear through context or a brief plain-English explanation. Reuse familiar words naturally and include 5 everyday collocations or short phrases. The 5 difficult-word entries should be the relatively harder words from this article, not a reason to add more advanced vocabulary.
-- If you are not sure about a breaking-news fact, avoid specific claims and choose a safer topic.
-- Output exactly 3 paragraphs of roughly 60 to 75 English words each, keeping the total within 180 to 220 words.
-- After each English paragraph, provide a natural Chinese translation.
-- Include 5 short phrases, 5 difficult words, and 5 common useful words, all taken from the English body. Give their meanings in this context, not generic dictionary definitions.
-- Use concise Chinese translations.
+- Write one complete CEFR B1 article with exactly 3 English paragraphs, about 180–220 English words in total. The word count is approximate; do not count words in the output.
+- Use mostly short sentences, familiar vocabulary, and concrete everyday examples. Explain unfamiliar ideas simply; avoid academic language and abstract debate.
+- Keep the article focused on one clear idea. Do not invent statistics, quotations, or current-news claims.
+- After each paragraph, provide a natural Chinese translation.
+- Include 5 useful phrases, 5 relatively harder words, and 5 common words from the article, each with a concise Chinese meaning. Do not add advanced vocabulary merely to fill the lists.
+- Return only the finished lesson in the format below, without planning notes or explanations.
 
 Markdown format:
 # [Title of the Lesson]
@@ -299,9 +295,14 @@ function parseMarkdownLesson(markdown) {
   }
   flushParagraph();
 
-  // 标题结构完全失效时，只救援“看起来像英文正文”的自然段。
-  if (paragraphs.length === 0) {
-    paragraphs.push(...salvageEnglishParagraphs(text));
+  // Unstructured output may be model planning, not a publishable lesson.
+  if (!title || paragraphs.length !== 3 || paragraphs.some((item) => !/[\u3400-\u9fff]/u.test(item.chinese))) {
+    throw new Error("Incomplete lesson: require a title and exactly three bilingual paragraphs");
+  }
+  for (const names of [["phrases", "short phrases", "短语"], ["hard words", "difficult words", "难词", "生词"], ["common words", "useful words", "常用词"]]) {
+    if (parseWordList(text, names).length !== 5) {
+      throw new Error("Incomplete lesson: require five entries in each vocabulary section");
+    }
   }
 
   return {
@@ -385,22 +386,6 @@ function parseWordList(text, sectionNames, expectedCount = 5) {
   return words;
 }
 
-function salvageEnglishParagraphs(text) {
-  return text
-    .split(/\n\s*\n/)
-    .map(cleanParagraph)
-    .filter((block) => {
-      if (!block || /^#|^(?:topic|summary tip|中文|translation)\s*[:：]/i.test(block)) return false;
-      if (/^(?:[-*+]\s+|\d+[.)]\s+)/.test(block)) return false;
-      const englishLetters = (block.match(/[A-Za-z]/g) || []).length;
-      const chineseChars = (block.match(/[\u3400-\u9fff]/g) || []).length;
-      const wordCount = (block.match(/[A-Za-z]+(?:['’-][A-Za-z]+)*/g) || []).length;
-      return englishLetters > chineseChars * 2 && wordCount >= 8;
-    })
-    .slice(0, 3)
-    .map((english) => ({ english, chinese: "" }));
-}
-
 function escapeRegExp(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -410,6 +395,7 @@ async function generateLessonContent() {
 
   const body = {
     model: "deepseek-v4-flash",
+    thinking: { type: "disabled" },
     temperature: 0.3,
     max_tokens: 4200,
     messages: buildMessages(),
@@ -420,9 +406,14 @@ async function generateLessonContent() {
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       const payload = await requestLesson(body);
+      const finishReason = payload?.choices?.[0]?.finish_reason;
+      if (finishReason && finishReason !== "stop") {
+        throw new Error(`Incomplete response (finish_reason=${finishReason})`);
+      }
       const content = readAssistantContent(payload);
-      // 不再用固定的 100 字符卡死流程；只要有文本，就交给容错解析器尽量提取。
       if (content.trim()) {
+        // Validate before accepting a response so incomplete output triggers a retry.
+        parseMarkdownLesson(content);
         console.log(`✅ DeepSeek request succeeded on attempt ${attempt}.`);
         return content;
       }
@@ -447,7 +438,7 @@ function buildMessages() {
     {
       role: "system",
       content:
-        "You generate safe, learner-friendly English study materials in Markdown format. Target CEFR B1 with familiar vocabulary, mostly short sentences, and concrete examples. Limit unfamiliar words and explain them in context; avoid nested clauses and abstract debate. Follow the user requirements for body length and topic diversity. Return only the Markdown content, no explanations or code fences.",
+        "Write clear CEFR B1 English lessons for Chinese learners. Return only the completed Markdown lesson, with no planning notes or code fences.",
     },
     {
       role: "user",
@@ -532,10 +523,6 @@ function readAssistantContent(payload) {
 
   if (typeof choice?.text === "string" && choice.text.trim()) {
     return choice.text.trim();
-  }
-
-  if (typeof message?.reasoning_content === "string" && message.reasoning_content.trim()) {
-    return message.reasoning_content.trim();
   }
 
   return "";
