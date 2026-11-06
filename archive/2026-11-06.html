@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How Social Media Decides What You See Next</title>
+  <style>
+    :root {
+      --bg-a: #f4efe7;
+      --bg-b: #dcecf2;
+      --paper: #fffdf8;
+      --sidebar: #edf6fb;
+      --ink: #22363c;
+      --muted: #64777c;
+      --accent: #11765f;
+      --accent-deep: #0b5948;
+      --line: #cad9dd;
+      --hover: #d8f4ec;
+      --tooltip: #17353a;
+      --soft: #edf9f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 28%),
+        linear-gradient(145deg, var(--bg-a) 0%, var(--bg-b) 100%);
+    }
+
+    .page {
+      max-width: 1220px;
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card,
+    .sidebar {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 38px rgba(32, 67, 75, 0.08);
+    }
+
+    .card {
+      background: var(--paper);
+      padding: 30px;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      padding: 22px;
+      position: sticky;
+      top: 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 45px);
+      line-height: 1.12;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tip {
+      margin: 0 0 24px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      background: var(--soft);
+      color: #28544b;
+    }
+
+    .article-block {
+      margin-bottom: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .article-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .article-block p {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .toggle-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--accent);
+      color: #f7fffd;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-1px);
+      background: var(--accent-deep);
+    }
+
+    .translation {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f3fcf8;
+      color: #355556;
+      font-size: 16px;
+    }
+
+    .translation.show {
+      display: block;
+    }
+
+    .word {
+      position: relative;
+      display: inline-block;
+      padding: 0 2px;
+      border-radius: 5px;
+      cursor: help;
+      transition: background-color 0.15s ease;
+    }
+
+    .word:hover {
+      background: var(--hover);
+    }
+
+    .word:hover::after,
+    .word:active::after,
+    .word:focus-visible::after,
+    .word.is-open::after {
+      content: attr(data-meaning);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      min-width: 64px;
+      max-width: 180px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: var(--tooltip);
+      color: #f4fdfd;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      z-index: 2;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(17, 118, 95, 0.12);
+      color: var(--accent-deep);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .side-section {
+      margin-bottom: 22px;
+    }
+
+    .side-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .side-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .side-section li {
+      margin-bottom: 10px;
+      color: #304248;
+      font-size: 15px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--accent-deep);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 14px auto;
+        padding: 10px;
+      }
+
+      .card,
+      .sidebar {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .article-block p {
+        font-size: 18px;
+      }
+
+      .word:hover::after,
+      .word:active::after,
+      .word:focus-visible::after,
+      .word.is-open::after {
+        left: 0;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="layout">
+      <main class="card">
+        <h1>How Social Media Decides What You See Next</h1>
+        <p class="meta">Date: 2026-11-06 | Level: B1 (target) | Topic: Algorithms and social media recommendations — how a recommendation system chooses your next video</p>
+        <p class="tip">阅读时先抓住“它想让你多停留”这个核心，再看平台如何用你的行为做判断。</p>
+        <section id="article">
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="when" data-meaning="点击或悬浮可翻译">When</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="open" data-meaning="点击或悬浮可翻译">open</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="short-video" data-meaning="点击或悬浮可翻译">short-video</span> <span class="word" tabindex="0" data-word="app" data-meaning="点击或悬浮可翻译">app</span>, <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="do" data-meaning="点击或悬浮可翻译">do</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="see" data-meaning="点击或悬浮可翻译">see</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="random" data-meaning="点击或悬浮可翻译">random</span> <span class="word" tabindex="0" data-word="list" data-meaning="点击或悬浮可翻译">list.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="recommendation" data-meaning="点击或悬浮可翻译">recommendation</span> <span class="word" tabindex="0" data-word="system" data-meaning="点击或悬浮可翻译">system</span> <span class="word" tabindex="0" data-word="chooses" data-meaning="点击或悬浮可翻译">chooses</span> <span class="word" tabindex="0" data-word="each" data-meaning="点击或悬浮可翻译">each</span> <span class="word" tabindex="0" data-word="video" data-meaning="点击或悬浮可翻译">video</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="watches" data-meaning="点击或悬浮可翻译">watches</span> <span class="word" tabindex="0" data-word="what" data-meaning="点击或悬浮可翻译">what</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="do" data-meaning="点击或悬浮可翻译">do</span>: <span class="word" tabindex="0" data-word="do" data-meaning="点击或悬浮可翻译">do</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="stop" data-meaning="点击或悬浮可翻译">stop</span>, <span class="word" tabindex="0" data-word="watch" data-meaning="点击或悬浮可翻译">watch</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="end" data-meaning="点击或悬浮可翻译">end</span>, <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="swipe" data-meaning="点击或悬浮可翻译">swipe</span> <span class="word" tabindex="0" data-word="away" data-meaning="点击或悬浮可翻译">away</span> <span class="word" tabindex="0" data-word="quickly" data-meaning="点击或悬浮可翻译">quickly</span>? <span class="word" tabindex="0" data-word="these" data-meaning="点击或悬浮可翻译">These</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">small</span> <span class="word" tabindex="0" data-word="actions" data-meaning="点击或悬浮可翻译">actions</span> <span class="word" tabindex="0" data-word="become" data-meaning="点击或悬浮可翻译">become</span> <span class="word" tabindex="0" data-word="signals" data-meaning="点击或悬浮可翻译">signals.</span> <span class="word" tabindex="0" data-word="if" data-meaning="点击或悬浮可翻译">If</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="watch" data-meaning="点击或悬浮可翻译">watch</span> <span class="word" tabindex="0" data-word="cooking" data-meaning="点击或悬浮可翻译">cooking</span> <span class="word" tabindex="0" data-word="videos" data-meaning="点击或悬浮可翻译">videos</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="long" data-meaning="点击或悬浮可翻译">long</span> <span class="word" tabindex="0" data-word="time" data-meaning="点击或悬浮可翻译">time</span>, <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="system" data-meaning="点击或悬浮可翻译">system</span> <span class="word" tabindex="0" data-word="thinks" data-meaning="点击或悬浮可翻译">thinks</span>, &quot;<span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="person" data-meaning="点击或悬浮可翻译">person</span> <span class="word" tabindex="0" data-word="likes" data-meaning="点击或悬浮可翻译">likes</span> <span class="word" tabindex="0" data-word="cooking" data-meaning="点击或悬浮可翻译">cooking.</span>&quot; <span class="word" tabindex="0" data-word="then" data-meaning="点击或悬浮可翻译">Then</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="shows" data-meaning="点击或悬浮可翻译">shows</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="more" data-meaning="点击或悬浮可翻译">more</span> <span class="word" tabindex="0" data-word="cooking" data-meaning="点击或悬浮可翻译">cooking</span> <span class="word" tabindex="0" data-word="videos" data-meaning="点击或悬浮可翻译">videos.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="reading" data-meaning="点击或悬浮可翻译">reading</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="mind" data-meaning="点击或悬浮可翻译">mind.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="simply" data-meaning="点击或悬浮可翻译">simply</span> <span class="word" tabindex="0" data-word="learning" data-meaning="点击或悬浮可翻译">learning</span> <span class="word" tabindex="0" data-word="from" data-meaning="点击或悬浮可翻译">from</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="past" data-meaning="点击或悬浮可翻译">past</span> <span class="word" tabindex="0" data-word="behavior" data-meaning="点击或悬浮可翻译">behavior.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(0, this)">显示中文翻译</button>
+          <div class="translation" id="translation-0">当你打开一个短视频应用时，你看到的并不是随机的列表。推荐系统会为你挑选每一个视频。它会观察你的行为：你是停下来、看到最后，还是很快划走？这些小动作都会变成信号。如果你长时间看做饭视频，系统就会想：“这个人喜欢做饭。”然后它给你看更多做饭视频。它并不是在读取你的想法，它只是从你过去的行为中学习。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">But</span> <span class="word" tabindex="0" data-word="there" data-meaning="点击或悬浮可翻译">there</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="trade-off" data-meaning="点击或悬浮可翻译">trade-off.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="system" data-meaning="点击或悬浮可翻译">system</span> <span class="word" tabindex="0" data-word="wants" data-meaning="点击或悬浮可翻译">wants</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="stay" data-meaning="点击或悬浮可翻译">stay</span> <span class="word" tabindex="0" data-word="longer" data-meaning="点击或悬浮可翻译">longer</span>, <span class="word" tabindex="0" data-word="because" data-meaning="点击或悬浮可翻译">because</span> <span class="word" tabindex="0" data-word="longer" data-meaning="点击或悬浮可翻译">longer</span> <span class="word" tabindex="0" data-word="time" data-meaning="点击或悬浮可翻译">time</span> <span class="word" tabindex="0" data-word="means" data-meaning="点击或悬浮可翻译">means</span> <span class="word" tabindex="0" data-word="more" data-meaning="点击或悬浮可翻译">more</span> <span class="word" tabindex="0" data-word="ads" data-meaning="点击或悬浮可翻译">ads</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="more" data-meaning="点击或悬浮可翻译">more</span> <span class="word" tabindex="0" data-word="money" data-meaning="点击或悬浮可翻译">money.</span> <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">So</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="often" data-meaning="点击或悬浮可翻译">often</span> <span class="word" tabindex="0" data-word="chooses" data-meaning="点击或悬浮可翻译">chooses</span> <span class="word" tabindex="0" data-word="videos" data-meaning="点击或悬浮可翻译">videos</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="exciting" data-meaning="点击或悬浮可翻译">exciting</span> <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="easy" data-meaning="点击或悬浮可翻译">easy</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="watch" data-meaning="点击或悬浮可翻译">watch.</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="be" data-meaning="点击或悬浮可翻译">be</span> <span class="word" tabindex="0" data-word="helpful" data-meaning="点击或悬浮可翻译">helpful</span>: <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="find" data-meaning="点击或悬浮可翻译">find</span> <span class="word" tabindex="0" data-word="new" data-meaning="点击或悬浮可翻译">new</span> <span class="word" tabindex="0" data-word="things" data-meaning="点击或悬浮可翻译">things</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="enjoy" data-meaning="点击或悬浮可翻译">enjoy.</span> <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">But</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="trap" data-meaning="点击或悬浮可翻译">trap</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">small</span> <span class="word" tabindex="0" data-word="bubble" data-meaning="点击或悬浮可翻译">bubble.</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">You</span> <span class="word" tabindex="0" data-word="see" data-meaning="点击或悬浮可翻译">see</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="same" data-meaning="点击或悬浮可翻译">same</span> <span class="word" tabindex="0" data-word="kind" data-meaning="点击或悬浮可翻译">kind</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="content" data-meaning="点击或悬浮可翻译">content</span> <span class="word" tabindex="0" data-word="again" data-meaning="点击或悬浮可翻译">again</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="again" data-meaning="点击或悬浮可翻译">again.</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">You</span> <span class="word" tabindex="0" data-word="may" data-meaning="点击或悬浮可翻译">may</span> <span class="word" tabindex="0" data-word="miss" data-meaning="点击或悬浮可翻译">miss</span> <span class="word" tabindex="0" data-word="other" data-meaning="点击或悬浮可翻译">other</span> <span class="word" tabindex="0" data-word="topics" data-meaning="点击或悬浮可翻译">topics</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="would" data-meaning="点击或悬浮可翻译">would</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="like" data-meaning="点击或悬浮可翻译">like.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="app" data-meaning="点击或悬浮可翻译">app</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="good" data-meaning="点击或悬浮可翻译">good</span> <span class="word" tabindex="0" data-word="at" data-meaning="点击或悬浮可翻译">at</span> <span class="word" tabindex="0" data-word="giving" data-meaning="点击或悬浮可翻译">giving</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="more" data-meaning="点击或悬浮可翻译">more</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="same" data-meaning="点击或悬浮可翻译">same</span>, <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="at" data-meaning="点击或悬浮可翻译">at</span> <span class="word" tabindex="0" data-word="showing" data-meaning="点击或悬浮可翻译">showing</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="something" data-meaning="点击或悬浮可翻译">something</span> <span class="word" tabindex="0" data-word="truly" data-meaning="点击或悬浮可翻译">truly</span> <span class="word" tabindex="0" data-word="new" data-meaning="点击或悬浮可翻译">new.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(1, this)">显示中文翻译</button>
+          <div class="translation" id="translation-1">但这里有一个取舍。系统想让你停留更久，因为时间越长，广告越多，赚的钱也越多。所以它常常选择刺激或容易观看的视频。这可能有帮助：你能发现自己喜欢的新东西。但它也可能把你困在一个小圈子里。你一遍又一遍地看到同类内容。你可能会错过其他你也会喜欢的主题。这个应用擅长给你更多相同的东西，却不擅长给你真正新的东西。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">So</span> <span class="word" tabindex="0" data-word="how" data-meaning="点击或悬浮可翻译">how</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="use" data-meaning="点击或悬浮可翻译">use</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">this</span> <span class="word" tabindex="0" data-word="knowledge" data-meaning="点击或悬浮可翻译">knowledge</span>? <span class="word" tabindex="0" data-word="first" data-meaning="点击或悬浮可翻译">First</span>, <span class="word" tabindex="0" data-word="notice" data-meaning="点击或悬浮可翻译">notice</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="own" data-meaning="点击或悬浮可翻译">own</span> <span class="word" tabindex="0" data-word="habits" data-meaning="点击或悬浮可翻译">habits.</span> <span class="word" tabindex="0" data-word="if" data-meaning="点击或悬浮可翻译">If</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="feed" data-meaning="点击或悬浮可翻译">feed</span> <span class="word" tabindex="0" data-word="feels" data-meaning="点击或悬浮可翻译">feels</span> <span class="word" tabindex="0" data-word="boring" data-meaning="点击或悬浮可翻译">boring</span> <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="too" data-meaning="点击或悬浮可翻译">too</span> <span class="word" tabindex="0" data-word="similar" data-meaning="点击或悬浮可翻译">similar</span>, <span class="word" tabindex="0" data-word="change" data-meaning="点击或悬浮可翻译">change</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="behavior" data-meaning="点击或悬浮可翻译">behavior.</span> <span class="word" tabindex="0" data-word="watch" data-meaning="点击或悬浮可翻译">Watch</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="different" data-meaning="点击或悬浮可翻译">different</span> <span class="word" tabindex="0" data-word="topic" data-meaning="点击或悬浮可翻译">topic</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="few" data-meaning="点击或悬浮可翻译">few</span> <span class="word" tabindex="0" data-word="minutes" data-meaning="点击或悬浮可翻译">minutes</span>, <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="search" data-meaning="点击或悬浮可翻译">search</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="something" data-meaning="点击或悬浮可翻译">something</span> <span class="word" tabindex="0" data-word="new" data-meaning="点击或悬浮可翻译">new.</span> <span class="word" tabindex="0" data-word="second" data-meaning="点击或悬浮可翻译">Second</span>, <span class="word" tabindex="0" data-word="remember" data-meaning="点击或悬浮可翻译">remember</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="app" data-meaning="点击或悬浮可翻译">app</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="your" data-meaning="点击或悬浮可翻译">your</span> <span class="word" tabindex="0" data-word="friend" data-meaning="点击或悬浮可翻译">friend</span>; <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="machine" data-meaning="点击或悬浮可翻译">machine</span> <span class="word" tabindex="0" data-word="following" data-meaning="点击或悬浮可翻译">following</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="goal" data-meaning="点击或悬浮可翻译">goal.</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">You</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="still" data-meaning="点击或悬浮可翻译">still</span> <span class="word" tabindex="0" data-word="enjoy" data-meaning="点击或悬浮可翻译">enjoy</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="should" data-meaning="点击或悬浮可翻译">should</span> <span class="word" tabindex="0" data-word="decide" data-meaning="点击或悬浮可翻译">decide</span> <span class="word" tabindex="0" data-word="what" data-meaning="点击或悬浮可翻译">what</span> <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="want" data-meaning="点击或悬浮可翻译">want</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="watch" data-meaning="点击或悬浮可翻译">watch.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="simple" data-meaning="点击或悬浮可翻译">simple</span> <span class="word" tabindex="0" data-word="rule" data-meaning="点击或悬浮可翻译">rule</span>: <span class="word" tabindex="0" data-word="ask" data-meaning="点击或悬浮可翻译">ask</span> <span class="word" tabindex="0" data-word="yourself" data-meaning="点击或悬浮可翻译">yourself</span>, &quot;<span class="word" tabindex="0" data-word="did" data-meaning="点击或悬浮可翻译">Did</span> <span class="word" tabindex="0" data-word="i" data-meaning="点击或悬浮可翻译">I</span> <span class="word" tabindex="0" data-word="choose" data-meaning="点击或悬浮可翻译">choose</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">this</span> <span class="word" tabindex="0" data-word="video" data-meaning="点击或悬浮可翻译">video</span>, <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="did" data-meaning="点击或悬浮可翻译">did</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="app" data-meaning="点击或悬浮可翻译">app</span> <span class="word" tabindex="0" data-word="choose" data-meaning="点击或悬浮可翻译">choose</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="me" data-meaning="点击或悬浮可翻译">me</span>?&quot;</p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(2, this)">显示中文翻译</button>
+          <div class="translation" id="translation-2">那么你该如何利用这个知识呢？首先，注意你自己的习惯。如果你的信息流感觉无聊或太相似，就改变你的行为。花几分钟看一个不同的主题，或者搜索一些新东西。其次，记住这个应用不是你的朋友；它是一台追随某个目标的机器。你仍然可以享受它，但你应该决定自己想看什么。一个简单的规则：问问自己，“是我选了这个视频，还是应用替我选的？”</div>
+        </div>
+      </section>
+        <p class="footer">
+          AI-generated lesson for daily English reading.
+          <br>Word translation on hover or tap uses the MyMemory public translation API.
+          <br>Site: <a href="https://ccandzy.github.io/daily-english/">https://ccandzy.github.io/daily-english/</a>
+        </p>
+      </main>
+
+      <aside class="sidebar">
+        <div class="side-section">
+          <span class="label">Phrases</span>
+          <h2>Short Phrases</h2>
+          <ul><li><strong>watch to the end</strong>: 看到最后</li><li><strong>swipe away</strong>: 划走</li><li><strong>a trade-off</strong>: 一种取舍</li><li><strong>again and again</strong>: 一次又一次</li><li><strong>search for something new</strong>: 搜索新东西</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Hard Words</span>
+          <h2>Difficult Words</h2>
+          <ul><li><strong>recommendation</strong>: 推荐</li><li><strong>signal</strong>: 信号</li><li><strong>behavior</strong>: 行为</li><li><strong>bubble</strong>: 圈子；信息茧房</li><li><strong>content</strong>: 内容</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Common Words</span>
+          <h2>Useful Words</h2>
+          <ul><li><strong>choose</strong>: 选择</li><li><strong>stay</strong>: 停留</li><li><strong>enjoy</strong>: 喜欢；享受</li><li><strong>notice</strong>: 注意到</li><li><strong>decide</strong>: 决定</li></ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const translationCache = new Map();
+    const words = Array.from(document.querySelectorAll(".word"));
+
+    for (const word of words) {
+      word.addEventListener("mouseenter", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("focus", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = !word.classList.contains("is-open");
+        closeWordTooltips();
+        if (willOpen) {
+          word.classList.add("is-open");
+          loadTranslation(word);
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      closeWordTooltips();
+    });
+
+    function closeWordTooltips() {
+      for (const word of words) {
+        word.classList.remove("is-open");
+      }
+    }
+
+    async function loadTranslation(word) {
+      const key = word.dataset.word || normalizeWord(word.textContent || "");
+      if (!key) {
+        word.dataset.meaning = "暂无翻译";
+        return;
+      }
+
+      if (translationCache.has(key)) {
+        word.dataset.meaning = translationCache.get(key);
+        return;
+      }
+
+      word.dataset.meaning = "翻译中...";
+
+      try {
+        const params = new URLSearchParams({
+          q: key,
+          langpair: "en|zh-CN",
+          mt: "1"
+        });
+        const response = await fetch("https://api.mymemory.translated.net/get?" + params.toString());
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        const translated =
+          data?.responseData?.translatedText ||
+          data?.matches?.find((item) => item?.translation)?.translation ||
+          "";
+
+        const clean = normalizeTranslation(translated, key);
+        const finalMeaning = clean || "暂无翻译";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      } catch (error) {
+        const fallback = localFallback(key);
+        const finalMeaning = fallback || "翻译失败，请稍后再试";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      }
+    }
+
+    function normalizeWord(value) {
+      return String(value).toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+    }
+
+    function normalizeTranslation(value, sourceWord) {
+      const text = String(value || "").trim();
+      if (!text) {
+        return "";
+      }
+
+      const lowered = text.toLowerCase();
+      if (lowered === String(sourceWord).toLowerCase()) {
+        return "";
+      }
+
+      return text.replace(/^zh-cn\|/i, "").trim();
+    }
+
+    function localFallback(word) {
+      const fallback = {
+        a: "一个",
+        an: "一个",
+        and: "和",
+        are: "是",
+        in: "在……里",
+        is: "是",
+        of: "……的",
+        on: "在……上",
+        the: "这；这个",
+        to: "到；去；用于不定式"
+      };
+      return fallback[word] || "";
+    }
+
+    function toggleTranslation(index, button) {
+      const el = document.getElementById("translation-" + index);
+      const isOpen = el.classList.toggle("show");
+      button.textContent = isOpen ? "隐藏中文翻译" : "显示中文翻译";
+    }
+  </script>
+</body>
+</html>
