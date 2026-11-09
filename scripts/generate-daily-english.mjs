@@ -143,6 +143,7 @@ Requirements:
 - Keep the article focused on one clear idea. Do not invent statistics, quotations, or current-news claims.
 - After each paragraph, provide a natural Chinese translation.
 - Include 5 useful phrases, 5 relatively harder words, and 5 common words from the article, each with a concise Chinese meaning. Do not add advanced vocabulary merely to fill the lists.
+- Add 3 distinct A2–B1 grammar points already present in the article. Quote one complete English sentence exactly from the body for each point, give its structure, a short Chinese explanation, and one simple new English example with a Chinese translation. Do not make the article harder to add grammar.
 - Return only the finished lesson in the format below, without planning notes or explanations.
 
 Markdown format:
@@ -186,6 +187,17 @@ Markdown format:
 - **[word 3]**: [meaning in Chinese]
 - **[word 4]**: [meaning in Chinese]
 - **[word 5]**: [meaning in Chinese]
+
+## Grammar Points
+### Grammar 1
+**Name:** [grammar name in Chinese]
+**Sentence:** [exact complete sentence from the English body]
+**Structure:** [short reusable pattern]
+**Explanation:** [brief Chinese explanation and usage note]
+**Example:** [new simple English sentence]
+**Example Translation:** [Chinese translation of the new example]
+
+Repeat the Grammar 1 block as Grammar 2 and Grammar 3, using different grammar points.
 `;
 
 console.log("=== DeepSeek Prompt Start ===");
@@ -278,7 +290,7 @@ function parseMarkdownLesson(markdown) {
       mode = "english";
       continue;
     }
-    if (isKnownSectionHeading(line)) {
+    if (isKnownSectionHeading(line) || /^##\s+Grammar Points\s*$/i.test(line)) {
       flushParagraph();
       continue;
     }
@@ -314,8 +326,34 @@ function parseMarkdownLesson(markdown) {
     phrases: parseWordList(text, ["phrases", "short phrases", "短语"]),
     hardWords: parseWordList(text, ["hard words", "difficult words", "难词", "生词"]),
     commonWords: parseWordList(text, ["common words", "useful words", "常用词"]),
+    grammarPoints: parseGrammarPoints(text, paragraphs),
     sourceNote: "AI-generated lesson for daily English reading.",
   };
+}
+
+function parseGrammarPoints(text, paragraphs) {
+  const section = text.match(/^##\s+Grammar Points\s*\n([\s\S]*?)(?=^##\s|$(?![\s\S]))/im)?.[1] || "";
+  const sentences = paragraphs.map((item) => cleanParagraph(item.english));
+  const seen = new Set();
+  return section.split(/^###\s+Grammar\s+\d+\s*$/im).slice(1).flatMap((block) => {
+    const lines = block.split("\n");
+    const point = Object.fromEntries([
+      ["name", "Name"], ["sentence", "Sentence"], ["structure", "Structure"],
+      ["explanation", "Explanation"], ["example", "Example"],
+      ["exampleTranslation", "Example Translation"],
+    ].map(([key, label]) => [key, cleanParagraph(readMetadata(lines, [label]))]));
+    if (Object.values(point).some((value) => !value)) return [];
+    if (!/[\u3400-\u9fff]/u.test(point.explanation) || !/[\u3400-\u9fff]/u.test(point.exampleTranslation)) return [];
+    if (!/[.!?]["'”’]?$/.test(point.sentence)) return [];
+    if (!sentences.some((body) => {
+      const index = body.indexOf(point.sentence);
+      return index >= 0 && (index === 0 || /[.!?]["'”’]?\s+$/.test(body.slice(0, index)));
+    })) return [];
+    const key = point.name.toLowerCase();
+    if (seen.has(key)) return [];
+    seen.add(key);
+    return [point];
+  }).slice(0, 3);
 }
 
 function normalizeMarkdown(markdown) {
@@ -353,7 +391,7 @@ function isParagraphHeading(line) {
 }
 
 function isKnownSectionHeading(line) {
-  return /^#{1,6}\s*(?:phrases?|short phrases?|hard words?|difficult words?|common words?|useful words?|短语|难词|生词|常用词).*$/i.test(line);
+  return /^#{1,6}\s*(?:phrases?|short phrases?|hard words?|difficult words?|common words?|useful words?|短语|难词|生词|常用词|grammar points).*$/i.test(line);
 }
 
 function parseTranslationLine(line) {
@@ -708,6 +746,7 @@ function buildHtml(lessonData, currentSiteUrl) {
   const phrasesHtml = buildList(lessonData.phrases);
   const hardWordsHtml = buildList(lessonData.hardWords);
   const commonWordsHtml = buildList(lessonData.commonWords);
+  const grammarHtml = buildGrammar(lessonData.grammarPoints);
   const safeTitle = escapeHtml(lessonData.title);
   const safeTopic = escapeHtml(lessonData.topic);
   const safeDate = escapeHtml(lessonData.date);
@@ -927,6 +966,18 @@ function buildHtml(lessonData, currentSiteUrl) {
       font-size: 15px;
     }
 
+    .grammar-card {
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .grammar-card summary { cursor: pointer; color: var(--accent-deep); }
+    .grammar-card p { margin: 10px 0 0; font-size: 15px; }
+    .grammar-sentence { color: var(--ink); }
+
     .footer {
       margin-top: 24px;
       color: var(--muted);
@@ -1006,6 +1057,7 @@ function buildHtml(lessonData, currentSiteUrl) {
           <h2>Useful Words</h2>
           <ul>${commonWordsHtml}</ul>
         </div>
+        ${grammarHtml}
       </aside>
     </div>
   </div>
@@ -1141,4 +1193,22 @@ function buildList(items) {
         `<li><strong>${escapeHtml(item.term)}</strong>: ${escapeHtml(item.meaning)}</li>`
     )
     .join("");
+}
+
+function buildGrammar(points) {
+  if (!Array.isArray(points) || points.length === 0) return "";
+  const cards = points.map((point) => `
+    <details class="grammar-card">
+      <summary>${escapeHtml(point.name)}</summary>
+      <p class="grammar-sentence"><strong>文中原句：</strong>${escapeHtml(point.sentence)}</p>
+      <p><strong>结构：</strong>${escapeHtml(point.structure)}</p>
+      <p><strong>说明：</strong>${escapeHtml(point.explanation)}</p>
+      <p><strong>仿写：</strong>${escapeHtml(point.example)}</p>
+      <p>${escapeHtml(point.exampleTranslation)}</p>
+    </details>`).join("");
+  return `<section class="side-section" aria-label="语法小课堂">
+    <span class="label">Grammar</span>
+    <h2>语法小课堂</h2>
+    ${cards}
+  </section>`;
 }
