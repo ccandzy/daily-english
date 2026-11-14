@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>城市如何应对越来越热的夏天</title>
+  <style>
+    :root {
+      --bg-a: #f4efe7;
+      --bg-b: #dcecf2;
+      --paper: #fffdf8;
+      --sidebar: #edf6fb;
+      --ink: #22363c;
+      --muted: #64777c;
+      --accent: #11765f;
+      --accent-deep: #0b5948;
+      --line: #cad9dd;
+      --hover: #d8f4ec;
+      --tooltip: #17353a;
+      --soft: #edf9f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 28%),
+        linear-gradient(145deg, var(--bg-a) 0%, var(--bg-b) 100%);
+    }
+
+    .page {
+      max-width: 1220px;
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card,
+    .sidebar {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 38px rgba(32, 67, 75, 0.08);
+    }
+
+    .card {
+      background: var(--paper);
+      padding: 30px;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      padding: 22px;
+      position: sticky;
+      top: 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 45px);
+      line-height: 1.12;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tip {
+      margin: 0 0 24px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      background: var(--soft);
+      color: #28544b;
+    }
+
+    .article-block {
+      margin-bottom: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .article-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .article-block p {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .toggle-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--accent);
+      color: #f7fffd;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-1px);
+      background: var(--accent-deep);
+    }
+
+    .translation {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f3fcf8;
+      color: #355556;
+      font-size: 16px;
+    }
+
+    .translation.show {
+      display: block;
+    }
+
+    .word {
+      position: relative;
+      display: inline-block;
+      padding: 0 2px;
+      border-radius: 5px;
+      cursor: help;
+      transition: background-color 0.15s ease;
+    }
+
+    .word:hover {
+      background: var(--hover);
+    }
+
+    .word:hover::after,
+    .word:active::after,
+    .word:focus-visible::after,
+    .word.is-open::after {
+      content: attr(data-meaning);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      min-width: 64px;
+      max-width: 180px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: var(--tooltip);
+      color: #f4fdfd;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      z-index: 2;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(17, 118, 95, 0.12);
+      color: var(--accent-deep);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .side-section {
+      margin-bottom: 22px;
+    }
+
+    .side-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .side-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .side-section li {
+      margin-bottom: 10px;
+      color: #304248;
+      font-size: 15px;
+    }
+
+    .grammar-card {
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .grammar-card summary { cursor: pointer; color: var(--accent-deep); }
+    .grammar-card p { margin: 10px 0 0; font-size: 15px; }
+    .grammar-sentence { color: var(--ink); }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--accent-deep);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 14px auto;
+        padding: 10px;
+      }
+
+      .card,
+      .sidebar {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .article-block p {
+        font-size: 18px;
+      }
+
+      .word:hover::after,
+      .word:active::after,
+      .word:focus-visible::after,
+      .word.is-open::after {
+        left: 0;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="layout">
+      <main class="card">
+        <h1>城市如何应对越来越热的夏天</h1>
+        <p class="meta">Date: 2026-11-14 | Level: B1 (target) | Topic: Climate adaptation and extreme weather — how cities use shade and water to cope with hotter summers</p>
+        <p class="tip">阅读时先找出“问题—办法—效果”的结构，这能帮助你更快理解说明类文章。</p>
+        <section id="article">
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="many" data-meaning="点击或悬浮可翻译">Many</span> <span class="word" tabindex="0" data-word="cities" data-meaning="点击或悬浮可翻译">cities</span> <span class="word" tabindex="0" data-word="now" data-meaning="点击或悬浮可翻译">now</span> <span class="word" tabindex="0" data-word="have" data-meaning="点击或悬浮可翻译">have</span> <span class="word" tabindex="0" data-word="hotter" data-meaning="点击或悬浮可翻译">hotter</span> <span class="word" tabindex="0" data-word="summers" data-meaning="点击或悬浮可翻译">summers</span> <span class="word" tabindex="0" data-word="than" data-meaning="点击或悬浮可翻译">than</span> <span class="word" tabindex="0" data-word="before" data-meaning="点击或悬浮可翻译">before.</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">On</span> <span class="word" tabindex="0" data-word="some" data-meaning="点击或悬浮可翻译">some</span> <span class="word" tabindex="0" data-word="days" data-meaning="点击或悬浮可翻译">days</span>, <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="temperature" data-meaning="点击或悬浮可翻译">temperature</span> <span class="word" tabindex="0" data-word="stays" data-meaning="点击或悬浮可翻译">stays</span> <span class="word" tabindex="0" data-word="high" data-meaning="点击或悬浮可翻译">high</span> <span class="word" tabindex="0" data-word="even" data-meaning="点击或悬浮可翻译">even</span> <span class="word" tabindex="0" data-word="at" data-meaning="点击或悬浮可翻译">at</span> <span class="word" tabindex="0" data-word="night" data-meaning="点击或悬浮可翻译">night.</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="hard" data-meaning="点击或悬浮可翻译">hard</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="older" data-meaning="点击或悬浮可翻译">older</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="who" data-meaning="点击或悬浮可翻译">who</span> <span class="word" tabindex="0" data-word="work" data-meaning="点击或悬浮可翻译">work</span> <span class="word" tabindex="0" data-word="outside" data-meaning="点击或悬浮可翻译">outside.</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">In</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="hot" data-meaning="点击或悬浮可翻译">hot</span> <span class="word" tabindex="0" data-word="city" data-meaning="点击或悬浮可翻译">city</span>, <span class="word" tabindex="0" data-word="some" data-meaning="点击或悬浮可翻译">some</span> <span class="word" tabindex="0" data-word="streets" data-meaning="点击或悬浮可翻译">streets</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="much" data-meaning="点击或悬浮可翻译">much</span> <span class="word" tabindex="0" data-word="hotter" data-meaning="点击或悬浮可翻译">hotter</span> <span class="word" tabindex="0" data-word="than" data-meaning="点击或悬浮可翻译">than</span> <span class="word" tabindex="0" data-word="others" data-meaning="点击或悬浮可翻译">others.</span> <span class="word" tabindex="0" data-word="streets" data-meaning="点击或悬浮可翻译">Streets</span> <span class="word" tabindex="0" data-word="with" data-meaning="点击或悬浮可翻译">with</span> <span class="word" tabindex="0" data-word="many" data-meaning="点击或悬浮可翻译">many</span> <span class="word" tabindex="0" data-word="trees" data-meaning="点击或悬浮可翻译">trees</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="cooler" data-meaning="点击或悬浮可翻译">cooler.</span> <span class="word" tabindex="0" data-word="streets" data-meaning="点击或悬浮可翻译">Streets</span> <span class="word" tabindex="0" data-word="with" data-meaning="点击或悬浮可翻译">with</span> <span class="word" tabindex="0" data-word="only" data-meaning="点击或悬浮可翻译">only</span> <span class="word" tabindex="0" data-word="concrete" data-meaning="点击或悬浮可翻译">concrete</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="cars" data-meaning="点击或悬浮可翻译">cars</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="be" data-meaning="点击或悬浮可翻译">be</span> <span class="word" tabindex="0" data-word="very" data-meaning="点击或悬浮可翻译">very</span> <span class="word" tabindex="0" data-word="hot" data-meaning="点击或悬浮可翻译">hot.</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="because" data-meaning="点击或悬浮可翻译">because</span> <span class="word" tabindex="0" data-word="trees" data-meaning="点击或悬浮可翻译">trees</span> <span class="word" tabindex="0" data-word="give" data-meaning="点击或悬浮可翻译">give</span> <span class="word" tabindex="0" data-word="shade" data-meaning="点击或悬浮可翻译">shade</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="water" data-meaning="点击或悬浮可翻译">water</span> <span class="word" tabindex="0" data-word="from" data-meaning="点击或悬浮可翻译">from</span> <span class="word" tabindex="0" data-word="their" data-meaning="点击或悬浮可翻译">their</span> <span class="word" tabindex="0" data-word="leaves" data-meaning="点击或悬浮可翻译">leaves.</span> <span class="word" tabindex="0" data-word="shade" data-meaning="点击或悬浮可翻译">Shade</span> <span class="word" tabindex="0" data-word="keeps" data-meaning="点击或悬浮可翻译">keeps</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="buildings" data-meaning="点击或悬浮可翻译">buildings</span> <span class="word" tabindex="0" data-word="cooler" data-meaning="点击或悬浮可翻译">cooler.</span> <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">So</span> <span class="word" tabindex="0" data-word="some" data-meaning="点击或悬浮可翻译">some</span> <span class="word" tabindex="0" data-word="city" data-meaning="点击或悬浮可翻译">city</span> <span class="word" tabindex="0" data-word="planners" data-meaning="点击或悬浮可翻译">planners</span> <span class="word" tabindex="0" data-word="now" data-meaning="点击或悬浮可翻译">now</span> <span class="word" tabindex="0" data-word="plant" data-meaning="点击或悬浮可翻译">plant</span> <span class="word" tabindex="0" data-word="more" data-meaning="点击或悬浮可翻译">more</span> <span class="word" tabindex="0" data-word="trees" data-meaning="点击或悬浮可翻译">trees</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="busy" data-meaning="点击或悬浮可翻译">busy</span> <span class="word" tabindex="0" data-word="streets" data-meaning="点击或悬浮可翻译">streets.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(0, this)">显示中文翻译</button>
+          <div class="translation" id="translation-0">现在许多城市的夏天比以前更热。有些日子，即使到了晚上，气温仍然很高。这对老年人和在户外工作的人来说很难熬。在一个炎热的城市里，有些街道比另一些街道热得多。种了很多树的街道更凉快。只有水泥和汽车的街道可能非常热。这是因为树木提供阴凉，叶子还会释放水分。阴凉让人和建筑更凉快。所以一些城市规划者现在在繁忙的街道上种更多树。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">But</span> <span class="word" tabindex="0" data-word="planting" data-meaning="点击或悬浮可翻译">planting</span> <span class="word" tabindex="0" data-word="trees" data-meaning="点击或悬浮可翻译">trees</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="always" data-meaning="点击或悬浮可翻译">always</span> <span class="word" tabindex="0" data-word="easy" data-meaning="点击或悬浮可翻译">easy.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="young" data-meaning="点击或悬浮可翻译">young</span> <span class="word" tabindex="0" data-word="tree" data-meaning="点击或悬浮可翻译">tree</span> <span class="word" tabindex="0" data-word="needs" data-meaning="点击或悬浮可翻译">needs</span> <span class="word" tabindex="0" data-word="years" data-meaning="点击或悬浮可翻译">years</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="grow" data-meaning="点击或悬浮可翻译">grow</span> <span class="word" tabindex="0" data-word="big" data-meaning="点击或悬浮可翻译">big</span> <span class="word" tabindex="0" data-word="enough" data-meaning="点击或悬浮可翻译">enough</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="give" data-meaning="点击或悬浮可翻译">give</span> <span class="word" tabindex="0" data-word="good" data-meaning="点击或悬浮可翻译">good</span> <span class="word" tabindex="0" data-word="shade" data-meaning="点击或悬浮可翻译">shade.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="needs" data-meaning="点击或悬浮可翻译">needs</span> <span class="word" tabindex="0" data-word="water" data-meaning="点击或悬浮可翻译">water</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="dry" data-meaning="点击或悬浮可翻译">dry</span> <span class="word" tabindex="0" data-word="summer" data-meaning="点击或悬浮可翻译">summer</span> <span class="word" tabindex="0" data-word="water" data-meaning="点击或悬浮可翻译">water</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="be" data-meaning="点击或悬浮可翻译">be</span> <span class="word" tabindex="0" data-word="expensive" data-meaning="点击或悬浮可翻译">expensive.</span> <span class="word" tabindex="0" data-word="some" data-meaning="点击或悬浮可翻译">Some</span> <span class="word" tabindex="0" data-word="streets" data-meaning="点击或悬浮可翻译">streets</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="too" data-meaning="点击或悬浮可翻译">too</span> <span class="word" tabindex="0" data-word="narrow" data-meaning="点击或悬浮可翻译">narrow</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="big" data-meaning="点击或悬浮可翻译">big</span> <span class="word" tabindex="0" data-word="trees" data-meaning="点击或悬浮可翻译">trees.</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">In</span> <span class="word" tabindex="0" data-word="these" data-meaning="点击或悬浮可翻译">these</span> <span class="word" tabindex="0" data-word="places" data-meaning="点击或悬浮可翻译">places</span>, <span class="word" tabindex="0" data-word="cities" data-meaning="点击或悬浮可翻译">cities</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="use" data-meaning="点击或悬浮可翻译">use</span> <span class="word" tabindex="0" data-word="other" data-meaning="点击或悬浮可翻译">other</span> <span class="word" tabindex="0" data-word="ideas" data-meaning="点击或悬浮可翻译">ideas.</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">They</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="build" data-meaning="点击或悬浮可翻译">build</span> <span class="word" tabindex="0" data-word="simple" data-meaning="点击或悬浮可翻译">simple</span> <span class="word" tabindex="0" data-word="roofs" data-meaning="点击或悬浮可翻译">roofs</span> <span class="word" tabindex="0" data-word="over" data-meaning="点击或悬浮可翻译">over</span> <span class="word" tabindex="0" data-word="bus" data-meaning="点击或悬浮可翻译">bus</span> <span class="word" tabindex="0" data-word="stops" data-meaning="点击或悬浮可翻译">stops.</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">They</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="paint" data-meaning="点击或悬浮可翻译">paint</span> <span class="word" tabindex="0" data-word="roofs" data-meaning="点击或悬浮可翻译">roofs</span> <span class="word" tabindex="0" data-word="white" data-meaning="点击或悬浮可翻译">white</span> <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">so</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="reflect" data-meaning="点击或悬浮可翻译">reflect</span> <span class="word" tabindex="0" data-word="sunlight" data-meaning="点击或悬浮可翻译">sunlight.</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">They</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="add" data-meaning="点击或悬浮可翻译">add</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">small</span> <span class="word" tabindex="0" data-word="water" data-meaning="点击或悬浮可翻译">water</span> <span class="word" tabindex="0" data-word="fountains" data-meaning="点击或悬浮可翻译">fountains</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="public" data-meaning="点击或悬浮可翻译">public</span> <span class="word" tabindex="0" data-word="squares" data-meaning="点击或悬浮可翻译">squares.</span> <span class="word" tabindex="0" data-word="these" data-meaning="点击或悬浮可翻译">These</span> <span class="word" tabindex="0" data-word="ideas" data-meaning="点击或悬浮可翻译">ideas</span> <span class="word" tabindex="0" data-word="work" data-meaning="点击或悬浮可翻译">work</span> <span class="word" tabindex="0" data-word="faster" data-meaning="点击或悬浮可翻译">faster</span> <span class="word" tabindex="0" data-word="than" data-meaning="点击或悬浮可翻译">than</span> <span class="word" tabindex="0" data-word="trees" data-meaning="点击或悬浮可翻译">trees</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="cost" data-meaning="点击或悬浮可翻译">cost</span> <span class="word" tabindex="0" data-word="money" data-meaning="点击或悬浮可翻译">money</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="build" data-meaning="点击或悬浮可翻译">build</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="keep" data-meaning="点击或悬浮可翻译">keep</span> <span class="word" tabindex="0" data-word="clean" data-meaning="点击或悬浮可翻译">clean.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(1, this)">显示中文翻译</button>
+          <div class="translation" id="translation-1">但是种树并不总是容易的。一棵小树需要很多年才能长得足够大，提供好的阴凉。它也需要水，而在干旱的夏天，水可能很贵。有些街道太窄，种不了大树。在这些地方，城市可以用其他办法。他们可以在公交站上方建简单的顶棚。他们可以把屋顶刷成白色，让屋顶反射阳光。他们还可以在公共广场加小喷泉。这些办法比种树见效快，但建造和保持清洁都需要花钱。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">So</span> <span class="word" tabindex="0" data-word="what" data-meaning="点击或悬浮可翻译">what</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="best" data-meaning="点击或悬浮可翻译">best</span> <span class="word" tabindex="0" data-word="choice" data-meaning="点击或悬浮可翻译">choice</span>? <span class="word" tabindex="0" data-word="many" data-meaning="点击或悬浮可翻译">Many</span> <span class="word" tabindex="0" data-word="experts" data-meaning="点击或悬浮可翻译">experts</span> <span class="word" tabindex="0" data-word="say" data-meaning="点击或悬浮可翻译">say</span> <span class="word" tabindex="0" data-word="cities" data-meaning="点击或悬浮可翻译">cities</span> <span class="word" tabindex="0" data-word="should" data-meaning="点击或悬浮可翻译">should</span> <span class="word" tabindex="0" data-word="use" data-meaning="点击或悬浮可翻译">use</span> <span class="word" tabindex="0" data-word="both" data-meaning="点击或悬浮可翻译">both</span> <span class="word" tabindex="0" data-word="trees" data-meaning="点击或悬浮可翻译">trees</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="quick" data-meaning="点击或悬浮可翻译">quick</span> <span class="word" tabindex="0" data-word="fixes" data-meaning="点击或悬浮可翻译">fixes.</span> <span class="word" tabindex="0" data-word="trees" data-meaning="点击或悬浮可翻译">Trees</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="slow" data-meaning="点击或悬浮可翻译">slow</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="last" data-meaning="点击或悬浮可翻译">last</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="many" data-meaning="点击或悬浮可翻译">many</span> <span class="word" tabindex="0" data-word="years" data-meaning="点击或悬浮可翻译">years</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="help" data-meaning="点击或悬浮可翻译">help</span> <span class="word" tabindex="0" data-word="birds" data-meaning="点击或悬浮可翻译">birds</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="insects" data-meaning="点击或悬浮可翻译">insects.</span> <span class="word" tabindex="0" data-word="quick" data-meaning="点击或悬浮可翻译">Quick</span> <span class="word" tabindex="0" data-word="fixes" data-meaning="点击或悬浮可翻译">fixes</span> <span class="word" tabindex="0" data-word="like" data-meaning="点击或悬浮可翻译">like</span> <span class="word" tabindex="0" data-word="white" data-meaning="点击或悬浮可翻译">white</span> <span class="word" tabindex="0" data-word="roofs" data-meaning="点击或悬浮可翻译">roofs</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="bus" data-meaning="点击或悬浮可翻译">bus</span> <span class="word" tabindex="0" data-word="stop" data-meaning="点击或悬浮可翻译">stop</span> <span class="word" tabindex="0" data-word="roofs" data-meaning="点击或悬浮可翻译">roofs</span> <span class="word" tabindex="0" data-word="help" data-meaning="点击或悬浮可翻译">help</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="right" data-meaning="点击或悬浮可翻译">right</span> <span class="word" tabindex="0" data-word="away" data-meaning="点击或悬浮可翻译">away.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="good" data-meaning="点击或悬浮可翻译">good</span> <span class="word" tabindex="0" data-word="plan" data-meaning="点击或悬浮可翻译">plan</span> <span class="word" tabindex="0" data-word="starts" data-meaning="点击或悬浮可翻译">starts</span> <span class="word" tabindex="0" data-word="with" data-meaning="点击或悬浮可翻译">with</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="hottest" data-meaning="点击或悬浮可翻译">hottest</span> <span class="word" tabindex="0" data-word="streets" data-meaning="点击或悬浮可翻译">streets</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="who" data-meaning="点击或悬浮可翻译">who</span> <span class="word" tabindex="0" data-word="need" data-meaning="点击或悬浮可翻译">need</span> <span class="word" tabindex="0" data-word="help" data-meaning="点击或悬浮可翻译">help</span> <span class="word" tabindex="0" data-word="most" data-meaning="点击或悬浮可翻译">most</span>, <span class="word" tabindex="0" data-word="such" data-meaning="点击或悬浮可翻译">such</span> <span class="word" tabindex="0" data-word="as" data-meaning="点击或悬浮可翻译">as</span> <span class="word" tabindex="0" data-word="older" data-meaning="点击或悬浮可翻译">older</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="outdoor" data-meaning="点击或悬浮可翻译">outdoor</span> <span class="word" tabindex="0" data-word="workers" data-meaning="点击或悬浮可翻译">workers.</span> <span class="word" tabindex="0" data-word="then" data-meaning="点击或悬浮可翻译">Then</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="city" data-meaning="点击或悬浮可翻译">city</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="plant" data-meaning="点击或悬浮可翻译">plant</span> <span class="word" tabindex="0" data-word="trees" data-meaning="点击或悬浮可翻译">trees</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="future" data-meaning="点击或悬浮可翻译">future</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="add" data-meaning="点击或悬浮可翻译">add</span> <span class="word" tabindex="0" data-word="shade" data-meaning="点击或悬浮可翻译">shade</span> <span class="word" tabindex="0" data-word="now" data-meaning="点击或悬浮可翻译">now.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="lesson" data-meaning="点击或悬浮可翻译">lesson</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="simple" data-meaning="点击或悬浮可翻译">simple</span>: <span class="word" tabindex="0" data-word="there" data-meaning="点击或悬浮可翻译">there</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="no" data-meaning="点击或悬浮可翻译">no</span> <span class="word" tabindex="0" data-word="single" data-meaning="点击或悬浮可翻译">single</span> <span class="word" tabindex="0" data-word="answer" data-meaning="点击或悬浮可翻译">answer</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">small</span> <span class="word" tabindex="0" data-word="steps" data-meaning="点击或悬浮可翻译">steps</span> <span class="word" tabindex="0" data-word="together" data-meaning="点击或悬浮可翻译">together</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="make" data-meaning="点击或悬浮可翻译">make</span> <span class="word" tabindex="0" data-word="summer" data-meaning="点击或悬浮可翻译">summer</span> <span class="word" tabindex="0" data-word="safer" data-meaning="点击或悬浮可翻译">safer.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(2, this)">显示中文翻译</button>
+          <div class="translation" id="translation-2">那么最好的选择是什么呢？许多专家说，城市应该同时使用树木和快速解决办法。树木见效慢，但能持续很多年，还能帮助鸟类和昆虫。白色屋顶和公交站顶棚这样的快速办法能立刻帮助人们。好的计划从最热的街道和最需要帮助的人开始，比如老年人和户外工作者。然后城市可以为未来种树，同时现在就增加阴凉。这个道理很简单：没有单一的答案，但小步骤加在一起可以让夏天更安全。</div>
+        </div>
+      </section>
+        <p class="footer">
+          AI-generated lesson for daily English reading.
+          <br>Word translation on hover or tap uses the MyMemory public translation API.
+          <br>Site: <a href="https://ccandzy.github.io/daily-english/">https://ccandzy.github.io/daily-english/</a>
+        </p>
+      </main>
+
+      <aside class="sidebar">
+        <div class="side-section">
+          <span class="label">Phrases</span>
+          <h2>Short Phrases</h2>
+          <ul><li><strong>stay high</strong>: 保持在高位</li><li><strong>give shade</strong>: 提供阴凉</li><li><strong>grow big enough</strong>: 长得足够大</li><li><strong>right away</strong>: 立刻；马上</li><li><strong>such as</strong>: 例如</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Hard Words</span>
+          <h2>Difficult Words</h2>
+          <ul><li><strong>concrete</strong>: 混凝土</li><li><strong>planner</strong>: 规划者</li><li><strong>reflect</strong>: 反射</li><li><strong>fountain</strong>: 喷泉</li><li><strong>expert</strong>: 专家</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Common Words</span>
+          <h2>Useful Words</h2>
+          <ul><li><strong>temperature</strong>: 温度</li><li><strong>narrow</strong>: 狭窄的</li><li><strong>roof</strong>: 屋顶</li><li><strong>square</strong>: 广场</li><li><strong>safer</strong>: 更安全的</li></ul>
+        </div>
+        <section class="side-section" aria-label="语法小课堂">
+    <span class="label">Grammar</span>
+    <h2>语法小课堂</h2>
+    
+    <details class="grammar-card">
+      <summary>比较级（than）</summary>
+      <p class="grammar-sentence"><strong>文中原句：</strong>Many cities now have hotter summers than before.</p>
+      <p><strong>结构：</strong>A + be/动词 + 比较级 + than + B</p>
+      <p><strong>说明：</strong>用比较级加 than 比较两者，说明一方程度更高。注意 hot 变 hotter 要双写辅音。</p>
+      <p><strong>仿写：</strong>This street is cooler than that one.</p>
+      <p>这条街比那条街更凉快。</p>
+    </details>
+    <details class="grammar-card">
+      <summary>because 引导原因状语从句</summary>
+      <p class="grammar-sentence"><strong>文中原句：</strong>This is because trees give shade and water from their leaves.</p>
+      <p><strong>结构：</strong>This is because + 主语 + 动词 + 其他</p>
+      <p><strong>说明：</strong>because 用来说明原因，回答“为什么”。This is because… 常用于解释前面提到的现象。</p>
+      <p><strong>仿写：</strong>The bus is late because the road is busy.</p>
+      <p>公交车晚点了，因为路上很忙。</p>
+    </details>
+    <details class="grammar-card">
+      <summary>不定式作目的（to + 动词原形）</summary>
+      <p class="grammar-sentence"><strong>文中原句：</strong>A young tree needs years to grow big enough to give good shade.</p>
+      <p><strong>结构：</strong>主语 + 动词 + to + 动词原形</p>
+      <p><strong>说明：</strong>to + 动词原形可以表示目的或结果。这里 to grow 表示树需要多年“去长大”。</p>
+      <p><strong>仿写：</strong>We plant trees to make the street cooler.</p>
+      <p>我们种树是为了让街道更凉快。</p>
+    </details>
+  </section>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const translationCache = new Map();
+    const words = Array.from(document.querySelectorAll(".word"));
+
+    for (const word of words) {
+      word.addEventListener("mouseenter", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("focus", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = !word.classList.contains("is-open");
+        closeWordTooltips();
+        if (willOpen) {
+          word.classList.add("is-open");
+          loadTranslation(word);
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      closeWordTooltips();
+    });
+
+    function closeWordTooltips() {
+      for (const word of words) {
+        word.classList.remove("is-open");
+      }
+    }
+
+    async function loadTranslation(word) {
+      const key = word.dataset.word || normalizeWord(word.textContent || "");
+      if (!key) {
+        word.dataset.meaning = "暂无翻译";
+        return;
+      }
+
+      if (translationCache.has(key)) {
+        word.dataset.meaning = translationCache.get(key);
+        return;
+      }
+
+      word.dataset.meaning = "翻译中...";
+
+      try {
+        const params = new URLSearchParams({
+          q: key,
+          langpair: "en|zh-CN",
+          mt: "1"
+        });
+        const response = await fetch("https://api.mymemory.translated.net/get?" + params.toString());
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        const translated =
+          data?.responseData?.translatedText ||
+          data?.matches?.find((item) => item?.translation)?.translation ||
+          "";
+
+        const clean = normalizeTranslation(translated, key);
+        const finalMeaning = clean || "暂无翻译";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      } catch (error) {
+        const fallback = localFallback(key);
+        const finalMeaning = fallback || "翻译失败，请稍后再试";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      }
+    }
+
+    function normalizeWord(value) {
+      return String(value).toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+    }
+
+    function normalizeTranslation(value, sourceWord) {
+      const text = String(value || "").trim();
+      if (!text) {
+        return "";
+      }
+
+      const lowered = text.toLowerCase();
+      if (lowered === String(sourceWord).toLowerCase()) {
+        return "";
+      }
+
+      return text.replace(/^zh-cn\|/i, "").trim();
+    }
+
+    function localFallback(word) {
+      const fallback = {
+        a: "一个",
+        an: "一个",
+        and: "和",
+        are: "是",
+        in: "在……里",
+        is: "是",
+        of: "……的",
+        on: "在……上",
+        the: "这；这个",
+        to: "到；去；用于不定式"
+      };
+      return fallback[word] || "";
+    }
+
+    function toggleTranslation(index, button) {
+      const el = document.getElementById("translation-" + index);
+      const isOpen = el.classList.toggle("show");
+      button.textContent = isOpen ? "隐藏中文翻译" : "显示中文翻译";
+    }
+  </script>
+</body>
+</html>
