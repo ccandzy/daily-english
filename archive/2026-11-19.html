@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Why Old City Homes Stay Cool in Summer</title>
+  <style>
+    :root {
+      --bg-a: #f4efe7;
+      --bg-b: #dcecf2;
+      --paper: #fffdf8;
+      --sidebar: #edf6fb;
+      --ink: #22363c;
+      --muted: #64777c;
+      --accent: #11765f;
+      --accent-deep: #0b5948;
+      --line: #cad9dd;
+      --hover: #d8f4ec;
+      --tooltip: #17353a;
+      --soft: #edf9f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 28%),
+        linear-gradient(145deg, var(--bg-a) 0%, var(--bg-b) 100%);
+    }
+
+    .page {
+      max-width: 1220px;
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card,
+    .sidebar {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 38px rgba(32, 67, 75, 0.08);
+    }
+
+    .card {
+      background: var(--paper);
+      padding: 30px;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      padding: 22px;
+      position: sticky;
+      top: 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 45px);
+      line-height: 1.12;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tip {
+      margin: 0 0 24px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      background: var(--soft);
+      color: #28544b;
+    }
+
+    .article-block {
+      margin-bottom: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .article-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .article-block p {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .toggle-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--accent);
+      color: #f7fffd;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-1px);
+      background: var(--accent-deep);
+    }
+
+    .translation {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f3fcf8;
+      color: #355556;
+      font-size: 16px;
+    }
+
+    .translation.show {
+      display: block;
+    }
+
+    .word {
+      position: relative;
+      display: inline-block;
+      padding: 0 2px;
+      border-radius: 5px;
+      cursor: help;
+      transition: background-color 0.15s ease;
+    }
+
+    .word:hover {
+      background: var(--hover);
+    }
+
+    .word:hover::after,
+    .word:active::after,
+    .word:focus-visible::after,
+    .word.is-open::after {
+      content: attr(data-meaning);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      min-width: 64px;
+      max-width: 180px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: var(--tooltip);
+      color: #f4fdfd;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      z-index: 2;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(17, 118, 95, 0.12);
+      color: var(--accent-deep);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .side-section {
+      margin-bottom: 22px;
+    }
+
+    .side-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .side-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .side-section li {
+      margin-bottom: 10px;
+      color: #304248;
+      font-size: 15px;
+    }
+
+    .grammar-card {
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .grammar-card summary { cursor: pointer; color: var(--accent-deep); }
+    .grammar-card p { margin: 10px 0 0; font-size: 15px; }
+    .grammar-sentence { color: var(--ink); }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--accent-deep);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 14px auto;
+        padding: 10px;
+      }
+
+      .card,
+      .sidebar {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .article-block p {
+        font-size: 18px;
+      }
+
+      .word:hover::after,
+      .word:active::after,
+      .word:focus-visible::after,
+      .word.is-open::after {
+        left: 0;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="layout">
+      <main class="card">
+        <h1>Why Old City Homes Stay Cool in Summer</h1>
+        <p class="meta">Date: 2026-11-19 | Level: B1 (target) | Topic: architecture and the way people live — how traditional courtyard homes stay cool without air conditioning</p>
+        <p class="tip">阅读时先找出文章里的“对比”（老房子 vs 新房子），这能帮你更快抓住重点。</p>
+        <section id="article">
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">In</span> <span class="word" tabindex="0" data-word="many" data-meaning="点击或悬浮可翻译">many</span> <span class="word" tabindex="0" data-word="old" data-meaning="点击或悬浮可翻译">old</span> <span class="word" tabindex="0" data-word="chinese" data-meaning="点击或悬浮可翻译">Chinese</span> <span class="word" tabindex="0" data-word="cities" data-meaning="点击或悬浮可翻译">cities</span>, <span class="word" tabindex="0" data-word="you" data-meaning="点击或悬浮可翻译">you</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="still" data-meaning="点击或悬浮可翻译">still</span> <span class="word" tabindex="0" data-word="find" data-meaning="点击或悬浮可翻译">find</span> <span class="word" tabindex="0" data-word="traditional" data-meaning="点击或悬浮可翻译">traditional</span> <span class="word" tabindex="0" data-word="courtyard" data-meaning="点击或悬浮可翻译">courtyard</span> <span class="word" tabindex="0" data-word="homes" data-meaning="点击或悬浮可翻译">homes.</span> <span class="word" tabindex="0" data-word="these" data-meaning="点击或悬浮可翻译">These</span> <span class="word" tabindex="0" data-word="houses" data-meaning="点击或悬浮可翻译">houses</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="built" data-meaning="点击或悬浮可翻译">built</span> <span class="word" tabindex="0" data-word="around" data-meaning="点击或悬浮可翻译">around</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">small</span> <span class="word" tabindex="0" data-word="open" data-meaning="点击或悬浮可翻译">open</span> <span class="word" tabindex="0" data-word="square" data-meaning="点击或悬浮可翻译">square</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="middle" data-meaning="点击或悬浮可翻译">middle.</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">In</span> <span class="word" tabindex="0" data-word="summer" data-meaning="点击或悬浮可翻译">summer</span>, <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">this</span> <span class="word" tabindex="0" data-word="square" data-meaning="点击或悬浮可翻译">square</span> <span class="word" tabindex="0" data-word="stays" data-meaning="点击或悬浮可翻译">stays</span> <span class="word" tabindex="0" data-word="cool" data-meaning="点击或悬浮可翻译">cool</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="evening" data-meaning="点击或悬浮可翻译">evening.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="walls" data-meaning="点击或悬浮可翻译">walls</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="thick" data-meaning="点击或悬浮可翻译">thick</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="windows" data-meaning="点击或悬浮可翻译">windows</span> <span class="word" tabindex="0" data-word="are" data-meaning="点击或悬浮可翻译">are</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">small.</span> <span class="word" tabindex="0" data-word="thick" data-meaning="点击或悬浮可翻译">Thick</span> <span class="word" tabindex="0" data-word="walls" data-meaning="点击或悬浮可翻译">walls</span> <span class="word" tabindex="0" data-word="keep" data-meaning="点击或悬浮可翻译">keep</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="hot" data-meaning="点击或悬浮可翻译">hot</span> <span class="word" tabindex="0" data-word="sun" data-meaning="点击或悬浮可翻译">sun</span> <span class="word" tabindex="0" data-word="outside" data-meaning="点击或悬浮可翻译">outside</span> <span class="word" tabindex="0" data-word="during" data-meaning="点击或悬浮可翻译">during</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="day" data-meaning="点击或悬浮可翻译">day.</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">Small</span> <span class="word" tabindex="0" data-word="windows" data-meaning="点击或悬浮可翻译">windows</span> <span class="word" tabindex="0" data-word="let" data-meaning="点击或悬浮可翻译">let</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="less" data-meaning="点击或悬浮可翻译">less</span> <span class="word" tabindex="0" data-word="heat" data-meaning="点击或悬浮可翻译">heat.</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">People</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="plant" data-meaning="点击或悬浮可翻译">plant</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="tree" data-meaning="点击或悬浮可翻译">tree</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="courtyard" data-meaning="点击或悬浮可翻译">courtyard.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="tree" data-meaning="点击或悬浮可翻译">tree</span> <span class="word" tabindex="0" data-word="gives" data-meaning="点击或悬浮可翻译">gives</span> <span class="word" tabindex="0" data-word="shade" data-meaning="点击或悬浮可翻译">shade</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="makes" data-meaning="点击或悬浮可翻译">makes</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="air" data-meaning="点击或悬浮可翻译">air</span> <span class="word" tabindex="0" data-word="feel" data-meaning="点击或悬浮可翻译">feel</span> <span class="word" tabindex="0" data-word="fresher" data-meaning="点击或悬浮可翻译">fresher.</span> <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">So</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="family" data-meaning="点击或悬浮可翻译">family</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="sit" data-meaning="点击或悬浮可翻译">sit</span> <span class="word" tabindex="0" data-word="outside" data-meaning="点击或悬浮可翻译">outside</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="enjoy" data-meaning="点击或悬浮可翻译">enjoy</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="cool" data-meaning="点击或悬浮可翻译">cool</span> <span class="word" tabindex="0" data-word="evening" data-meaning="点击或悬浮可翻译">evening</span> <span class="word" tabindex="0" data-word="without" data-meaning="点击或悬浮可翻译">without</span> <span class="word" tabindex="0" data-word="using" data-meaning="点击或悬浮可翻译">using</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="fan" data-meaning="点击或悬浮可翻译">fan.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(0, this)">显示中文翻译</button>
+          <div class="translation" id="translation-0">在许多中国老城里，你仍然能找到传统的四合院。这些房子围绕中间一个小露天院子建造。夏天，这个院子在傍晚很凉快。墙很厚，窗户很小。厚墙在白天把炎热的太阳挡在外面。小窗户让更少的热量进来。人们还会在院子里种一棵树。树提供阴凉，让空气感觉更清爽。所以一家人可以坐在外面，享受凉爽的傍晚，而不用开风扇。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="modern" data-meaning="点击或悬浮可翻译">Modern</span> <span class="word" tabindex="0" data-word="apartments" data-meaning="点击或悬浮可翻译">apartments</span> <span class="word" tabindex="0" data-word="work" data-meaning="点击或悬浮可翻译">work</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="very" data-meaning="点击或悬浮可翻译">very</span> <span class="word" tabindex="0" data-word="different" data-meaning="点击或悬浮可翻译">different</span> <span class="word" tabindex="0" data-word="way" data-meaning="点击或悬浮可翻译">way.</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">They</span> <span class="word" tabindex="0" data-word="often" data-meaning="点击或悬浮可翻译">often</span> <span class="word" tabindex="0" data-word="have" data-meaning="点击或悬浮可翻译">have</span> <span class="word" tabindex="0" data-word="large" data-meaning="点击或悬浮可翻译">large</span> <span class="word" tabindex="0" data-word="windows" data-meaning="点击或悬浮可翻译">windows</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="thin" data-meaning="点击或悬浮可翻译">thin</span> <span class="word" tabindex="0" data-word="walls" data-meaning="点击或悬浮可翻译">walls.</span> <span class="word" tabindex="0" data-word="large" data-meaning="点击或悬浮可翻译">Large</span> <span class="word" tabindex="0" data-word="windows" data-meaning="点击或悬浮可翻译">windows</span> <span class="word" tabindex="0" data-word="let" data-meaning="点击或悬浮可翻译">let</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="lot" data-meaning="点击或悬浮可翻译">lot</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="light" data-meaning="点击或悬浮可翻译">light</span>, <span class="word" tabindex="0" data-word="which" data-meaning="点击或悬浮可翻译">which</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="nice" data-meaning="点击或悬浮可翻译">nice</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="winter" data-meaning="点击或悬浮可翻译">winter.</span> <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">But</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="summer" data-meaning="点击或悬浮可翻译">summer</span>, <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="same" data-meaning="点击或悬浮可翻译">same</span> <span class="word" tabindex="0" data-word="windows" data-meaning="点击或悬浮可翻译">windows</span> <span class="word" tabindex="0" data-word="let" data-meaning="点击或悬浮可翻译">let</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="lot" data-meaning="点击或悬浮可翻译">lot</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="heat" data-meaning="点击或悬浮可翻译">heat.</span> <span class="word" tabindex="0" data-word="then" data-meaning="点击或悬浮可翻译">Then</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="must" data-meaning="点击或悬浮可翻译">must</span> <span class="word" tabindex="0" data-word="turn" data-meaning="点击或悬浮可翻译">turn</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="air" data-meaning="点击或悬浮可翻译">air</span> <span class="word" tabindex="0" data-word="conditioner" data-meaning="点击或悬浮可翻译">conditioner.</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="uses" data-meaning="点击或悬浮可翻译">uses</span> <span class="word" tabindex="0" data-word="electricity" data-meaning="点击或悬浮可翻译">electricity</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="costs" data-meaning="点击或悬浮可翻译">costs</span> <span class="word" tabindex="0" data-word="money" data-meaning="点击或悬浮可翻译">money.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="makes" data-meaning="点击或悬浮可翻译">makes</span> <span class="word" tabindex="0" data-word="some" data-meaning="点击或悬浮可翻译">some</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="feel" data-meaning="点击或悬浮可翻译">feel</span> <span class="word" tabindex="0" data-word="uncomfortable" data-meaning="点击或悬浮可翻译">uncomfortable.</span> <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">So</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="design" data-meaning="点击或悬浮可翻译">design</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="good" data-meaning="点击或悬浮可翻译">good</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="one" data-meaning="点击或悬浮可翻译">one</span> <span class="word" tabindex="0" data-word="season" data-meaning="点击或悬浮可翻译">season</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="be" data-meaning="点击或悬浮可翻译">be</span> <span class="word" tabindex="0" data-word="bad" data-meaning="点击或悬浮可翻译">bad</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="another" data-meaning="点击或悬浮可翻译">another.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="old" data-meaning="点击或悬浮可翻译">old</span> <span class="word" tabindex="0" data-word="courtyard" data-meaning="点击或悬浮可翻译">courtyard</span> <span class="word" tabindex="0" data-word="home" data-meaning="点击或悬浮可翻译">home</span> <span class="word" tabindex="0" data-word="solves" data-meaning="点击或悬浮可翻译">solves</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="summer" data-meaning="点击或悬浮可翻译">summer</span> <span class="word" tabindex="0" data-word="problem" data-meaning="点击或悬浮可翻译">problem</span> <span class="word" tabindex="0" data-word="with" data-meaning="点击或悬浮可翻译">with</span> <span class="word" tabindex="0" data-word="shape" data-meaning="点击或悬浮可翻译">shape</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="shade" data-meaning="点击或悬浮可翻译">shade</span>, <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="with" data-meaning="点击或悬浮可翻译">with</span> <span class="word" tabindex="0" data-word="machines" data-meaning="点击或悬浮可翻译">machines.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(1, this)">显示中文翻译</button>
+          <div class="translation" id="translation-1">现代公寓的运作方式很不一样。它们通常有大窗户和薄墙。大窗户让很多光线进来，这在冬天很好。但在夏天，同样的窗户也让很多热量进来。于是人们必须开空调。这要用电，也要花钱。它还会让一些人觉得不舒服。所以，对一个季节好的设计，可能对另一个季节不好。老四合院用形状和阴凉解决夏天的问题，而不是用机器。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="does" data-meaning="点击或悬浮可翻译">does</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="mean" data-meaning="点击或悬浮可翻译">mean</span> <span class="word" tabindex="0" data-word="we" data-meaning="点击或悬浮可翻译">we</span> <span class="word" tabindex="0" data-word="should" data-meaning="点击或悬浮可翻译">should</span> <span class="word" tabindex="0" data-word="all" data-meaning="点击或悬浮可翻译">all</span> <span class="word" tabindex="0" data-word="move" data-meaning="点击或悬浮可翻译">move</span> <span class="word" tabindex="0" data-word="back" data-meaning="点击或悬浮可翻译">back</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="old" data-meaning="点击或悬浮可翻译">old</span> <span class="word" tabindex="0" data-word="houses" data-meaning="点击或悬浮可翻译">houses.</span> <span class="word" tabindex="0" data-word="old" data-meaning="点击或悬浮可翻译">Old</span> <span class="word" tabindex="0" data-word="homes" data-meaning="点击或悬浮可翻译">homes</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="be" data-meaning="点击或悬浮可翻译">be</span> <span class="word" tabindex="0" data-word="dark" data-meaning="点击或悬浮可翻译">dark</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="may" data-meaning="点击或悬浮可翻译">may</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="fit" data-meaning="点击或悬浮可翻译">fit</span> <span class="word" tabindex="0" data-word="modern" data-meaning="点击或悬浮可翻译">modern</span> <span class="word" tabindex="0" data-word="families" data-meaning="点击或悬浮可翻译">families.</span> <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">But</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="teach" data-meaning="点击或悬浮可翻译">teach</span> <span class="word" tabindex="0" data-word="us" data-meaning="点击或悬浮可翻译">us</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="simple" data-meaning="点击或悬浮可翻译">simple</span> <span class="word" tabindex="0" data-word="lesson" data-meaning="点击或悬浮可翻译">lesson.</span> <span class="word" tabindex="0" data-word="before" data-meaning="点击或悬浮可翻译">Before</span> <span class="word" tabindex="0" data-word="we" data-meaning="点击或悬浮可翻译">we</span> <span class="word" tabindex="0" data-word="buy" data-meaning="点击或悬浮可翻译">buy</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="big" data-meaning="点击或悬浮可翻译">big</span> <span class="word" tabindex="0" data-word="air" data-meaning="点击或悬浮可翻译">air</span> <span class="word" tabindex="0" data-word="conditioner" data-meaning="点击或悬浮可翻译">conditioner</span>, <span class="word" tabindex="0" data-word="we" data-meaning="点击或悬浮可翻译">we</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="think" data-meaning="点击或悬浮可翻译">think</span> <span class="word" tabindex="0" data-word="about" data-meaning="点击或悬浮可翻译">about</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="building" data-meaning="点击或悬浮可翻译">building</span> <span class="word" tabindex="0" data-word="itself" data-meaning="点击或悬浮可翻译">itself.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="tree" data-meaning="点击或悬浮可翻译">tree</span> <span class="word" tabindex="0" data-word="outside" data-meaning="点击或悬浮可翻译">outside</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="window" data-meaning="点击或悬浮可翻译">window</span>, <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="thick" data-meaning="点击或悬浮可翻译">thick</span> <span class="word" tabindex="0" data-word="curtain" data-meaning="点击或悬浮可翻译">curtain</span>, <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">small</span> <span class="word" tabindex="0" data-word="shade" data-meaning="点击或悬浮可翻译">shade</span> <span class="word" tabindex="0" data-word="can" data-meaning="点击或悬浮可翻译">can</span> <span class="word" tabindex="0" data-word="make" data-meaning="点击或悬浮可翻译">make</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="room" data-meaning="点击或悬浮可翻译">room</span> <span class="word" tabindex="0" data-word="cooler" data-meaning="点击或悬浮可翻译">cooler.</span> <span class="word" tabindex="0" data-word="these" data-meaning="点击或悬浮可翻译">These</span> <span class="word" tabindex="0" data-word="small" data-meaning="点击或悬浮可翻译">small</span> <span class="word" tabindex="0" data-word="changes" data-meaning="点击或悬浮可翻译">changes</span> <span class="word" tabindex="0" data-word="cost" data-meaning="点击或悬浮可翻译">cost</span> <span class="word" tabindex="0" data-word="little" data-meaning="点击或悬浮可翻译">little</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="help" data-meaning="点击或悬浮可翻译">help</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="planet" data-meaning="点击或悬浮可翻译">planet.</span> <span class="word" tabindex="0" data-word="good" data-meaning="点击或悬浮可翻译">Good</span> <span class="word" tabindex="0" data-word="design" data-meaning="点击或悬浮可翻译">design</span> <span class="word" tabindex="0" data-word="often" data-meaning="点击或悬浮可翻译">often</span> <span class="word" tabindex="0" data-word="starts" data-meaning="点击或悬浮可翻译">starts</span> <span class="word" tabindex="0" data-word="with" data-meaning="点击或悬浮可翻译">with</span> <span class="word" tabindex="0" data-word="watching" data-meaning="点击或悬浮可翻译">watching</span> <span class="word" tabindex="0" data-word="how" data-meaning="点击或悬浮可翻译">how</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="house" data-meaning="点击或悬浮可翻译">house</span> <span class="word" tabindex="0" data-word="meets" data-meaning="点击或悬浮可翻译">meets</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="sun" data-meaning="点击或悬浮可翻译">sun</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="wind" data-meaning="点击或悬浮可翻译">wind.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(2, this)">显示中文翻译</button>
+          <div class="translation" id="translation-2">这并不意味着我们都应该搬回老房子。老房子可能很暗，也可能不适合现代家庭。但它们教给我们一个简单的道理。在买一台大空调之前，我们可以先想想建筑本身。窗外的一棵树、一幅厚窗帘，或者一小块遮阳，都能让房间更凉快。这些小改变花钱少，也对地球有好处。好的设计常常始于观察一座房子如何面对阳光和风。</div>
+        </div>
+      </section>
+        <p class="footer">
+          AI-generated lesson for daily English reading.
+          <br>Word translation on hover or tap uses the MyMemory public translation API.
+          <br>Site: <a href="https://ccandzy.github.io/daily-english/">https://ccandzy.github.io/daily-english/</a>
+        </p>
+      </main>
+
+      <aside class="sidebar">
+        <div class="side-section">
+          <span class="label">Phrases</span>
+          <h2>Short Phrases</h2>
+          <ul><li><strong>stay cool</strong>: 保持凉爽</li><li><strong>let in</strong>: 让……进来</li><li><strong>turn on</strong>: 打开（电器）</li><li><strong>move back to</strong>: 搬回……</li><li><strong>start with</strong>: 从……开始</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Hard Words</span>
+          <h2>Difficult Words</h2>
+          <ul><li><strong>traditional</strong>: 传统的</li><li><strong>courtyard</strong>: 庭院；院子</li><li><strong>shade</strong>: 阴凉处；遮阴</li><li><strong>electricity</strong>: 电；电力</li><li><strong>curtain</strong>: 窗帘</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Common Words</span>
+          <h2>Useful Words</h2>
+          <ul><li><strong>thick</strong>: 厚的</li><li><strong>heat</strong>: 热量；热</li><li><strong>season</strong>: 季节</li><li><strong>machine</strong>: 机器</li><li><strong>planet</strong>: 星球；地球</li></ul>
+        </div>
+        <section class="side-section" aria-label="语法小课堂">
+    <span class="label">Grammar</span>
+    <h2>语法小课堂</h2>
+    
+    <details class="grammar-card">
+      <summary>一般现在时（描述普遍事实）</summary>
+      <p class="grammar-sentence"><strong>文中原句：</strong>Thick walls keep the hot sun outside during the day.</p>
+      <p><strong>结构：</strong>主语 + 动词原形/动词-s + 其他</p>
+      <p><strong>说明：</strong>用来描述习惯、规律或普遍事实。主语是第三人称单数时，动词要加 -s。</p>
+      <p><strong>仿写：</strong>Small windows keep the room cool in summer.</p>
+      <p>小窗户在夏天让房间保持凉爽。</p>
+    </details>
+    <details class="grammar-card">
+      <summary>情态动词 can 表示能力或可能</summary>
+      <p class="grammar-sentence"><strong>文中原句：</strong>So the family can sit outside and enjoy the cool evening without using a fan.</p>
+      <p><strong>结构：</strong>主语 + can + 动词原形 + 其他</p>
+      <p><strong>说明：</strong>can 后面直接跟动词原形，表示“能够”或“可以”。否定形式是 cannot / can&#39;t。</p>
+      <p><strong>仿写：</strong>You can open the window to let in fresh air.</p>
+      <p>你可以打开窗户让新鲜空气进来。</p>
+    </details>
+  </section>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const translationCache = new Map();
+    const words = Array.from(document.querySelectorAll(".word"));
+
+    for (const word of words) {
+      word.addEventListener("mouseenter", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("focus", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = !word.classList.contains("is-open");
+        closeWordTooltips();
+        if (willOpen) {
+          word.classList.add("is-open");
+          loadTranslation(word);
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      closeWordTooltips();
+    });
+
+    function closeWordTooltips() {
+      for (const word of words) {
+        word.classList.remove("is-open");
+      }
+    }
+
+    async function loadTranslation(word) {
+      const key = word.dataset.word || normalizeWord(word.textContent || "");
+      if (!key) {
+        word.dataset.meaning = "暂无翻译";
+        return;
+      }
+
+      if (translationCache.has(key)) {
+        word.dataset.meaning = translationCache.get(key);
+        return;
+      }
+
+      word.dataset.meaning = "翻译中...";
+
+      try {
+        const params = new URLSearchParams({
+          q: key,
+          langpair: "en|zh-CN",
+          mt: "1"
+        });
+        const response = await fetch("https://api.mymemory.translated.net/get?" + params.toString());
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        const translated =
+          data?.responseData?.translatedText ||
+          data?.matches?.find((item) => item?.translation)?.translation ||
+          "";
+
+        const clean = normalizeTranslation(translated, key);
+        const finalMeaning = clean || "暂无翻译";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      } catch (error) {
+        const fallback = localFallback(key);
+        const finalMeaning = fallback || "翻译失败，请稍后再试";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      }
+    }
+
+    function normalizeWord(value) {
+      return String(value).toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+    }
+
+    function normalizeTranslation(value, sourceWord) {
+      const text = String(value || "").trim();
+      if (!text) {
+        return "";
+      }
+
+      const lowered = text.toLowerCase();
+      if (lowered === String(sourceWord).toLowerCase()) {
+        return "";
+      }
+
+      return text.replace(/^zh-cn\|/i, "").trim();
+    }
+
+    function localFallback(word) {
+      const fallback = {
+        a: "一个",
+        an: "一个",
+        and: "和",
+        are: "是",
+        in: "在……里",
+        is: "是",
+        of: "……的",
+        on: "在……上",
+        the: "这；这个",
+        to: "到；去；用于不定式"
+      };
+      return fallback[word] || "";
+    }
+
+    function toggleTranslation(index, button) {
+      const el = document.getElementById("translation-" + index);
+      const isOpen = el.classList.toggle("show");
+      button.textContent = isOpen ? "隐藏中文翻译" : "显示中文翻译";
+    }
+  </script>
+</body>
+</html>
