@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Silk Road: Goods That Travelled Both Ways</title>
+  <style>
+    :root {
+      --bg-a: #f4efe7;
+      --bg-b: #dcecf2;
+      --paper: #fffdf8;
+      --sidebar: #edf6fb;
+      --ink: #22363c;
+      --muted: #64777c;
+      --accent: #11765f;
+      --accent-deep: #0b5948;
+      --line: #cad9dd;
+      --hover: #d8f4ec;
+      --tooltip: #17353a;
+      --soft: #edf9f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 28%),
+        linear-gradient(145deg, var(--bg-a) 0%, var(--bg-b) 100%);
+    }
+
+    .page {
+      max-width: 1220px;
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card,
+    .sidebar {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 38px rgba(32, 67, 75, 0.08);
+    }
+
+    .card {
+      background: var(--paper);
+      padding: 30px;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      padding: 22px;
+      position: sticky;
+      top: 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 45px);
+      line-height: 1.12;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tip {
+      margin: 0 0 24px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      background: var(--soft);
+      color: #28544b;
+    }
+
+    .article-block {
+      margin-bottom: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .article-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .article-block p {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .toggle-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--accent);
+      color: #f7fffd;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-1px);
+      background: var(--accent-deep);
+    }
+
+    .translation {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f3fcf8;
+      color: #355556;
+      font-size: 16px;
+    }
+
+    .translation.show {
+      display: block;
+    }
+
+    .word {
+      position: relative;
+      display: inline-block;
+      padding: 0 2px;
+      border-radius: 5px;
+      cursor: help;
+      transition: background-color 0.15s ease;
+    }
+
+    .word:hover {
+      background: var(--hover);
+    }
+
+    .word:hover::after,
+    .word:active::after,
+    .word:focus-visible::after,
+    .word.is-open::after {
+      content: attr(data-meaning);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      min-width: 64px;
+      max-width: 180px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: var(--tooltip);
+      color: #f4fdfd;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      z-index: 2;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(17, 118, 95, 0.12);
+      color: var(--accent-deep);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .side-section {
+      margin-bottom: 22px;
+    }
+
+    .side-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .side-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .side-section li {
+      margin-bottom: 10px;
+      color: #304248;
+      font-size: 15px;
+    }
+
+    .grammar-card {
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .grammar-card summary { cursor: pointer; color: var(--accent-deep); }
+    .grammar-card p { margin: 10px 0 0; font-size: 15px; }
+    .grammar-sentence { color: var(--ink); }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--accent-deep);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 14px auto;
+        padding: 10px;
+      }
+
+      .card,
+      .sidebar {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .article-block p {
+        font-size: 18px;
+      }
+
+      .word:hover::after,
+      .word:active::after,
+      .word:focus-visible::after,
+      .word.is-open::after {
+        left: 0;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="layout">
+      <main class="card">
+        <h1>The Silk Road: Goods That Travelled Both Ways</h1>
+        <p class="meta">Date: 2026-11-26 | Level: B1 (target) | Topic: trade routes and cultural exchange — how goods and ideas moved along the Silk Road</p>
+        <p class="tip">阅读时先找出每一段的“核心物品”（丝绸、葡萄、纸），再想它是从哪边传到哪边的，这样更容易抓住文章主线。</p>
+        <section id="article">
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="long" data-meaning="点击或悬浮可翻译">Long</span> <span class="word" tabindex="0" data-word="ago" data-meaning="点击或悬浮可翻译">ago</span>, <span class="word" tabindex="0" data-word="traders" data-meaning="点击或悬浮可翻译">traders</span> <span class="word" tabindex="0" data-word="travelled" data-meaning="点击或悬浮可翻译">travelled</span> <span class="word" tabindex="0" data-word="between" data-meaning="点击或悬浮可翻译">between</span> <span class="word" tabindex="0" data-word="china" data-meaning="点击或悬浮可翻译">China</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="europe" data-meaning="点击或悬浮可翻译">Europe</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="slow" data-meaning="点击或悬浮可翻译">slow</span> <span class="word" tabindex="0" data-word="road" data-meaning="点击或悬浮可翻译">road.</span> <span class="word" tabindex="0" data-word="we" data-meaning="点击或悬浮可翻译">We</span> <span class="word" tabindex="0" data-word="call" data-meaning="点击或悬浮可翻译">call</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="silk" data-meaning="点击或悬浮可翻译">Silk</span> <span class="word" tabindex="0" data-word="road" data-meaning="点击或悬浮可翻译">Road.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="was" data-meaning="点击或悬浮可翻译">was</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="one" data-meaning="点击或悬浮可翻译">one</span> <span class="word" tabindex="0" data-word="road" data-meaning="点击或悬浮可翻译">road.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="was" data-meaning="点击或悬浮可翻译">was</span> <span class="word" tabindex="0" data-word="many" data-meaning="点击或悬浮可翻译">many</span> <span class="word" tabindex="0" data-word="paths" data-meaning="点击或悬浮可翻译">paths</span> <span class="word" tabindex="0" data-word="across" data-meaning="点击或悬浮可翻译">across</span> <span class="word" tabindex="0" data-word="deserts" data-meaning="点击或悬浮可翻译">deserts</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="mountains" data-meaning="点击或悬浮可翻译">mountains.</span> <span class="word" tabindex="0" data-word="chinese" data-meaning="点击或悬浮可翻译">Chinese</span> <span class="word" tabindex="0" data-word="silk" data-meaning="点击或悬浮可翻译">silk</span> <span class="word" tabindex="0" data-word="went" data-meaning="点击或悬浮可翻译">went</span> <span class="word" tabindex="0" data-word="west" data-meaning="点击或悬浮可翻译">west.</span> <span class="word" tabindex="0" data-word="rich" data-meaning="点击或悬浮可翻译">Rich</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="rome" data-meaning="点击或悬浮可翻译">Rome</span> <span class="word" tabindex="0" data-word="loved" data-meaning="点击或悬浮可翻译">loved</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it.</span> <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">But</span> <span class="word" tabindex="0" data-word="goods" data-meaning="点击或悬浮可翻译">goods</span> <span class="word" tabindex="0" data-word="also" data-meaning="点击或悬浮可翻译">also</span> <span class="word" tabindex="0" data-word="came" data-meaning="点击或悬浮可翻译">came</span> <span class="word" tabindex="0" data-word="east" data-meaning="点击或悬浮可翻译">east.</span> <span class="word" tabindex="0" data-word="grapes" data-meaning="点击或悬浮可翻译">Grapes</span>, <span class="word" tabindex="0" data-word="walnuts" data-meaning="点击或悬浮可翻译">walnuts</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="horses" data-meaning="点击或悬浮可翻译">horses</span> <span class="word" tabindex="0" data-word="arrived" data-meaning="点击或悬浮可翻译">arrived</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="china" data-meaning="点击或悬浮可翻译">China</span> <span class="word" tabindex="0" data-word="from" data-meaning="点击或悬浮可翻译">from</span> <span class="word" tabindex="0" data-word="central" data-meaning="点击或悬浮可翻译">Central</span> <span class="word" tabindex="0" data-word="asia" data-meaning="点击或悬浮可翻译">Asia.</span> <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">So</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="road" data-meaning="点击或悬浮可翻译">road</span> <span class="word" tabindex="0" data-word="worked" data-meaning="点击或悬浮可翻译">worked</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="two" data-meaning="点击或悬浮可翻译">two</span> <span class="word" tabindex="0" data-word="directions" data-meaning="点击或悬浮可翻译">directions.</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="is" data-meaning="点击或悬浮可翻译">is</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="first" data-meaning="点击或悬浮可翻译">first</span> <span class="word" tabindex="0" data-word="thing" data-meaning="点击或悬浮可翻译">thing</span> <span class="word" tabindex="0" data-word="to" data-meaning="点击或悬浮可翻译">to</span> <span class="word" tabindex="0" data-word="remember" data-meaning="点击或悬浮可翻译">remember</span> <span class="word" tabindex="0" data-word="about" data-meaning="点击或悬浮可翻译">about</span> <span class="word" tabindex="0" data-word="trade" data-meaning="点击或悬浮可翻译">trade</span> <span class="word" tabindex="0" data-word="routes" data-meaning="点击或悬浮可翻译">routes</span>: <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">they</span> <span class="word" tabindex="0" data-word="carry" data-meaning="点击或悬浮可翻译">carry</span> <span class="word" tabindex="0" data-word="things" data-meaning="点击或悬浮可翻译">things</span> <span class="word" tabindex="0" data-word="both" data-meaning="点击或悬浮可翻译">both</span> <span class="word" tabindex="0" data-word="ways" data-meaning="点击或悬浮可翻译">ways.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(0, this)">显示中文翻译</button>
+          <div class="translation" id="translation-0">很久以前，商人们在一条缓慢的道路上往返于中国和欧洲之间。我们称它为丝绸之路。它不是一条路，而是穿过沙漠和山地的许多条小路。中国的丝绸向西运去，罗马的富人都很喜欢。但货物也向东传来。葡萄、核桃和马匹从中亚来到中国。所以这条路是双向的。这是关于贸易路线要记住的第一件事：它们双向运送货物。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="ideas" data-meaning="点击或悬浮可翻译">Ideas</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="skills" data-meaning="点击或悬浮可翻译">skills</span> <span class="word" tabindex="0" data-word="moved" data-meaning="点击或悬浮可翻译">moved</span> <span class="word" tabindex="0" data-word="too" data-meaning="点击或悬浮可翻译">too.</span> <span class="word" tabindex="0" data-word="paper-making" data-meaning="点击或悬浮可翻译">Paper-making</span> <span class="word" tabindex="0" data-word="left" data-meaning="点击或悬浮可翻译">left</span> <span class="word" tabindex="0" data-word="china" data-meaning="点击或悬浮可翻译">China</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="slowly" data-meaning="点击或悬浮可翻译">slowly</span> <span class="word" tabindex="0" data-word="reached" data-meaning="点击或悬浮可翻译">reached</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="middle" data-meaning="点击或悬浮可翻译">Middle</span> <span class="word" tabindex="0" data-word="east" data-meaning="点击或悬浮可翻译">East</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="europe" data-meaning="点击或悬浮可翻译">Europe.</span> <span class="word" tabindex="0" data-word="at" data-meaning="点击或悬浮可翻译">At</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="same" data-meaning="点击或悬浮可翻译">same</span> <span class="word" tabindex="0" data-word="time" data-meaning="点击或悬浮可翻译">time</span>, <span class="word" tabindex="0" data-word="new" data-meaning="点击或悬浮可翻译">new</span> <span class="word" tabindex="0" data-word="ways" data-meaning="点击或悬浮可翻译">ways</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="growing" data-meaning="点击或悬浮可翻译">growing</span> <span class="word" tabindex="0" data-word="food" data-meaning="点击或悬浮可翻译">food</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="new" data-meaning="点击或悬浮可翻译">new</span> <span class="word" tabindex="0" data-word="music" data-meaning="点击或悬浮可翻译">music</span> <span class="word" tabindex="0" data-word="came" data-meaning="点击或悬浮可翻译">came</span> <span class="word" tabindex="0" data-word="into" data-meaning="点击或悬浮可翻译">into</span> <span class="word" tabindex="0" data-word="china" data-meaning="点击或悬浮可翻译">China.</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">This</span> <span class="word" tabindex="0" data-word="exchange" data-meaning="点击或悬浮可翻译">exchange</span> <span class="word" tabindex="0" data-word="changed" data-meaning="点击或悬浮可翻译">changed</span> <span class="word" tabindex="0" data-word="daily" data-meaning="点击或悬浮可翻译">daily</span> <span class="word" tabindex="0" data-word="life" data-meaning="点击或悬浮可翻译">life</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="both" data-meaning="点击或悬浮可翻译">both</span> <span class="word" tabindex="0" data-word="sides" data-meaning="点击或悬浮可翻译">sides.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="farmer" data-meaning="点击或悬浮可翻译">farmer</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="china" data-meaning="点击或悬浮可翻译">China</span> <span class="word" tabindex="0" data-word="might" data-meaning="点击或悬浮可翻译">might</span> <span class="word" tabindex="0" data-word="grow" data-meaning="点击或悬浮可翻译">grow</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="new" data-meaning="点击或悬浮可翻译">new</span> <span class="word" tabindex="0" data-word="plant" data-meaning="点击或悬浮可翻译">plant.</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">A</span> <span class="word" tabindex="0" data-word="family" data-meaning="点击或悬浮可翻译">family</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="europe" data-meaning="点击或悬浮可翻译">Europe</span> <span class="word" tabindex="0" data-word="might" data-meaning="点击或悬浮可翻译">might</span> <span class="word" tabindex="0" data-word="write" data-meaning="点击或悬浮可翻译">write</span> <span class="word" tabindex="0" data-word="on" data-meaning="点击或悬浮可翻译">on</span> <span class="word" tabindex="0" data-word="cheaper" data-meaning="点击或悬浮可翻译">cheaper</span> <span class="word" tabindex="0" data-word="paper" data-meaning="点击或悬浮可翻译">paper.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="road" data-meaning="点击或悬浮可翻译">road</span> <span class="word" tabindex="0" data-word="did" data-meaning="点击或悬浮可翻译">did</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="just" data-meaning="点击或悬浮可翻译">just</span> <span class="word" tabindex="0" data-word="move" data-meaning="点击或悬浮可翻译">move</span> <span class="word" tabindex="0" data-word="beautiful" data-meaning="点击或悬浮可翻译">beautiful</span> <span class="word" tabindex="0" data-word="things" data-meaning="点击或悬浮可翻译">things</span> <span class="word" tabindex="0" data-word="for" data-meaning="点击或悬浮可翻译">for</span> <span class="word" tabindex="0" data-word="rich" data-meaning="点击或悬浮可翻译">rich</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people.</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">It</span> <span class="word" tabindex="0" data-word="moved" data-meaning="点击或悬浮可翻译">moved</span> <span class="word" tabindex="0" data-word="useful" data-meaning="点击或悬浮可翻译">useful</span> <span class="word" tabindex="0" data-word="knowledge" data-meaning="点击或悬浮可翻译">knowledge</span> <span class="word" tabindex="0" data-word="that" data-meaning="点击或悬浮可翻译">that</span> <span class="word" tabindex="0" data-word="helped" data-meaning="点击或悬浮可翻译">helped</span> <span class="word" tabindex="0" data-word="ordinary" data-meaning="点击或悬浮可翻译">ordinary</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(1, this)">显示中文翻译</button>
+          <div class="translation" id="translation-1">思想和技艺也在流动。造纸术离开中国，慢慢传到中东和欧洲。与此同时，新的种植方法和新的音乐也传入中国。这种交流改变了双方日常生活。中国的农民可能种上一种新植物，欧洲的家庭可能用更便宜的纸写字。这条路不只是为富人运送漂亮的东西，它还传递了帮助普通人的有用知识。</div>
+        </div>
+      
+        <div class="article-block">
+          <p><span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">But</span> <span class="word" tabindex="0" data-word="this" data-meaning="点击或悬浮可翻译">this</span> <span class="word" tabindex="0" data-word="exchange" data-meaning="点击或悬浮可翻译">exchange</span> <span class="word" tabindex="0" data-word="had" data-meaning="点击或悬浮可翻译">had</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="cost" data-meaning="点击或悬浮可翻译">cost.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="journey" data-meaning="点击或悬浮可翻译">journey</span> <span class="word" tabindex="0" data-word="was" data-meaning="点击或悬浮可翻译">was</span> <span class="word" tabindex="0" data-word="long" data-meaning="点击或悬浮可翻译">long</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="dangerous" data-meaning="点击或悬浮可翻译">dangerous.</span> <span class="word" tabindex="0" data-word="traders" data-meaning="点击或悬浮可翻译">Traders</span> <span class="word" tabindex="0" data-word="crossed" data-meaning="点击或悬浮可翻译">crossed</span> <span class="word" tabindex="0" data-word="hot" data-meaning="点击或悬浮可翻译">hot</span> <span class="word" tabindex="0" data-word="deserts" data-meaning="点击或悬浮可翻译">deserts</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="cold" data-meaning="点击或悬浮可翻译">cold</span> <span class="word" tabindex="0" data-word="mountains" data-meaning="点击或悬浮可翻译">mountains.</span> <span class="word" tabindex="0" data-word="many" data-meaning="点击或悬浮可翻译">Many</span> <span class="word" tabindex="0" data-word="became" data-meaning="点击或悬浮可翻译">became</span> <span class="word" tabindex="0" data-word="sick" data-meaning="点击或悬浮可翻译">sick</span> <span class="word" tabindex="0" data-word="or" data-meaning="点击或悬浮可翻译">or</span> <span class="word" tabindex="0" data-word="lost" data-meaning="点击或悬浮可翻译">lost</span> <span class="word" tabindex="0" data-word="their" data-meaning="点击或悬浮可翻译">their</span> <span class="word" tabindex="0" data-word="goods" data-meaning="点击或悬浮可翻译">goods.</span> <span class="word" tabindex="0" data-word="because" data-meaning="点击或悬浮可翻译">Because</span> <span class="word" tabindex="0" data-word="travel" data-meaning="点击或悬浮可翻译">travel</span> <span class="word" tabindex="0" data-word="was" data-meaning="点击或悬浮可翻译">was</span> <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">so</span> <span class="word" tabindex="0" data-word="hard" data-meaning="点击或悬浮可翻译">hard</span>, <span class="word" tabindex="0" data-word="most" data-meaning="点击或悬浮可翻译">most</span> <span class="word" tabindex="0" data-word="traders" data-meaning="点击或悬浮可翻译">traders</span> <span class="word" tabindex="0" data-word="did" data-meaning="点击或悬浮可翻译">did</span> <span class="word" tabindex="0" data-word="not" data-meaning="点击或悬浮可翻译">not</span> <span class="word" tabindex="0" data-word="go" data-meaning="点击或悬浮可翻译">go</span> <span class="word" tabindex="0" data-word="all" data-meaning="点击或悬浮可翻译">all</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">the</span> <span class="word" tabindex="0" data-word="way" data-meaning="点击或悬浮可翻译">way.</span> <span class="word" tabindex="0" data-word="they" data-meaning="点击或悬浮可翻译">They</span> <span class="word" tabindex="0" data-word="sold" data-meaning="点击或悬浮可翻译">sold</span> <span class="word" tabindex="0" data-word="their" data-meaning="点击或悬浮可翻译">their</span> <span class="word" tabindex="0" data-word="goods" data-meaning="点击或悬浮可翻译">goods</span> <span class="word" tabindex="0" data-word="in" data-meaning="点击或悬浮可翻译">in</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="town" data-meaning="点击或悬浮可翻译">town</span>, <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="another" data-meaning="点击或悬浮可翻译">another</span> <span class="word" tabindex="0" data-word="trader" data-meaning="点击或悬浮可翻译">trader</span> <span class="word" tabindex="0" data-word="carried" data-meaning="点击或悬浮可翻译">carried</span> <span class="word" tabindex="0" data-word="them" data-meaning="点击或悬浮可翻译">them</span> <span class="word" tabindex="0" data-word="further" data-meaning="点击或悬浮可翻译">further.</span> <span class="word" tabindex="0" data-word="so" data-meaning="点击或悬浮可翻译">So</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="piece" data-meaning="点击或悬浮可翻译">piece</span> <span class="word" tabindex="0" data-word="of" data-meaning="点击或悬浮可翻译">of</span> <span class="word" tabindex="0" data-word="silk" data-meaning="点击或悬浮可翻译">silk</span> <span class="word" tabindex="0" data-word="might" data-meaning="点击或悬浮可翻译">might</span> <span class="word" tabindex="0" data-word="pass" data-meaning="点击或悬浮可翻译">pass</span> <span class="word" tabindex="0" data-word="through" data-meaning="点击或悬浮可翻译">through</span> <span class="word" tabindex="0" data-word="many" data-meaning="点击或悬浮可翻译">many</span> <span class="word" tabindex="0" data-word="hands" data-meaning="点击或悬浮可翻译">hands</span> <span class="word" tabindex="0" data-word="before" data-meaning="点击或悬浮可翻译">before</span> <span class="word" tabindex="0" data-word="it" data-meaning="点击或悬浮可翻译">it</span> <span class="word" tabindex="0" data-word="reached" data-meaning="点击或悬浮可翻译">reached</span> <span class="word" tabindex="0" data-word="europe" data-meaning="点击或悬浮可翻译">Europe.</span> <span class="word" tabindex="0" data-word="the" data-meaning="点击或悬浮可翻译">The</span> <span class="word" tabindex="0" data-word="silk" data-meaning="点击或悬浮可翻译">Silk</span> <span class="word" tabindex="0" data-word="road" data-meaning="点击或悬浮可翻译">Road</span> <span class="word" tabindex="0" data-word="brought" data-meaning="点击或悬浮可翻译">brought</span> <span class="word" tabindex="0" data-word="people" data-meaning="点击或悬浮可翻译">people</span> <span class="word" tabindex="0" data-word="closer" data-meaning="点击或悬浮可翻译">closer</span>, <span class="word" tabindex="0" data-word="but" data-meaning="点击或悬浮可翻译">but</span> <span class="word" tabindex="0" data-word="slowly" data-meaning="点击或悬浮可翻译">slowly</span> <span class="word" tabindex="0" data-word="and" data-meaning="点击或悬浮可翻译">and</span> <span class="word" tabindex="0" data-word="at" data-meaning="点击或悬浮可翻译">at</span> <span class="word" tabindex="0" data-word="a" data-meaning="点击或悬浮可翻译">a</span> <span class="word" tabindex="0" data-word="high" data-meaning="点击或悬浮可翻译">high</span> <span class="word" tabindex="0" data-word="price" data-meaning="点击或悬浮可翻译">price.</span></p>
+          <button class="toggle-btn" type="button" onclick="toggleTranslation(2, this)">显示中文翻译</button>
+          <div class="translation" id="translation-2">但这种交流是有代价的。旅程又长又危险。商人们要穿过炎热的沙漠和寒冷的山地。许多人病了，或者丢了货物。因为旅行太难，大多数商人不会走完全程。他们在一个镇上卖掉货物，再由另一个商人运到更远的地方。所以一块丝绸可能经过很多人的手才到达欧洲。丝绸之路让人们更近了，但很慢，而且代价很高。</div>
+        </div>
+      </section>
+        <p class="footer">
+          AI-generated lesson for daily English reading.
+          <br>Word translation on hover or tap uses the MyMemory public translation API.
+          <br>Site: <a href="https://ccandzy.github.io/daily-english/">https://ccandzy.github.io/daily-english/</a>
+        </p>
+      </main>
+
+      <aside class="sidebar">
+        <div class="side-section">
+          <span class="label">Phrases</span>
+          <h2>Short Phrases</h2>
+          <ul><li><strong>in two directions</strong>: 双向地</li><li><strong>at the same time</strong>: 与此同时</li><li><strong>daily life</strong>: 日常生活</li><li><strong>all the way</strong>: 一路到底；全程</li><li><strong>at a high price</strong>: 以很高的代价</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Hard Words</span>
+          <h2>Difficult Words</h2>
+          <ul><li><strong>traders</strong>: 商人</li><li><strong>exchange</strong>: 交换；交流</li><li><strong>ordinary</strong>: 普通的</li><li><strong>dangerous</strong>: 危险的</li><li><strong>reach</strong>: 到达</li></ul>
+        </div>
+
+        <div class="side-section">
+          <span class="label">Common Words</span>
+          <h2>Useful Words</h2>
+          <ul><li><strong>goods</strong>: 货物</li><li><strong>travel</strong>: 旅行；行进</li><li><strong>carry</strong>: 运送；携带</li><li><strong>useful</strong>: 有用的</li><li><strong>cost</strong>: 代价；花费</li></ul>
+        </div>
+        <section class="side-section" aria-label="语法小课堂">
+    <span class="label">Grammar</span>
+    <h2>语法小课堂</h2>
+    
+    <details class="grammar-card">
+      <summary>一般过去时（描述过去的事）</summary>
+      <p class="grammar-sentence"><strong>文中原句：</strong>Chinese silk went west.</p>
+      <p><strong>结构：</strong>主语 + 动词过去式 + 其他</p>
+      <p><strong>说明：</strong>用来讲述过去发生的事。本文讲历史，所以大量使用过去式，如 went、came、moved。</p>
+      <p><strong>仿写：</strong>Chinese tea travelled to many countries.</p>
+      <p>中国茶叶传到了许多国家。</p>
+    </details>
+    <details class="grammar-card">
+      <summary>被动语态（一般过去时）</summary>
+      <p class="grammar-sentence"><strong>文中原句：</strong>We call it the Silk Road.</p>
+      <p><strong>结构：</strong>主语 + be动词过去式 + 过去分词</p>
+      <p><strong>说明：</strong>当重点在“事情被怎样”而不是“谁做的”时用被动语态。文中“was not one road”也是这种结构。</p>
+      <p><strong>仿写：</strong>The paper was made in China.</p>
+      <p>这种纸是在中国制造的。</p>
+    </details>
+    <details class="grammar-card">
+      <summary>because 引导原因状语从句</summary>
+      <p class="grammar-sentence"><strong>文中原句：</strong>Because travel was so hard, most traders did not go all the way.</p>
+      <p><strong>结构：</strong>Because + 原因句, 结果句</p>
+      <p><strong>说明：</strong>because 用来说明原因，可以放在句首或句中。放在句首时，后面常用逗号隔开。</p>
+      <p><strong>仿写：</strong>Because the road was long, many traders stopped in towns.</p>
+      <p>因为路途漫长，许多商人停在城镇里。</p>
+    </details>
+  </section>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const translationCache = new Map();
+    const words = Array.from(document.querySelectorAll(".word"));
+
+    for (const word of words) {
+      word.addEventListener("mouseenter", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("focus", () => {
+        loadTranslation(word);
+      });
+
+      word.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = !word.classList.contains("is-open");
+        closeWordTooltips();
+        if (willOpen) {
+          word.classList.add("is-open");
+          loadTranslation(word);
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      closeWordTooltips();
+    });
+
+    function closeWordTooltips() {
+      for (const word of words) {
+        word.classList.remove("is-open");
+      }
+    }
+
+    async function loadTranslation(word) {
+      const key = word.dataset.word || normalizeWord(word.textContent || "");
+      if (!key) {
+        word.dataset.meaning = "暂无翻译";
+        return;
+      }
+
+      if (translationCache.has(key)) {
+        word.dataset.meaning = translationCache.get(key);
+        return;
+      }
+
+      word.dataset.meaning = "翻译中...";
+
+      try {
+        const params = new URLSearchParams({
+          q: key,
+          langpair: "en|zh-CN",
+          mt: "1"
+        });
+        const response = await fetch("https://api.mymemory.translated.net/get?" + params.toString());
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+        const translated =
+          data?.responseData?.translatedText ||
+          data?.matches?.find((item) => item?.translation)?.translation ||
+          "";
+
+        const clean = normalizeTranslation(translated, key);
+        const finalMeaning = clean || "暂无翻译";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      } catch (error) {
+        const fallback = localFallback(key);
+        const finalMeaning = fallback || "翻译失败，请稍后再试";
+        translationCache.set(key, finalMeaning);
+        word.dataset.meaning = finalMeaning;
+      }
+    }
+
+    function normalizeWord(value) {
+      return String(value).toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+    }
+
+    function normalizeTranslation(value, sourceWord) {
+      const text = String(value || "").trim();
+      if (!text) {
+        return "";
+      }
+
+      const lowered = text.toLowerCase();
+      if (lowered === String(sourceWord).toLowerCase()) {
+        return "";
+      }
+
+      return text.replace(/^zh-cn\|/i, "").trim();
+    }
+
+    function localFallback(word) {
+      const fallback = {
+        a: "一个",
+        an: "一个",
+        and: "和",
+        are: "是",
+        in: "在……里",
+        is: "是",
+        of: "……的",
+        on: "在……上",
+        the: "这；这个",
+        to: "到；去；用于不定式"
+      };
+      return fallback[word] || "";
+    }
+
+    function toggleTranslation(index, button) {
+      const el = document.getElementById("translation-" + index);
+      const isOpen = el.classList.toggle("show");
+      button.textContent = isOpen ? "隐藏中文翻译" : "显示中文翻译";
+    }
+  </script>
+</body>
+</html>
